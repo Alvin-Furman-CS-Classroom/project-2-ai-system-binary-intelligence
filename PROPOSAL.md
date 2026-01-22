@@ -1,4 +1,3 @@
-Great addition. Terrain affects pacing, injury r
 # Long Run: AI Marathon Training System for Beginners
 
 ## System Overview
