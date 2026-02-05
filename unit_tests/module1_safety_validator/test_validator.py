@@ -584,3 +584,127 @@ class TestRealWorldScenarios:
         
         # Should be safe (within 1.5x weekly mileage and not high intensity)
         assert result["safe"] is True
+
+
+class TestInvalidInputs:
+    """Test validation with invalid or edge-case inputs (negative numbers, empty strings)."""
+
+    def test_negative_distance_does_not_crash(self):
+        """Test that negative distance is handled without crashing."""
+        profile = {
+            "injuries": [],
+            "weekly_mileage": 20,
+            "experience_level": "intermediate",
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "rest_days_this_week": 2,
+            "days_trained_this_week": 3,
+            "fully_recovered": True,
+            "sleep_quality": "good",
+            "available_terrain": ["road"]
+        }
+        workout = {"type": "easy run", "distance": -5, "terrain": "road"}
+        result = validate_workout(profile, workout)
+        assert isinstance(result, dict)
+        assert "safe" in result
+        assert "reason" in result
+        assert "alternative" in result
+
+    def test_negative_weekly_mileage_does_not_crash(self):
+        """Test that negative weekly mileage is handled without crashing."""
+        profile = {
+            "injuries": [],
+            "weekly_mileage": -10,
+            "experience_level": "intermediate",
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "rest_days_this_week": 2,
+            "days_trained_this_week": 3,
+            "fully_recovered": True,
+            "sleep_quality": "good",
+            "available_terrain": ["road"]
+        }
+        workout = {"type": "long run", "distance": 5, "terrain": "road"}
+        result = validate_workout(profile, workout)
+        assert isinstance(result, dict)
+        assert "safe" in result
+
+    def test_empty_string_workout_type_does_not_crash(self):
+        """Test that empty string workout type is handled without crashing."""
+        profile = {
+            "injuries": [],
+            "weekly_mileage": 20,
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "available_terrain": ["road"]
+        }
+        workout = {"type": "", "distance": 5, "terrain": "road"}
+        result = validate_workout(profile, workout)
+        assert isinstance(result, dict)
+        assert "safe" in result
+
+    def test_empty_string_terrain_does_not_crash(self):
+        """Test that empty string terrain is handled without crashing."""
+        profile = {
+            "injuries": [],
+            "weekly_mileage": 20,
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "available_terrain": ["road"]
+        }
+        workout = {"type": "easy run", "distance": 5, "terrain": ""}
+        result = validate_workout(profile, workout)
+        assert isinstance(result, dict)
+        assert "safe" in result
+
+
+class TestMultipleInjuries:
+    """Test validation when runner has multiple injuries."""
+
+    def test_multiple_injuries_unsafe_terrain_gets_alternative(self):
+        """Test that multiple injuries with one safe option still get alternative."""
+        profile = {
+            "injuries": ["shin splints", "knee pain"],
+            "cleared_by_doctor": True,
+            "weekly_mileage": 20,
+            "experience_level": "intermediate",
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "rest_days_this_week": 2,
+            "days_trained_this_week": 3,
+            "fully_recovered": True,
+            "sleep_quality": "good",
+            "available_terrain": ["track", "treadmill"]
+        }
+        workout = {"type": "long run", "distance": 10, "terrain": "track"}
+        result = validate_workout(profile, workout)
+        assert result["safe"] is False
+        assert result["alternative"] is not None
+        assert result["alternative"]["terrain"] == "treadmill"
+
+    def test_multiple_injuries_all_terrains_contraindicated_returns_rest(self):
+        """Test that when all available terrains are bad for injuries, recommendation is rest."""
+        profile = {
+            "injuries": ["shin splints"],
+            "cleared_by_doctor": True,
+            "weekly_mileage": 20,
+            "experience_level": "intermediate",
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal",
+            "rest_days_this_week": 2,
+            "days_trained_this_week": 3,
+            "fully_recovered": True,
+            "sleep_quality": "good",
+            "available_terrain": ["track"]
+        }
+        workout = {"type": "long run", "distance": 10, "terrain": "track"}
+        result = validate_workout(profile, workout)
+        assert result["safe"] is False
+        assert result["alternative"] is None
+        assert result.get("recommendation") == "rest"

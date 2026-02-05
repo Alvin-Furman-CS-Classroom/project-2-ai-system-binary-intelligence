@@ -107,9 +107,25 @@ class TestFindSafeTerrain:
         injuries = ["unknown injury"]
         available = ["track", "treadmill", "road"]
         current = "track"
-        
+
         safe_terrain = _find_safe_terrain(injuries, available, current)
         assert safe_terrain == "treadmill"  # Generic preference
+
+    def test_find_safe_terrain_multiple_injuries_has_safe_option(self):
+        """Test terrain selection with multiple injuries when one option is safe."""
+        injuries = ["shin splints", "knee pain"]
+        available = ["track", "treadmill", "road"]
+        current = "track"
+        safe_terrain = _find_safe_terrain(injuries, available, current)
+        assert safe_terrain == "treadmill"
+
+    def test_find_safe_terrain_multiple_injuries_all_contraindicated(self):
+        """Test that multiple injuries with only bad terrains returns None."""
+        injuries = ["shin splints", "knee pain"]
+        available = ["track"]
+        current = "track"
+        safe_terrain = _find_safe_terrain(injuries, available, current)
+        assert safe_terrain is None
 
 
 class TestCalculateSafeDistance:
@@ -138,6 +154,11 @@ class TestCalculateSafeDistance:
     def test_calculate_safe_distance_zero_mileage(self):
         """Test that zero mileage returns None."""
         distance = _calculate_safe_distance(0, "long run")
+        assert distance is None
+
+    def test_calculate_safe_distance_negative_mileage(self):
+        """Test that negative weekly mileage returns None or is handled."""
+        distance = _calculate_safe_distance(-10, "long run")
         assert distance is None
     
     def test_calculate_safe_distance_rounds_correctly(self):
@@ -278,7 +299,24 @@ class TestGenerateAlternative:
         
         alternative = generate_alternative(profile, workout, fired_rules)
         assert alternative is None
-    
+
+    def test_generate_alternative_multiple_injuries_all_terrains_contraindicated(self):
+        """Test that multiple injuries with only contraindicated terrains returns None."""
+        profile = {
+            "injuries": ["shin splints", "knee pain"],
+            "cleared_by_doctor": True,
+            "weekly_mileage": 20,
+            "available_terrain": ["track"],
+            "experience_level": "intermediate",
+            "hydrated": True,
+            "proper_footwear": True,
+            "weather": "normal"
+        }
+        workout = {"type": "long run", "distance": 10, "terrain": "track"}
+        fired_rules = [get_rule_by_name("shin_splints_track")]
+        alternative = generate_alternative(profile, workout, fired_rules)
+        assert alternative is None
+
     def test_generate_alternative_race_week_long_run(self):
         """Test race week long run converts to easy run."""
         profile = {

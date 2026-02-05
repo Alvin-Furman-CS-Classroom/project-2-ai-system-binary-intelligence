@@ -388,6 +388,42 @@ class TestDerivedFactComputation:
         facts = _compute_derived_facts(set(), profile)
         assert "excessive_progression" not in facts
 
+    def test_negative_distance_no_excessive_distance(self):
+        """Test that negative distance does not trigger excessive_distance."""
+        profile = {
+            "weekly_mileage": 10,
+            "proposed_workout": {"type": "long run", "distance": -5}
+        }
+        facts = extract_facts(profile)
+        assert "excessive_distance" not in facts
+
+    def test_negative_weekly_mileage_no_excessive_distance(self):
+        """Test that negative weekly mileage does not trigger excessive_distance."""
+        profile = {
+            "weekly_mileage": -10,
+            "proposed_workout": {"type": "long run", "distance": 20}
+        }
+        facts = extract_facts(profile)
+        assert "excessive_distance" not in facts
+
+    def test_empty_string_workout_type_no_type_facts(self):
+        """Test that empty string workout type adds no workout type facts."""
+        profile = {"proposed_workout": {"type": "", "distance": 5, "terrain": "road"}}
+        facts = _extract_workout_facts(profile)
+        assert "long_run" not in facts
+        assert "easy_run" not in facts
+        assert "tempo_run" not in facts
+        assert "intervals" not in facts
+
+    def test_empty_string_terrain_no_terrain_facts(self):
+        """Test that empty string terrain adds no terrain facts."""
+        profile = {"proposed_workout": {"type": "easy run", "distance": 5, "terrain": ""}}
+        facts = _extract_workout_facts(profile)
+        assert "track_terrain" not in facts
+        assert "road_terrain" not in facts
+        assert "trail_terrain" not in facts
+        assert "treadmill_terrain" not in facts
+
 
 class TestCompleteFactExtraction:
     """Test complete fact extraction with realistic profiles."""
