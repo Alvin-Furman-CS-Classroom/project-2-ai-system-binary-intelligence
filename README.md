@@ -1,18 +1,23 @@
-# [Your System Title]
+# Long Run: AI Marathon Training System for Beginners
 
 ## Overview
 
-Provide a concise system overview (200-300 words). Explain the unifying theme and how the modules combine into a coherent AI system.
+Novice runners often struggle with pacing, training volume, and progression without professional guidance. Many beginners either follow generic plans that ignore their fitness level, push too hard and risk injury, or lose motivation when they don't see improvement. Long Run addresses these challenges by providing personalized coaching that adapts to each runner's constraints, goals, and progress.
+
+The system validates workout safety based on user limitations and available terrain, generates training plans tailored to race goals and running environment, logs run performance through natural language input, adapts training loads based on results, and predicts race readiness timelines. This creates a complete coaching experience from a runner's first easy jog through race day preparation.
+
+Implementing a marathon training system requires multiple AI techniques because coaching involves diverse intelligent behaviors. Safety validation requires logical reasoning about injury risk, recovery needs, and terrain suitability. Plan generation requires searching through possible workout combinations across different surfaces. Run logging requires understanding informal user descriptions. Motivation management requires strategic decision-making about when to push and when to rest. Progression requires learning each runner's response patterns. Race prediction requires modeling trends from historical data.
+
+The system comprises six modules that share a central user profile and training history database. Early modules establish safety constraints and baseline plans, while later modules learn from accumulated training data to adapt and predict outcomes.
 
 ## Team
 
-- Member 1
-- Member 2
-- Member 3 (if applicable)
+- Member 1: Tanya Masvimbo
+- Member 2: Mengsrun Nit
 
 ## Proposal
 
-Link to the approved Project 1 proposal (or paste a short summary here).
+See the approved project proposal in PROPOSAL.md for complete system design details.
 
 ## Module Plan
 
@@ -20,7 +25,8 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 
 | Module | Topic(s) | Inputs | Outputs | Depends On | Checkpoint |
 | ------ | -------- | ------ | ------- | ---------- | ---------- |
-| 1 |  |  |  |  |  |
+| 1 | Propositional Logic (Knowledge Bases, Inference, Chaining) | Runner profile dict with injuries, symptoms, training load, recovery status, experience level, environment, available terrain, and proposed workout | Safety assessment dict with safe (bool), reason (str), alternative workout (dict or None), and recommendation (str) if no alternative exists | None | Checkpoint 1 (Feb 11) |
+| 2 |  |  |  |  |  |
 | 2 |  |  |  |  |  |
 | 3 |  |  |  |  |  |
 | 4 |  |  |  |  |  |

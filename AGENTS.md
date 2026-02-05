@@ -1,12 +1,19 @@
 ## Project Context
 
-- System title: [Your System Title]
-- Theme: [Your Theme]
-- Proposal link or summary: [Your Proposal Link or Summary]
+- System title: Long Run: AI Marathon Training System for Beginners
+- Theme: Personalized marathon coaching that adapts to each runner's constraints, goals, terrain options, and progress
+- Proposal link or summary: See PROPOSAL.md for full proposal
 
 **Module plan:**
 
-[Your Module Plan Table copied from README.md]
+| Module | Required Topic(s) | Topic Covered By | Checkpoint Due |
+| ------ | ----------------- | ---------------- | -------------- |
+| 1: Safety Validator | Propositional Logic | Weeks 1-2 | Checkpoint 1 (Feb 11) |
+| 2: Plan Generator | Search Algorithms | Weeks 3-4 | Checkpoint 1 (Feb 11) |
+| 3: Run Logger | NLP | Weeks 7-8 | Checkpoint 2 (Feb 26) |
+| 4: Motivation Selector | Game Theory | Weeks 8-9 | Checkpoint 3 (Mar 19) |
+| 5: Adaptive Progression | Reinforcement Learning | Weeks 10-11 | Checkpoint 4 (Apr 2) |
+| 6: Race Predictor | Supervised Learning | Weeks 12+ | Checkpoint 5 (Apr 16) |
 
 ## Constraints
 
