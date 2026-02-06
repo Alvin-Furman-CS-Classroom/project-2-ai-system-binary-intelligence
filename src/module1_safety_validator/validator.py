@@ -6,29 +6,11 @@ using propositional logic, forward chaining inference, and alternative
 workout generation.
 """
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List
 from .facts import extract_facts
 from .rules import SAFETY_RULES
 from .inference import forward_chain, determine_safety
 from .alternatives import generate_alternative, can_suggest_alternative, suggest_rest_day_message
-
-
-def _normalize_profile_and_workout(
-    runner_profile: Dict[str, Any],
-    proposed_workout: Dict[str, Any] = None
-) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    """
-    Normalize inputs: merge proposed_workout into profile if passed separately.
-
-    Returns:
-        Tuple of (full_profile, proposed_workout) for use in validation.
-    """
-    if proposed_workout is not None:
-        full_profile = {**runner_profile, "proposed_workout": proposed_workout}
-    else:
-        full_profile = runner_profile
-        proposed_workout = runner_profile.get("proposed_workout", {})
-    return full_profile, proposed_workout
 
 
 def validate_workout(
@@ -92,10 +74,25 @@ def validate_workout(
         >>> result["alternative"]["terrain"]
         'treadmill'
     """
-    full_profile, proposed_workout = _normalize_profile_and_workout(
-        runner_profile, proposed_workout
-    )
-
+    # Handle case where proposed_workout is passed separately or embedded in profile
+    if proposed_workout is not None:
+        full_profile = {**runner_profile, "proposed_workout": proposed_workout}
+    else:
+        full_profile = runner_profile
+        proposed_workout = runner_profile.get("proposed_workout", {})
+    
+    # Validate inputs first (CRITICAL: prevents garbage in/garbage out)
+    from .input_validation import validate_runner_profile
+    
+    input_error = validate_runner_profile(full_profile)
+    if input_error:
+        return {
+            "safe": False,
+            "reason": f"Invalid input: {input_error}",
+            "alternative": None,
+            "recommendation": None
+        }
+    
     # Validate input has required fields
     if not proposed_workout:
         return {
@@ -199,12 +196,15 @@ def validate_workout_detailed(
                 - derived_facts: Set[str]
                 - fired_rules: List[str]
                 - severity: str
-        - inference_chain: str
+                - inference_chain: str
     """
-    full_profile, proposed_workout = _normalize_profile_and_workout(
-        runner_profile, proposed_workout
-    )
-
+    # Handle case where proposed_workout is passed separately or embedded in profile
+    if proposed_workout is not None:
+        full_profile = {**runner_profile, "proposed_workout": proposed_workout}
+    else:
+        full_profile = runner_profile
+        proposed_workout = runner_profile.get("proposed_workout", {})
+    
     # Extract facts
     initial_facts = extract_facts(full_profile)
     

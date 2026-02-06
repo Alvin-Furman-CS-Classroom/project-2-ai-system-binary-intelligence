@@ -1,9 +1,80 @@
 """
 Safety rules for workout validation using propositional logic.
 
-This module defines the knowledge base of 20 safety rules organized into
+This module defines the knowledge base of safety rules organized into
 five categories: absolute safety, injury-terrain contraindications, training
 load, recovery/fatigue, and environment/preparation.
+
+EVIDENCE-BASED SOURCES:
+=======================
+Rules are based on sports medicine research, physical therapy best practices,
+and running coaching expertise from the following sources:
+
+1. Physical Therapy & Sports Medicine Center (PTSMC)
+   https://www.ptsmc.com/ready-to-run-key-strategies-to-get-started-running-safely/
+   - Running benefits, proper gear, safety tips, effective strategies
+   - Run/walk method for beginners, warm-up routines
+   
+2. Marathon Handbook
+   https://marathonhandbook.com/the-12-rules-of-marathon-training/
+   - 12 rules of marathon training including 10% rule, taper, even pacing
+   - Strength training importance, fueling on the run
+   
+3. Running Lifestyle Media
+   https://running-lifestyle.com/9-guidelines-on-writing-a-running-training-plan/
+   - Training plan guidelines, perceived effort scale, workout types
+   - Build weeks, drop-back weeks, spacing key workouts
+   
+4. Mayo Clinic Health System
+   https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/
+   - Medical perspective on training safely, gait analysis
+   - Injury prevention, recovery techniques, when to stop running
+   
+5. Therapeutic Associates Physical Therapy
+   https://www.therapeuticassociates.com/10-laws-of-preventing-running-injuries/
+   - 10 laws of preventing running injuries
+   - Gradual progression (mileage and intensity), rest days importance
+   - Flexibility, strength training, cross-training
+   
+6. Hospital for Special Surgery (HSS)
+   https://www.hss.edu/article_injury-prevention-marathon-runners.asp
+   - Injury prevention for first-time marathon runners
+   - Overuse injury overview, muscle imbalances, foundation building
+   - Shoe replacement (300 miles), ramping up mileage over time
+   
+7. VCU Health
+   https://www.vcuhealth.org/news/how-runners-can-prevent-injury
+   - Sports medicine expert guidance on injury prevention
+   - Common injuries (runner's knee, IT band syndrome, plantar fasciitis)
+   - Stress fractures, R.E.D.-S, weather considerations
+
+RULE STRUCTURE:
+===============
+Each rule follows the form: IF (conditions) THEN (conclusion)
+
+- conditions: List of facts that must ALL be true (AND logic)
+- conclusion: Fact derived when conditions are met
+- severity: "critical", "high", or "medium"
+- can_suggest_alternative: Whether a safe alternative workout can be suggested
+
+EXPERIENCE LEVEL DEFINITIONS:
+==============================
+See experience_levels.py for detailed criteria.
+
+Beginner (0-1 year):
+  - Weekly mileage: 0-30 miles
+  - Long run max: 13 miles
+  - Cannot do high-intensity workouts
+
+Intermediate (1-3 years):
+  - Weekly mileage: 20-50 miles
+  - Long run max: 18 miles
+  - Can do tempo runs and moderate intervals
+
+Advanced (3+ years):
+  - Weekly mileage: 40-200 miles
+  - Long run max: 26 miles
+  - Can handle all workout types
 """
 
 from dataclasses import dataclass
@@ -75,11 +146,13 @@ ABSOLUTE_SAFETY_RULES = [
 
 
 # ============================================================================
-# CATEGORY 2: INJURY-TERRAIN CONTRAINDICATIONS (5 rules)
+# CATEGORY 2: INJURY-TERRAIN CONTRAINDICATIONS (17 rules)
 # These suggest terrain alternatives when violated
+# Based on: VCU Health, HSS, Therapeutic Associates
 # ============================================================================
 
 INJURY_TERRAIN_RULES = [
+    # Shin splints rules
     SafetyRule(
         name="shin_splints_track",
         conditions=["shin_splints", "track_terrain"],
@@ -96,6 +169,8 @@ INJURY_TERRAIN_RULES = [
         explanation="Road running can aggravate shin splints on hard surfaces",
         can_suggest_alternative=True
     ),
+    
+    # Knee injury rules  
     SafetyRule(
         name="knee_injury_trail",
         conditions=["knee_injury", "trail_terrain"],
@@ -112,6 +187,8 @@ INJURY_TERRAIN_RULES = [
         explanation="Road running can stress knees on hard surfaces",
         can_suggest_alternative=True
     ),
+    
+    # Plantar fasciitis rules
     SafetyRule(
         name="plantar_fasciitis_hard_surface",
         conditions=["plantar_fasciitis", "hard_surface"],
@@ -120,11 +197,123 @@ INJURY_TERRAIN_RULES = [
         explanation="Hard surfaces aggravate plantar fasciitis",
         can_suggest_alternative=True
     ),
+    
+    # IT band syndrome rules
+    SafetyRule(
+        name="it_band_trail",
+        conditions=["it_band_syndrome", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with hills and uneven surfaces can aggravate IT band syndrome",
+        can_suggest_alternative=True
+    ),
+    SafetyRule(
+        name="it_band_track",
+        conditions=["it_band_syndrome", "track_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Track running with repetitive turns in one direction aggravates IT band syndrome",
+        can_suggest_alternative=True
+    ),
+    
+    # Achilles tendonitis rules
+    SafetyRule(
+        name="achilles_trail",
+        conditions=["achilles_tendonitis", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with elevation changes stresses Achilles tendon",
+        can_suggest_alternative=True
+    ),
+    SafetyRule(
+        name="achilles_hard_surface",
+        conditions=["achilles_tendonitis", "hard_surface"],
+        conclusion="medium_injury_risk",
+        severity="medium",
+        explanation="Hard surfaces can aggravate Achilles tendonitis",
+        can_suggest_alternative=True
+    ),
+    
+    # Stress fracture rule (should rest, not just change terrain)
+    SafetyRule(
+        name="stress_fracture_running",
+        conditions=["stress_fracture"],
+        conclusion="unsafe_critical",
+        severity="critical",
+        explanation="Stress fractures require complete rest from running to heal properly",
+        can_suggest_alternative=False
+    ),
+    
+    # Hip injury rule
+    SafetyRule(
+        name="hip_injury_trail",
+        conditions=["hip_injury", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with uneven surfaces stresses hip stabilizers",
+        can_suggest_alternative=True
+    ),
+    
+    # Hamstring injury rule
+    SafetyRule(
+        name="hamstring_trail",
+        conditions=["hamstring_injury", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with uneven surfaces and elevation changes stresses hamstrings",
+        can_suggest_alternative=True
+    ),
+    
+    # Calf injury rules
+    SafetyRule(
+        name="calf_trail",
+        conditions=["calf_injury", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with elevation changes and uneven surfaces stresses calves",
+        can_suggest_alternative=True
+    ),
+    SafetyRule(
+        name="calf_hard_surface",
+        conditions=["calf_injury", "hard_surface"],
+        conclusion="medium_injury_risk",
+        severity="medium",
+        explanation="Hard surfaces can aggravate calf injuries",
+        can_suggest_alternative=True
+    ),
+    
+    # Ankle injury rule
+    SafetyRule(
+        name="ankle_trail",
+        conditions=["ankle_injury", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with uneven surfaces increases ankle instability and reinjury risk",
+        can_suggest_alternative=True
+    ),
+    
+    # Back injury rules
+    SafetyRule(
+        name="back_injury_trail",
+        conditions=["back_injury", "trail_terrain"],
+        conclusion="high_injury_risk",
+        severity="high",
+        explanation="Trail running with uneven surfaces and impact stresses lower back",
+        can_suggest_alternative=True
+    ),
+    SafetyRule(
+        name="back_injury_hard_surface",
+        conditions=["back_injury", "hard_surface"],
+        conclusion="medium_injury_risk",
+        severity="medium",
+        explanation="Hard surfaces increase impact forces on back",
+        can_suggest_alternative=True
+    ),
 ]
 
 
 # ============================================================================
-# CATEGORY 3: TRAINING LOAD & PROGRESSION (5 rules)
+# CATEGORY 3: TRAINING LOAD & PROGRESSION (4 rules)
 # These enforce safe training progression
 # ============================================================================
 
@@ -135,14 +324,6 @@ TRAINING_LOAD_RULES = [
         conclusion="unsafe_high",
         severity="high",
         explanation="Long run distance exceeds safe limit (1.5x weekly mileage)",
-        can_suggest_alternative=True
-    ),
-    SafetyRule(
-        name="excessive_progression",
-        conditions=["excessive_progression"],
-        conclusion="unsafe_medium",
-        severity="medium",
-        explanation="Weekly mileage increase exceeds 10% rule",
         can_suggest_alternative=True
     ),
     SafetyRule(
@@ -240,7 +421,8 @@ ENVIRONMENT_PREPARATION_RULES = [
 
 # ============================================================================
 # COMBINED RULE SET
-# All 20 rules in a single list for the inference engine
+# All 31 rules in a single list for the inference engine
+# Categories: 4 absolute + 17 injury-terrain + 4 training + 3 recovery + 3 environment
 # ============================================================================
 
 SAFETY_RULES: List[SafetyRule] = (
@@ -265,7 +447,7 @@ def get_rules_by_category(category: str) -> List[SafetyRule]:
     Example:
         >>> injury_rules = get_rules_by_category("injury")
         >>> len(injury_rules)
-        5
+        17
     """
     category_map = {
         "absolute": ABSOLUTE_SAFETY_RULES,

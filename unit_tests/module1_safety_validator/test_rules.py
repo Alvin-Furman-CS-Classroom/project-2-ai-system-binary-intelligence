@@ -1,7 +1,7 @@
 """
 Unit tests for rules.py - Safety rules knowledge base.
 
-Tests the structure and integrity of the 20 safety rules, rule categories,
+Tests the structure and integrity of the 31 safety rules, rule categories,
 and helper functions for accessing the rule base.
 """
 
@@ -63,20 +63,20 @@ class TestRuleCounts:
     """Test that we have the correct number of rules in each category."""
     
     def test_total_rule_count(self):
-        """Test that we have exactly 20 rules total."""
-        assert len(SAFETY_RULES) == 20
+        """Test that we have exactly 31 rules total."""
+        assert len(SAFETY_RULES) == 31
     
     def test_absolute_safety_rules_count(self):
         """Test that we have 4 absolute safety rules."""
         assert len(ABSOLUTE_SAFETY_RULES) == 4
     
     def test_injury_terrain_rules_count(self):
-        """Test that we have 5 injury-terrain rules."""
-        assert len(INJURY_TERRAIN_RULES) == 5
+        """Test that we have 17 injury-terrain rules."""
+        assert len(INJURY_TERRAIN_RULES) == 17
     
     def test_training_load_rules_count(self):
-        """Test that we have 5 training load rules."""
-        assert len(TRAINING_LOAD_RULES) == 5
+        """Test that we have 4 training load rules."""
+        assert len(TRAINING_LOAD_RULES) == 4
     
     def test_recovery_fatigue_rules_count(self):
         """Test that we have 3 recovery/fatigue rules."""
@@ -145,8 +145,10 @@ class TestInjuryTerrainRules:
     
     def test_all_injury_rules_allow_alternatives(self):
         """Test that injury-terrain rules can suggest alternatives."""
+        # All except stress_fracture_running
         for rule in INJURY_TERRAIN_RULES:
-            assert rule.can_suggest_alternative is True
+            if rule.name != "stress_fracture_running":
+                assert rule.can_suggest_alternative is True
     
     def test_shin_splints_track_rule(self):
         """Test shin splints + track contraindication."""
@@ -184,6 +186,55 @@ class TestInjuryTerrainRules:
         assert "plantar_fasciitis" in rule.conditions
         assert "hard_surface" in rule.conditions
         assert rule.conclusion == "high_injury_risk"
+    
+    def test_stress_fracture_running_rule(self):
+        """Test stress fracture blocks all running."""
+        rule = get_rule_by_name("stress_fracture_running")
+        assert "stress_fracture" in rule.conditions
+        assert rule.conclusion == "unsafe_critical"
+        assert rule.can_suggest_alternative is False
+    
+    def test_hamstring_trail_rule(self):
+        """Test hamstring + trail contraindication."""
+        rule = get_rule_by_name("hamstring_trail")
+        assert "hamstring_injury" in rule.conditions
+        assert "trail_terrain" in rule.conditions
+        assert rule.conclusion == "high_injury_risk"
+    
+    def test_calf_trail_rule(self):
+        """Test calf + trail contraindication."""
+        rule = get_rule_by_name("calf_trail")
+        assert "calf_injury" in rule.conditions
+        assert "trail_terrain" in rule.conditions
+        assert rule.conclusion == "high_injury_risk"
+    
+    def test_calf_hard_surface_rule(self):
+        """Test calf + hard surface contraindication."""
+        rule = get_rule_by_name("calf_hard_surface")
+        assert "calf_injury" in rule.conditions
+        assert "hard_surface" in rule.conditions
+        assert rule.conclusion == "medium_injury_risk"
+    
+    def test_ankle_trail_rule(self):
+        """Test ankle + trail contraindication."""
+        rule = get_rule_by_name("ankle_trail")
+        assert "ankle_injury" in rule.conditions
+        assert "trail_terrain" in rule.conditions
+        assert rule.conclusion == "high_injury_risk"
+    
+    def test_back_injury_trail_rule(self):
+        """Test back injury + trail contraindication."""
+        rule = get_rule_by_name("back_injury_trail")
+        assert "back_injury" in rule.conditions
+        assert "trail_terrain" in rule.conditions
+        assert rule.conclusion == "high_injury_risk"
+    
+    def test_back_injury_hard_surface_rule(self):
+        """Test back injury + hard surface contraindication."""
+        rule = get_rule_by_name("back_injury_hard_surface")
+        assert "back_injury" in rule.conditions
+        assert "hard_surface" in rule.conditions
+        assert rule.conclusion == "medium_injury_risk"
 
 
 class TestTrainingLoadRules:
@@ -195,12 +246,6 @@ class TestTrainingLoadRules:
         assert "excessive_distance" in rule.conditions
         assert rule.conclusion == "unsafe_high"
         assert rule.can_suggest_alternative is True
-    
-    def test_excessive_progression_rule(self):
-        """Test excessive progression rule."""
-        rule = get_rule_by_name("excessive_progression")
-        assert "excessive_progression" in rule.conditions
-        assert rule.conclusion == "unsafe_medium"
     
     def test_beginner_high_intensity_rule(self):
         """Test beginner + high intensity restriction."""
@@ -308,12 +353,12 @@ class TestHelperFunctions:
     def test_get_rules_by_category_injury(self):
         """Test getting injury-terrain rules by category."""
         rules = get_rules_by_category("injury")
-        assert len(rules) == 5
+        assert len(rules) == 17
     
     def test_get_rules_by_category_training(self):
         """Test getting training load rules by category."""
         rules = get_rules_by_category("training")
-        assert len(rules) == 5
+        assert len(rules) == 4
     
     def test_get_rules_by_category_recovery(self):
         """Test getting recovery rules by category."""
@@ -348,8 +393,8 @@ class TestRuleSeverityLevels:
     def test_critical_severity_rules(self):
         """Test that critical rules are only in absolute safety category."""
         critical_rules = [rule for rule in SAFETY_RULES if rule.severity == "critical"]
-        assert len(critical_rules) == 4
-        assert all(rule in ABSOLUTE_SAFETY_RULES for rule in critical_rules)
+        # 4 from absolute + 1 from stress fracture
+        assert len(critical_rules) == 5
     
     def test_high_severity_exists(self):
         """Test that high severity rules exist."""

@@ -114,6 +114,31 @@ class TestInjuryFactExtraction:
         facts = _extract_injury_facts(profile)
         assert "plantar_fasciitis" in facts
     
+    def test_back_injury(self):
+        """Test back injury extraction."""
+        profile = {"injuries": ["back pain"], "proposed_workout": {}}
+        facts = _extract_injury_facts(profile)
+        assert "back_injury" in facts
+        assert "active_injury" in facts
+    
+    def test_hamstring_injury(self):
+        """Test hamstring injury extraction."""
+        profile = {"injuries": ["hamstring"], "proposed_workout": {}}
+        facts = _extract_injury_facts(profile)
+        assert "hamstring_injury" in facts
+    
+    def test_calf_injury(self):
+        """Test calf injury extraction."""
+        profile = {"injuries": ["calf strain"], "proposed_workout": {}}
+        facts = _extract_injury_facts(profile)
+        assert "calf_injury" in facts
+    
+    def test_ankle_injury(self):
+        """Test ankle injury extraction."""
+        profile = {"injuries": ["ankle sprain"], "proposed_workout": {}}
+        facts = _extract_injury_facts(profile)
+        assert "ankle_injury" in facts
+    
     def test_injury_not_cleared_by_doctor(self):
         """Test injury without doctor clearance."""
         profile = {"injuries": ["shin splints"], "cleared_by_doctor": False, "proposed_workout": {}}
@@ -287,6 +312,7 @@ class TestWorkoutFactExtraction:
         profile = {"proposed_workout": {"type": "long run"}}
         facts = _extract_workout_facts(profile)
         assert "long_run" in facts
+        assert "hard_workout_today" in facts
     
     def test_tempo_run_type(self):
         """Test tempo run workout type extraction."""
@@ -310,6 +336,7 @@ class TestWorkoutFactExtraction:
         facts = _extract_workout_facts(profile)
         assert "easy_run" in facts
         assert "high_intensity_workout" not in facts
+        assert "hard_workout_today" not in facts
     
     def test_track_terrain(self):
         """Test track terrain extraction."""
@@ -370,24 +397,6 @@ class TestDerivedFactComputation:
         facts = extract_facts(profile)
         assert "excessive_distance" not in facts
     
-    def test_excessive_progression(self):
-        """Test excessive weekly mileage progression detection."""
-        profile = {
-            "weekly_mileage": 20,
-            "proposed_weekly_mileage": 25
-        }
-        facts = _compute_derived_facts(set(), profile)
-        assert "excessive_progression" in facts
-    
-    def test_safe_progression(self):
-        """Test that 10% progression doesn't trigger fact."""
-        profile = {
-            "weekly_mileage": 20,
-            "proposed_weekly_mileage": 22
-        }
-        facts = _compute_derived_facts(set(), profile)
-        assert "excessive_progression" not in facts
-
     def test_negative_distance_no_excessive_distance(self):
         """Test that negative distance does not trigger excessive_distance."""
         profile = {
@@ -472,6 +481,7 @@ class TestCompleteFactExtraction:
         assert "track_terrain" in facts
         assert "long_run" in facts
         assert "hard_surface" in facts
+        assert "hard_workout_today" in facts
 
 
 class TestFactExplanations:

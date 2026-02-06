@@ -9,6 +9,9 @@ while maintaining the workout's general intent.
 from typing import Optional, Dict, Any, List, Set
 from .rules import SafetyRule
 
+# Minimum practical workout distance in miles
+MIN_WORKOUT_DISTANCE = 2.0
+
 
 def generate_alternative(
     runner_profile: Dict[str, Any],
@@ -72,9 +75,11 @@ def generate_alternative(
                 runner_profile.get("weekly_mileage", 0),
                 alternative.get("type", "")
             )
-            if safe_distance:
+            if safe_distance and safe_distance >= MIN_WORKOUT_DISTANCE:
                 alternative["distance"] = safe_distance
                 modified = True
+            else:
+                return None  # Distance would be too short to be practical
         
         # Handle beginner + high intensity
         if rule.name == "beginner_high_intensity":
@@ -88,15 +93,20 @@ def generate_alternative(
                 alternative["type"] = "easy run"
                 modified = True
             if alternative.get("distance", 0) > 5:
-                alternative["distance"] = max(3, alternative.get("distance", 0) * 0.5)
+                new_distance = max(MIN_WORKOUT_DISTANCE, alternative.get("distance", 0) * 0.5)
+                alternative["distance"] = new_distance
                 modified = True
         
         # Handle race week long run
         if rule.name == "race_week_long_run":
             # Suggest shorter easy run instead
             alternative["type"] = "easy run"
-            alternative["distance"] = min(5, alternative.get("distance", 0) * 0.5)
-            modified = True
+            new_distance = min(5, alternative.get("distance", 0) * 0.5)
+            if new_distance >= MIN_WORKOUT_DISTANCE:
+                alternative["distance"] = new_distance
+                modified = True
+            else:
+                return None  # Distance would be too short
     
     # Return alternative only if we made modifications
     return alternative if modified else None
@@ -123,6 +133,10 @@ def _find_safe_terrain(
     Returns:
         Safe terrain string, or None if no safe option exists
     """
+    # Return None if no terrain options available
+    if not available_terrain:
+        return None
+    
     # Normalize injury names
     injuries_lower = [inj.lower() for inj in injuries]
     
@@ -163,7 +177,7 @@ def _calculate_safe_distance(weekly_mileage: float, workout_type: str) -> Option
         workout_type: Type of workout
         
     Returns:
-        Safe distance in miles, or None if mileage is 0
+        Safe distance in miles, or None if mileage is 0 or result would be too short
     """
     if weekly_mileage <= 0:
         return None
@@ -180,7 +194,13 @@ def _calculate_safe_distance(weekly_mileage: float, workout_type: str) -> Option
         safe_limit = weekly_mileage * 0.5
     
     # Round to 1 decimal place
-    return round(safe_limit, 1)
+    safe_limit = round(safe_limit, 1)
+    
+    # Return None if the safe limit is below minimum practical distance
+    if safe_limit < MIN_WORKOUT_DISTANCE:
+        return None
+    
+    return safe_limit
 
 
 def can_suggest_alternative(fired_rules: List[SafetyRule]) -> bool:

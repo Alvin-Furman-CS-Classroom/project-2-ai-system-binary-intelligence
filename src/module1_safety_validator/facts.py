@@ -100,19 +100,40 @@ def _extract_injury_facts(profile: Dict[str, Any]) -> Set[str]:
     
     injuries = profile.get("injuries", [])
     
-    # Normalize injury names to propositional facts
+    # CRITICAL: ANY injury adds active_injury fact
+    # This ensures the uncleared_injury_block rule can fire
+    if injuries:
+        facts.add("active_injury")
+    
+    # Normalize injury names to specific propositional facts
     for injury in injuries:
         injury_lower = injury.lower()
         
+        # Specific injury mappings for terrain rules
         if "shin splint" in injury_lower:
             facts.add("shin_splints")
-            facts.add("active_injury")
         elif "knee" in injury_lower:
             facts.add("knee_injury")
-            facts.add("active_injury")
         elif "plantar fasciitis" in injury_lower or "plantar" in injury_lower:
             facts.add("plantar_fasciitis")
-            facts.add("active_injury")
+        elif "it band" in injury_lower or "itb" in injury_lower:
+            facts.add("it_band_syndrome")
+        elif "achilles" in injury_lower:
+            facts.add("achilles_tendonitis")
+        elif "stress fracture" in injury_lower or "fracture" in injury_lower:
+            facts.add("stress_fracture")
+        elif "hip" in injury_lower:
+            facts.add("hip_injury")
+        elif "hamstring" in injury_lower:
+            facts.add("hamstring_injury")
+        elif "calf" in injury_lower:
+            facts.add("calf_injury")
+        elif "ankle" in injury_lower:
+            facts.add("ankle_injury")
+        elif "back" in injury_lower:
+            facts.add("back_injury")
+        # Note: Other injuries like "broken arm" will only trigger "active_injury"
+        # which is sufficient for the uncleared_injury_block rule
     
     # Check medical clearance
     if injuries and not profile.get("cleared_by_doctor", False):
@@ -246,6 +267,8 @@ def _extract_workout_facts(profile: Dict[str, Any]) -> Set[str]:
     workout_type = workout.get("type", "").lower()
     if "long run" in workout_type or "long" in workout_type:
         facts.add("long_run")
+        # Long runs are considered hard workouts
+        facts.add("hard_workout_today")
     elif "tempo" in workout_type:
         facts.add("tempo_run")
         facts.add("high_intensity_workout")
@@ -295,16 +318,6 @@ def _compute_derived_facts(facts: Set[str], profile: Dict[str, Any]) -> Set[str]
         safe_limit = weekly_mileage * 1.5
         if distance > safe_limit:
             derived.add("excessive_distance")
-    
-    # Excessive progression check (10% rule)
-    # Note: This would require knowing next week's planned mileage
-    # For now, we'll add it if the proposed workout would push weekly mileage up significantly
-    # This is a simplified version - a more complete implementation would track planned weekly totals
-    proposed_weekly = profile.get("proposed_weekly_mileage")
-    if proposed_weekly and weekly_mileage > 0:
-        increase_ratio = proposed_weekly / weekly_mileage
-        if increase_ratio > 1.1:
-            derived.add("excessive_progression")
     
     return derived
 
@@ -385,7 +398,6 @@ def get_fact_explanation(fact: str) -> str:
         
         # Derived
         "excessive_distance": "Distance exceeds safe limit for weekly mileage",
-        "excessive_progression": "Weekly mileage increase exceeds 10% rule",
     }
     
     return explanations.get(fact, f"Unknown fact: {fact}")
