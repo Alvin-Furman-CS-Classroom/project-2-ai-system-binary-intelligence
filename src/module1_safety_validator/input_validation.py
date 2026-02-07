@@ -42,6 +42,34 @@ def validate_runner_profile(runner_profile: Dict[str, Any]) -> Optional[str]:
     """
     errors = []
     
+    # Type validation for critical fields
+    if "weekly_mileage" in runner_profile:
+        v = runner_profile["weekly_mileage"]
+        if not isinstance(v, (int, float)):
+            errors.append("weekly_mileage must be a number")
+    if "injuries" in runner_profile:
+        v = runner_profile["injuries"]
+        if not isinstance(v, list):
+            errors.append("injuries must be a list")
+        elif not all(isinstance(i, str) for i in v):
+            errors.append("injuries must be a list of strings")
+    if "available_terrain" in runner_profile:
+        v = runner_profile["available_terrain"]
+        if not isinstance(v, list):
+            errors.append("available_terrain must be a list")
+        elif not all(isinstance(t, str) for t in v):
+            errors.append("available_terrain must be a list of strings")
+    if "days_trained_this_week" in runner_profile:
+        v = runner_profile["days_trained_this_week"]
+        if not isinstance(v, (int, float)) or v != int(v):
+            errors.append("days_trained_this_week must be an integer")
+    if "rest_days_this_week" in runner_profile:
+        v = runner_profile["rest_days_this_week"]
+        if not isinstance(v, (int, float)) or v != int(v):
+            errors.append("rest_days_this_week must be an integer")
+    if errors:
+        return errors[0]
+    
     # Validate weekly mileage bounds
     weekly_mileage = runner_profile.get("weekly_mileage", 0)
     if weekly_mileage < 0:
@@ -130,9 +158,23 @@ def validate_workout_structure(workout: Dict[str, Any]) -> List[str]:
     """
     errors = []
     
+    # Validate workout type when provided
+    VALID_WORKOUT_TYPES = ("easy run", "easy", "long run", "long", "tempo", "intervals", "interval")
+    workout_type = workout.get("type", "")
+    if workout_type and isinstance(workout_type, str):
+        if workout_type.lower().strip() not in VALID_WORKOUT_TYPES:
+            errors.append(
+                f"Invalid workout type: '{workout_type}'. "
+                f"Valid options: {', '.join(VALID_WORKOUT_TYPES)}"
+            )
+    elif workout_type is not None and not isinstance(workout_type, str):
+        errors.append("Workout type must be a string")
+    
     # Validate distance
     distance = workout.get("distance", 0)
-    if distance < 0:
+    if not isinstance(distance, (int, float)):
+        errors.append("Workout distance must be a number")
+    elif distance < 0:
         errors.append("Workout distance cannot be negative")
     elif distance > 50:
         errors.append(

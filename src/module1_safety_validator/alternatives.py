@@ -7,7 +7,7 @@ while maintaining the workout's general intent.
 """
 
 from typing import Optional, Dict, Any, List, Set
-from .rules import SafetyRule
+from .rules import SafetyRule, SEVERITY_CRITICAL, SEVERITY_HIGH
 
 # Minimum practical workout distance in miles
 MIN_WORKOUT_DISTANCE = 2.0
@@ -283,7 +283,7 @@ def suggest_rest_day_message(fired_rules: List[SafetyRule]) -> str:
         True
     """
     # Check severity of fired rules
-    critical_rules = [r for r in fired_rules if r.severity == "critical"]
+    critical_rules = [r for r in fired_rules if r.severity == SEVERITY_CRITICAL]
     
     if critical_rules:
         # Critical issues require immediate attention
@@ -295,7 +295,7 @@ def suggest_rest_day_message(fired_rules: List[SafetyRule]) -> str:
             return "Rest required. Consult with a healthcare provider before resuming training."
     
     # Non-critical but still need rest
-    high_severity = [r for r in fired_rules if r.severity == "high"]
+    high_severity = [r for r in fired_rules if r.severity == SEVERITY_HIGH]
     if high_severity:
         return "Rest recommended to prevent injury. Resume training when conditions improve."
     

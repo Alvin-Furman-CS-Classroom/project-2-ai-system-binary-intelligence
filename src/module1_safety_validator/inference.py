@@ -6,7 +6,7 @@ to derive safety conclusions from facts and rules.
 """
 
 from typing import Set, List, Tuple
-from .rules import SafetyRule, SAFETY_RULES
+from .rules import SafetyRule, SAFETY_RULES, SEVERITY_CRITICAL, SEVERITY_HIGH, SEVERITY_MEDIUM, SEVERITY_NONE
 
 # Safety limit to prevent infinite loops in forward chaining
 MAX_FORWARD_CHAIN_ITERATIONS = 100
@@ -102,16 +102,16 @@ def determine_safety(derived_facts: Set[str]) -> Tuple[bool, str]:
     """
     # Check for unsafe conclusions in priority order
     if "unsafe_critical" in derived_facts:
-        return False, "critical"
+        return False, SEVERITY_CRITICAL
     
     if "high_injury_risk" in derived_facts or "unsafe_high" in derived_facts:
-        return False, "high"
+        return False, SEVERITY_HIGH
     
     if "unsafe_medium" in derived_facts or "overtraining_risk" in derived_facts or "medium_injury_risk" in derived_facts:
-        return False, "medium"
+        return False, SEVERITY_MEDIUM
     
     # No unsafe conclusions found
-    return True, "none"
+    return True, SEVERITY_NONE
 
 
 def explain_inference(
@@ -184,7 +184,7 @@ def get_critical_rules(fired_rules: List[SafetyRule]) -> List[SafetyRule]:
     Returns:
         List of only critical severity rules
     """
-    return [rule for rule in fired_rules if rule.severity == "critical"]
+    return [rule for rule in fired_rules if rule.severity == SEVERITY_CRITICAL]
 
 
 def get_alternative_blocking_rules(fired_rules: List[SafetyRule]) -> List[SafetyRule]:

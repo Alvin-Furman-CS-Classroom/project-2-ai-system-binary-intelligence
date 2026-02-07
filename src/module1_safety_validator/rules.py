@@ -104,6 +104,13 @@ class SafetyRule:
     can_suggest_alternative: bool
 
 
+# Severity levels (use constants to avoid typos and magic strings)
+SEVERITY_CRITICAL = "critical"
+SEVERITY_HIGH = "high"
+SEVERITY_MEDIUM = "medium"
+SEVERITY_NONE = "none"
+
+
 # ============================================================================
 # CATEGORY 1: ABSOLUTE SAFETY RULES (4 rules)
 # These always block training with no alternatives
@@ -114,7 +121,7 @@ ABSOLUTE_SAFETY_RULES = [
         name="chest_pain_block",
         conditions=["chest_pain"],
         conclusion="unsafe_critical",
-        severity="critical",
+        severity=SEVERITY_CRITICAL,
         explanation="Chest pain requires immediate medical attention",
         can_suggest_alternative=False
     ),
@@ -122,7 +129,7 @@ ABSOLUTE_SAFETY_RULES = [
         name="dizziness_block",
         conditions=["dizziness"],
         conclusion="unsafe_critical",
-        severity="critical",
+        severity=SEVERITY_CRITICAL,
         explanation="Dizziness during exercise can indicate serious medical issues",
         can_suggest_alternative=False
     ),
@@ -130,7 +137,7 @@ ABSOLUTE_SAFETY_RULES = [
         name="severe_pain_block",
         conditions=["severe_pain"],
         conclusion="unsafe_critical",
-        severity="critical",
+        severity=SEVERITY_CRITICAL,
         explanation="Severe pain indicates potential injury requiring rest",
         can_suggest_alternative=False
     ),
@@ -138,7 +145,7 @@ ABSOLUTE_SAFETY_RULES = [
         name="uncleared_injury_block",
         conditions=["active_injury", "not_cleared_by_doctor"],
         conclusion="unsafe_critical",
-        severity="critical",
+        severity=SEVERITY_CRITICAL,
         explanation="Active injuries require medical clearance before training",
         can_suggest_alternative=False
     ),
@@ -157,7 +164,7 @@ INJURY_TERRAIN_RULES = [
         name="shin_splints_track",
         conditions=["shin_splints", "track_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Track running aggravates shin splints due to repetitive turns",
         can_suggest_alternative=True
     ),
@@ -165,7 +172,7 @@ INJURY_TERRAIN_RULES = [
         name="shin_splints_road",
         conditions=["shin_splints", "road_terrain"],
         conclusion="medium_injury_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Road running can aggravate shin splints on hard surfaces",
         can_suggest_alternative=True
     ),
@@ -175,7 +182,7 @@ INJURY_TERRAIN_RULES = [
         name="knee_injury_trail",
         conditions=["knee_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running stresses knees with uneven surfaces and elevation changes",
         can_suggest_alternative=True
     ),
@@ -183,7 +190,7 @@ INJURY_TERRAIN_RULES = [
         name="knee_injury_road",
         conditions=["knee_injury", "road_terrain"],
         conclusion="medium_injury_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Road running can stress knees on hard surfaces",
         can_suggest_alternative=True
     ),
@@ -193,7 +200,7 @@ INJURY_TERRAIN_RULES = [
         name="plantar_fasciitis_hard_surface",
         conditions=["plantar_fasciitis", "hard_surface"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Hard surfaces aggravate plantar fasciitis",
         can_suggest_alternative=True
     ),
@@ -203,7 +210,7 @@ INJURY_TERRAIN_RULES = [
         name="it_band_trail",
         conditions=["it_band_syndrome", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with hills and uneven surfaces can aggravate IT band syndrome",
         can_suggest_alternative=True
     ),
@@ -211,7 +218,7 @@ INJURY_TERRAIN_RULES = [
         name="it_band_track",
         conditions=["it_band_syndrome", "track_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Track running with repetitive turns in one direction aggravates IT band syndrome",
         can_suggest_alternative=True
     ),
@@ -221,7 +228,7 @@ INJURY_TERRAIN_RULES = [
         name="achilles_trail",
         conditions=["achilles_tendonitis", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with elevation changes stresses Achilles tendon",
         can_suggest_alternative=True
     ),
@@ -229,7 +236,7 @@ INJURY_TERRAIN_RULES = [
         name="achilles_hard_surface",
         conditions=["achilles_tendonitis", "hard_surface"],
         conclusion="medium_injury_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Hard surfaces can aggravate Achilles tendonitis",
         can_suggest_alternative=True
     ),
@@ -239,7 +246,7 @@ INJURY_TERRAIN_RULES = [
         name="stress_fracture_running",
         conditions=["stress_fracture"],
         conclusion="unsafe_critical",
-        severity="critical",
+        severity=SEVERITY_CRITICAL,
         explanation="Stress fractures require complete rest from running to heal properly",
         can_suggest_alternative=False
     ),
@@ -249,7 +256,7 @@ INJURY_TERRAIN_RULES = [
         name="hip_injury_trail",
         conditions=["hip_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with uneven surfaces stresses hip stabilizers",
         can_suggest_alternative=True
     ),
@@ -259,7 +266,7 @@ INJURY_TERRAIN_RULES = [
         name="hamstring_trail",
         conditions=["hamstring_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with uneven surfaces and elevation changes stresses hamstrings",
         can_suggest_alternative=True
     ),
@@ -269,7 +276,7 @@ INJURY_TERRAIN_RULES = [
         name="calf_trail",
         conditions=["calf_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with elevation changes and uneven surfaces stresses calves",
         can_suggest_alternative=True
     ),
@@ -277,7 +284,7 @@ INJURY_TERRAIN_RULES = [
         name="calf_hard_surface",
         conditions=["calf_injury", "hard_surface"],
         conclusion="medium_injury_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Hard surfaces can aggravate calf injuries",
         can_suggest_alternative=True
     ),
@@ -287,7 +294,7 @@ INJURY_TERRAIN_RULES = [
         name="ankle_trail",
         conditions=["ankle_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with uneven surfaces increases ankle instability and reinjury risk",
         can_suggest_alternative=True
     ),
@@ -297,7 +304,7 @@ INJURY_TERRAIN_RULES = [
         name="back_injury_trail",
         conditions=["back_injury", "trail_terrain"],
         conclusion="high_injury_risk",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Trail running with uneven surfaces and impact stresses lower back",
         can_suggest_alternative=True
     ),
@@ -305,7 +312,7 @@ INJURY_TERRAIN_RULES = [
         name="back_injury_hard_surface",
         conditions=["back_injury", "hard_surface"],
         conclusion="medium_injury_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Hard surfaces increase impact forces on back",
         can_suggest_alternative=True
     ),
@@ -322,7 +329,7 @@ TRAINING_LOAD_RULES = [
         name="excessive_distance",
         conditions=["excessive_distance"],
         conclusion="unsafe_high",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Long run distance exceeds safe limit (1.5x weekly mileage)",
         can_suggest_alternative=True
     ),
@@ -330,7 +337,7 @@ TRAINING_LOAD_RULES = [
         name="beginner_high_intensity",
         conditions=["beginner_runner", "high_intensity_workout"],
         conclusion="unsafe_high",
-        severity="high",
+        severity=SEVERITY_HIGH,
         explanation="Beginners should not perform high-intensity workouts without proper base",
         can_suggest_alternative=True
     ),
@@ -338,7 +345,7 @@ TRAINING_LOAD_RULES = [
         name="consecutive_hard_workouts",
         conditions=["hard_workout_yesterday", "hard_workout_today", "no_rest_yesterday"],
         conclusion="overtraining_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Back-to-back hard workouts without rest increases injury risk",
         can_suggest_alternative=True
     ),
@@ -346,7 +353,7 @@ TRAINING_LOAD_RULES = [
         name="race_week_long_run",
         conditions=["race_within_7_days", "long_run"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Long runs within 7 days of race prevent proper taper",
         can_suggest_alternative=True
     ),
@@ -363,7 +370,7 @@ RECOVERY_FATIGUE_RULES = [
         name="insufficient_recovery_high_intensity",
         conditions=["not_fully_recovered", "high_intensity_workout"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="High-intensity workouts require full recovery from previous training",
         can_suggest_alternative=True
     ),
@@ -371,7 +378,7 @@ RECOVERY_FATIGUE_RULES = [
         name="poor_sleep_high_intensity",
         conditions=["poor_sleep", "high_intensity_workout"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Poor sleep impairs performance and increases injury risk during intense workouts",
         can_suggest_alternative=True
     ),
@@ -379,7 +386,7 @@ RECOVERY_FATIGUE_RULES = [
         name="no_rest_days",
         conditions=["zero_rest_days_this_week", "six_plus_training_days"],
         conclusion="overtraining_risk",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Training 6+ days without rest increases overtraining and injury risk",
         can_suggest_alternative=True
     ),
@@ -396,7 +403,7 @@ ENVIRONMENT_PREPARATION_RULES = [
         name="extreme_weather",
         conditions=["extreme_weather"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Extreme heat or cold increases risk of heat illness or hypothermia",
         can_suggest_alternative=False
     ),
@@ -404,7 +411,7 @@ ENVIRONMENT_PREPARATION_RULES = [
         name="not_hydrated",
         conditions=["not_hydrated"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Dehydration impairs performance and increases health risks",
         can_suggest_alternative=False
     ),
@@ -412,7 +419,7 @@ ENVIRONMENT_PREPARATION_RULES = [
         name="improper_footwear",
         conditions=["no_proper_footwear"],
         conclusion="unsafe_medium",
-        severity="medium",
+        severity=SEVERITY_MEDIUM,
         explanation="Improper footwear significantly increases injury risk",
         can_suggest_alternative=False
     ),

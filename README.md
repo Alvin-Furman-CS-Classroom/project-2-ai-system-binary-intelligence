@@ -51,7 +51,13 @@ List dependencies, setup steps, and any environment variables required to run th
 
 ## Running
 
-Provide commands or scripts for running modules and demos.
+**Module 1 (safety validator):**
+```python
+from src.module1_safety_validator import validate_workout
+profile = {"weekly_mileage": 20, "experience_level": "intermediate", "hydrated": True, "proper_footwear": True, "weather": "normal", "rest_days_this_week": 2, "days_trained_this_week": 3, "fully_recovered": True, "sleep_quality": "good", "available_terrain": ["road", "track"]}
+workout = {"type": "long run", "distance": 10, "terrain": "road"}
+result = validate_workout(profile, workout)  # {"safe": bool, "reason": str, "alternative": ...}
+```
 
 ## Testing
 

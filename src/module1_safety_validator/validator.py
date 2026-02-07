@@ -4,9 +4,23 @@ Main workout safety validator module.
 This module provides the primary interface for validating workout safety
 using propositional logic, forward chaining inference, and alternative
 workout generation.
+
+Quick example:
+    from src.module1_safety_validator import validate_workout
+    profile = {"weekly_mileage": 20, "experience_level": "intermediate", ...}
+    workout = {"type": "long run", "distance": 10, "terrain": "track"}
+    result = validate_workout(profile, workout)  # {"safe": bool, "reason": str, "alternative": ...}
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, TypedDict, Optional
+
+
+class ValidationResult(TypedDict, total=False):
+    """Shape of the dict returned by validate_workout / validate_workout_detailed."""
+    safe: bool
+    reason: str
+    alternative: Optional[Dict[str, Any]]
+    recommendation: str
 from .facts import extract_facts
 from .rules import SAFETY_RULES
 from .inference import forward_chain, determine_safety

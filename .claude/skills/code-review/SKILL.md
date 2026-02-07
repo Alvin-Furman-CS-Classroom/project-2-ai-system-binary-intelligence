@@ -7,6 +7,7 @@ Use this skill to review the project against the AI System rubric and provide ac
 - Repository context (current module spec, recent changes, test results).
 - Elegance Rubric: https://csc-343.path.app/rubrics/code-elegance.rubric.md
 - AI System Rubric: https://csc-343.path.app/projects/project-2-ai-system/ai-system.rubric.md
+- Checkpoint Preparation: .claude/skills/code-review/checkpoint_preparation.md
 
 ## Review Process
 
