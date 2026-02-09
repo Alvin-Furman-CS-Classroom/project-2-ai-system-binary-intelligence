@@ -3,13 +3,7 @@ Runner experience level definitions and validation.
 
 Defines clear criteria for beginner, intermediate, and advanced runners based on
 evidence-based practices from sports medicine research and running coaching experts.
-
-SOURCES:
-- Marathon Handbook: https://marathonhandbook.com/the-12-rules-of-marathon-training/
-- PTSMC: https://www.ptsmc.com/ready-to-run-key-strategies-to-get-started-running-safely/
-- Running Lifestyle: https://running-lifestyle.com/9-guidelines-on-writing-a-running-training-plan/
-- Mayo Clinic Health System
-- Therapeutic Associates Physical Therapy
+See README.md References section for sources.
 """
 
 from dataclasses import dataclass

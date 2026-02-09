@@ -92,4 +92,27 @@ Keep `AGENTS.md` updated with your module plan, constraints, and links to APIs/d
 
 ## References
 
-List libraries, APIs, datasets, and other references used by the system.
+**Libraries**
+
+- Python 3 (standard library only for Module 1: `dataclasses`, `typing`, `datetime`)
+- pytest 9.x (testing; see `requirements.txt`)
+
+**APIs / datasets**
+
+- None for Module 1.
+
+**References**
+
+Hospital for Special Surgery. "Injury Prevention for Marathon Runners." *HSS*, https://www.hss.edu/article_injury-prevention-marathon-runners.asp.
+
+Marathon Handbook. "The 12 Rules of Marathon Training." *Marathon Handbook*, https://marathonhandbook.com/the-12-rules-of-marathon-training/.
+
+Mayo Clinic Health System. "Speaking of Health." *Mayo Clinic Health System*, https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/.
+
+Physical Therapy & Sports Medicine Center. "Ready to Run: Key Strategies to Get Started Running Safely." *PTSMC*, https://www.ptsmc.com/ready-to-run-key-strategies-to-get-started-running-safely/.
+
+Running Lifestyle Media. "9 Guidelines on Writing a Running Training Plan." *Running Lifestyle*, https://running-lifestyle.com/9-guidelines-on-writing-a-running-training-plan/.
+
+Therapeutic Associates Physical Therapy. "10 Laws of Preventing Running Injuries." *Therapeutic Associates*, https://www.therapeuticassociates.com/10-laws-of-preventing-running-injuries/.
+
+VCU Health. "How Runners Can Prevent Injury." *VCU Health*, https://www.vcuhealth.org/news/how-runners-can-prevent-injury.

@@ -4,49 +4,7 @@ Safety rules for workout validation using propositional logic.
 This module defines the knowledge base of safety rules organized into
 five categories: absolute safety, injury-terrain contraindications, training
 load, recovery/fatigue, and environment/preparation.
-
-EVIDENCE-BASED SOURCES:
-=======================
-Rules are based on sports medicine research, physical therapy best practices,
-and running coaching expertise from the following sources:
-
-1. Physical Therapy & Sports Medicine Center (PTSMC)
-   https://www.ptsmc.com/ready-to-run-key-strategies-to-get-started-running-safely/
-   - Running benefits, proper gear, safety tips, effective strategies
-   - Run/walk method for beginners, warm-up routines
-   
-2. Marathon Handbook
-   https://marathonhandbook.com/the-12-rules-of-marathon-training/
-   - 12 rules of marathon training including 10% rule, taper, even pacing
-   - Strength training importance, fueling on the run
-   
-3. Running Lifestyle Media
-   https://running-lifestyle.com/9-guidelines-on-writing-a-running-training-plan/
-   - Training plan guidelines, perceived effort scale, workout types
-   - Build weeks, drop-back weeks, spacing key workouts
-   
-4. Mayo Clinic Health System
-   https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/
-   - Medical perspective on training safely, gait analysis
-   - Injury prevention, recovery techniques, when to stop running
-   
-5. Therapeutic Associates Physical Therapy
-   https://www.therapeuticassociates.com/10-laws-of-preventing-running-injuries/
-   - 10 laws of preventing running injuries
-   - Gradual progression (mileage and intensity), rest days importance
-   - Flexibility, strength training, cross-training
-   
-6. Hospital for Special Surgery (HSS)
-   https://www.hss.edu/article_injury-prevention-marathon-runners.asp
-   - Injury prevention for first-time marathon runners
-   - Overuse injury overview, muscle imbalances, foundation building
-   - Shoe replacement (300 miles), ramping up mileage over time
-   
-7. VCU Health
-   https://www.vcuhealth.org/news/how-runners-can-prevent-injury
-   - Sports medicine expert guidance on injury prevention
-   - Common injuries (runner's knee, IT band syndrome, plantar fasciitis)
-   - Stress fractures, R.E.D.-S, weather considerations
+See README.md References section for sources.
 
 RULE STRUCTURE:
 ===============

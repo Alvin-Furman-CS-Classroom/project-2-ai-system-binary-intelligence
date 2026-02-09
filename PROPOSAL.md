@@ -1,4 +1,4 @@
-# Long Run: AI Marathon Training System for Beginners
+# Long Run: AI Marathon Training System
 
 ## System Overview
 
