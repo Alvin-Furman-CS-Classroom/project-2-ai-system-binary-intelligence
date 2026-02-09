@@ -1,403 +1,193 @@
-"""
-Fact extraction for workout safety validation.
+import json
+from pathlib import Path
+from typing import Set, Dict, Any
+from datetime import datetime
 
-This module converts structured input data (runner profile and proposed workout)
-into propositional facts that can be used by the inference engine.
-"""
+# src/module/fact.py
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_CONFIG_PATH = PROJECT_ROOT / "data" / "fact_config.json"
 
-from typing import Set, Dict, Any, Optional
-from datetime import datetime, timedelta
+def _load_config() -> Dict[str, Any]:
+    with _CONFIG_PATH.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+CONFIG = _load_config()
 
 
-def extract_facts(runner_profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract all propositional facts from runner profile and proposed workout.
-    
-    Converts structured input into a set of atomic propositions that the
-    inference engine can reason about using the safety rules.
-    
-    Args:
-        runner_profile: Dictionary containing runner data and proposed workout
-        
-    Returns:
-        Set of propositional fact strings
-        
-    Example:
-        >>> profile = {
-        ...     "injuries": ["shin splints"],
-        ...     "proposed_workout": {"type": "long run", "terrain": "track"}
-        ... }
-        >>> facts = extract_facts(profile)
-        >>> "shin_splints" in facts
-        True
-        >>> "track_terrain" in facts
-        True
-    """
-    facts = set()
-    
-    # Extract health and symptom facts
-    facts.update(_extract_health_facts(runner_profile))
-    
-    # Extract injury facts
-    facts.update(_extract_injury_facts(runner_profile))
-    
-    # Extract recovery facts
-    facts.update(_extract_recovery_facts(runner_profile))
-    
-    # Extract training context facts
-    facts.update(_extract_training_facts(runner_profile))
-    
-    # Extract environment and preparation facts
-    facts.update(_extract_environment_facts(runner_profile))
-    
-    # Extract proposed workout facts
-    facts.update(_extract_workout_facts(runner_profile))
-    
-    # Compute derived facts (facts that depend on calculations)
-    facts.update(_compute_derived_facts(facts, runner_profile))
-    
-    return facts
+def _matches_any(text: str, contains_list: list[str]) -> bool:
+    return any(substr in text for substr in contains_list)
 
 
 def _extract_health_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract health and symptom-related facts.
-    
-    Args:
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of health-related propositional facts
-    """
     facts = set()
-    
-    # Symptoms
-    symptoms = profile.get("symptoms", [])
-    if "chest_pain" in symptoms or "chest pain" in symptoms:
-        facts.add("chest_pain")
-    if "dizziness" in symptoms:
-        facts.add("dizziness")
-    
-    # Pain level
-    pain_level = profile.get("pain_level", "none")
-    if pain_level == "severe":
-        facts.add("severe_pain")
-    
+
+    symptoms = [s.lower() for s in profile.get("symptoms", [])]
+
+    for fact, aliases in CONFIG["symptom_aliases"].items():
+        if any(alias.lower() in symptoms for alias in aliases):
+            facts.add(fact)
+
+    pain_level = str(profile.get("pain_level", "none")).lower()
+    pain_map = CONFIG.get("pain_level_facts", {})
+    if pain_level in pain_map:
+        facts.add(pain_map[pain_level])
+
     return facts
 
 
 def _extract_injury_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract injury-related facts.
-    
-    Args:
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of injury-related propositional facts
-    """
     facts = set()
-    
     injuries = profile.get("injuries", [])
-    
-    # CRITICAL: ANY injury adds active_injury fact
-    # This ensures the uncleared_injury_block rule can fire
+
     if injuries:
         facts.add("active_injury")
-    
-    # Normalize injury names to specific propositional facts
+
     for injury in injuries:
-        injury_lower = injury.lower()
-        
-        # Specific injury mappings for terrain rules
-        if "shin splint" in injury_lower:
-            facts.add("shin_splints")
-        elif "knee" in injury_lower:
-            facts.add("knee_injury")
-        elif "plantar fasciitis" in injury_lower or "plantar" in injury_lower:
-            facts.add("plantar_fasciitis")
-        elif "it band" in injury_lower or "itb" in injury_lower:
-            facts.add("it_band_syndrome")
-        elif "achilles" in injury_lower:
-            facts.add("achilles_tendonitis")
-        elif "stress fracture" in injury_lower or "fracture" in injury_lower:
-            facts.add("stress_fracture")
-        elif "hip" in injury_lower:
-            facts.add("hip_injury")
-        elif "hamstring" in injury_lower:
-            facts.add("hamstring_injury")
-        elif "calf" in injury_lower:
-            facts.add("calf_injury")
-        elif "ankle" in injury_lower:
-            facts.add("ankle_injury")
-        elif "back" in injury_lower:
-            facts.add("back_injury")
-        # Note: Other injuries like "broken arm" will only trigger "active_injury"
-        # which is sufficient for the uncleared_injury_block rule
-    
-    # Check medical clearance
+        injury_lower = str(injury).lower()
+        for rule in CONFIG["injury_mappings"]:
+            if _matches_any(injury_lower, rule["contains"]):
+                facts.add(rule["fact"])
+                break
+
     if injuries and not profile.get("cleared_by_doctor", False):
         facts.add("not_cleared_by_doctor")
-    
-    return facts
 
-
-def _extract_recovery_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract recovery and fatigue-related facts.
-    
-    Args:
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of recovery-related propositional facts
-    """
-    facts = set()
-    
-    # Recovery status
-    if not profile.get("fully_recovered", True):
-        facts.add("not_fully_recovered")
-    
-    # Sleep quality
-    sleep_quality = profile.get("sleep_quality", "good")
-    if sleep_quality == "poor":
-        facts.add("poor_sleep")
-    
-    # Rest days
-    rest_days = profile.get("rest_days_this_week", 0)
-    if rest_days == 0:
-        facts.add("zero_rest_days_this_week")
-    
-    # Training days
-    days_trained = profile.get("days_trained_this_week", 0)
-    if days_trained >= 6:
-        facts.add("six_plus_training_days")
-    
-    # Previous workout
-    if profile.get("hard_workout_yesterday", False):
-        facts.add("hard_workout_yesterday")
-    
-    if not profile.get("rest_day_yesterday", True):
-        facts.add("no_rest_yesterday")
-    
     return facts
 
 
 def _extract_training_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract training context facts.
-    
-    Args:
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of training-related propositional facts
-    """
     facts = set()
-    
-    # Experience level
-    experience = profile.get("experience_level", "beginner")
-    if experience == "beginner":
-        facts.add("beginner_runner")
-    elif experience == "intermediate":
-        facts.add("intermediate_runner")
-    elif experience == "advanced":
-        facts.add("advanced_runner")
-    
-    # Race proximity
+
+    experience = str(profile.get("experience_level", "beginner")).lower()
+    exp_map = CONFIG["experience_level_facts"]
+    if experience in exp_map:
+        facts.add(exp_map[experience])
+
     race_date_str = profile.get("race_date")
     if race_date_str:
         try:
             race_date = datetime.fromisoformat(race_date_str.replace("Z", "+00:00"))
             today = datetime.now(race_date.tzinfo) if race_date.tzinfo else datetime.now()
-            days_until_race = (race_date - today).days
-            
-            if 0 <= days_until_race <= 7:
+            days_until = (race_date - today).days
+
+            within_days = int(CONFIG["derived_rules"].get("race_within_days", 7))
+            if 0 <= days_until <= within_days:
                 facts.add("race_within_7_days")
         except (ValueError, AttributeError):
-            # Invalid date format, skip
             pass
+
+    return facts
+
+
+def _extract_recovery_facts(profile: Dict[str, Any]) -> Set[str]:
+    facts = set()
     
+    # Direct boolean mappings
+    bool_facts = [
+        "hard_workout_yesterday", 
+        "hard_workout_today"
+    ]
+    
+    for fact in bool_facts:
+        if profile.get(fact, False):
+            facts.add(fact)
+            
+    # Conditional mappings
+    if str(profile.get("sleep_quality", "")).lower() == "poor" or profile.get("poor_sleep", False):
+        facts.add("poor_sleep")
+        
+    if "rest_days_this_week" in profile and profile["rest_days_this_week"] == 0:
+        facts.add("zero_rest_days_this_week")
+    # Also support direct flag just in case
+    if profile.get("zero_rest_days_this_week", False):
+        facts.add("zero_rest_days_this_week")
+        
+    if profile.get("days_trained_this_week", 0) >= 6:
+        facts.add("six_plus_training_days")
+    if profile.get("six_plus_training_days", False):
+         facts.add("six_plus_training_days")
+
+    if "rest_day_yesterday" in profile and not profile["rest_day_yesterday"]:
+        facts.add("no_rest_yesterday")
+    if profile.get("no_rest_yesterday", False):
+        facts.add("no_rest_yesterday")
+            
+    # Handle recovery status
+    if not profile.get("fully_recovered", True) or profile.get("not_fully_recovered", False):
+        facts.add("not_fully_recovered")
+        
     return facts
 
 
 def _extract_environment_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract environment and preparation facts.
-    
-    Args:
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of environment-related propositional facts
-    """
     facts = set()
-    
-    # Weather conditions
-    weather = profile.get("weather", "normal")
-    if weather in ["extreme_heat", "extreme_cold"]:
+
+    weather = str(profile.get("weather", "normal")).lower()
+    if weather in CONFIG["extreme_weather_values"]:
         facts.add("extreme_weather")
-    
-    # Hydration
+
     if not profile.get("hydrated", True):
         facts.add("not_hydrated")
-    
-    # Footwear
+
     if not profile.get("proper_footwear", True):
         facts.add("no_proper_footwear")
-    
+
     return facts
 
 
 def _extract_workout_facts(profile: Dict[str, Any]) -> Set[str]:
-    """
-    Extract proposed workout facts.
-    
-    Args:
-        profile: Runner profile dictionary (contains proposed_workout)
-        
-    Returns:
-        Set of workout-related propositional facts
-    """
     facts = set()
-    
     workout = profile.get("proposed_workout", {})
-    
-    # Workout type
-    workout_type = workout.get("type", "").lower()
-    if "long run" in workout_type or "long" in workout_type:
-        facts.add("long_run")
-        # Long runs are considered hard workouts
-        facts.add("hard_workout_today")
-    elif "tempo" in workout_type:
-        facts.add("tempo_run")
-        facts.add("high_intensity_workout")
-        facts.add("hard_workout_today")
-    elif "interval" in workout_type:
-        facts.add("intervals")
-        facts.add("high_intensity_workout")
-        facts.add("hard_workout_today")
-    elif "easy" in workout_type:
-        facts.add("easy_run")
-    
-    # Terrain
-    terrain = workout.get("terrain", "").lower()
-    if "track" in terrain:
-        facts.add("track_terrain")
-        facts.add("hard_surface")
-    elif "road" in terrain:
-        facts.add("road_terrain")
-        facts.add("hard_surface")
-    elif "trail" in terrain:
-        facts.add("trail_terrain")
-    elif "treadmill" in terrain:
-        facts.add("treadmill_terrain")
-    
+
+    workout_type = str(workout.get("type", "")).lower()
+    for rule in CONFIG["workout_type_mappings"]:
+        if _matches_any(workout_type, rule["contains"]):
+            facts.update(rule["facts"])
+            break
+
+    terrain = str(workout.get("terrain", "")).lower()
+    for rule in CONFIG["terrain_mappings"]:
+        if _matches_any(terrain, rule["contains"]):
+            facts.update(rule["facts"])
+            break
+
     return facts
 
 
 def _compute_derived_facts(facts: Set[str], profile: Dict[str, Any]) -> Set[str]:
-    """
-    Compute facts that require numerical calculations or complex logic.
-    
-    Args:
-        facts: Current set of extracted facts
-        profile: Runner profile dictionary
-        
-    Returns:
-        Set of derived propositional facts
-    """
     derived = set()
-    
+    rules = CONFIG.get("derived_rules", {})
+
     workout = profile.get("proposed_workout", {})
-    distance = workout.get("distance", 0)
-    weekly_mileage = profile.get("weekly_mileage", 0)
-    
-    # Excessive distance check (long run > 1.5x weekly mileage)
-    if "long_run" in facts and weekly_mileage > 0:
-        safe_limit = weekly_mileage * 1.5
-        if distance > safe_limit:
+    distance = workout.get("distance", 0) or 0
+    weekly_mileage = profile.get("weekly_mileage", 0) or 0
+
+    ex = rules.get("excessive_distance", {})
+    if ex.get("enabled", True) and "long_run" in facts and weekly_mileage > 0:
+        multiplier = float(ex.get("long_run_multiplier", 1.5))
+        if distance > weekly_mileage * multiplier:
             derived.add("excessive_distance")
-    
+
     return derived
 
 
-def profile_to_facts(runner_profile: Dict[str, Any]) -> Set[str]:
-    """
-    Alias for extract_facts for backward compatibility.
-    
-    Args:
-        runner_profile: Runner profile dictionary
-        
-    Returns:
-        Set of propositional facts
-    """
-    return extract_facts(runner_profile)
-
-
 def get_fact_explanation(fact: str) -> str:
-    """
-    Get a human-readable explanation of what a propositional fact means.
+    return CONFIG.get("fact_explanations", {}).get(fact, f"Unknown fact: {fact}")
+
+
+def profile_to_facts(profile: Dict[str, Any]) -> Set[str]:
+    facts = set()
+    facts.update(_extract_health_facts(profile))
+    facts.update(_extract_injury_facts(profile))
+    facts.update(_extract_recovery_facts(profile))
+    facts.update(_extract_training_facts(profile))
+    facts.update(_extract_environment_facts(profile))
+    facts.update(_extract_workout_facts(profile))
     
-    Args:
-        fact: Propositional fact string
-        
-    Returns:
-        Human-readable explanation
-        
-    Example:
-        >>> get_fact_explanation("shin_splints")
-        'Runner has shin splints injury'
-    """
-    explanations = {
-        # Health
-        "chest_pain": "Runner experiencing chest pain",
-        "dizziness": "Runner experiencing dizziness",
-        "severe_pain": "Runner experiencing severe pain",
-        
-        # Injuries
-        "shin_splints": "Runner has shin splints injury",
-        "knee_injury": "Runner has knee injury",
-        "plantar_fasciitis": "Runner has plantar fasciitis",
-        "active_injury": "Runner has an active injury",
-        "not_cleared_by_doctor": "Injury not cleared by medical professional",
-        
-        # Recovery
-        "not_fully_recovered": "Runner not fully recovered from previous workout",
-        "poor_sleep": "Runner had poor sleep quality",
-        "zero_rest_days_this_week": "No rest days taken this week",
-        "six_plus_training_days": "Trained 6 or more days this week",
-        "hard_workout_yesterday": "Completed hard workout yesterday",
-        "no_rest_yesterday": "No rest day yesterday",
-        
-        # Training
-        "beginner_runner": "Runner is a beginner",
-        "intermediate_runner": "Runner is intermediate level",
-        "advanced_runner": "Runner is advanced level",
-        "race_within_7_days": "Race scheduled within 7 days",
-        
-        # Environment
-        "extreme_weather": "Extreme heat or cold conditions",
-        "not_hydrated": "Runner is not properly hydrated",
-        "no_proper_footwear": "Runner does not have proper footwear",
-        
-        # Workout
-        "long_run": "Proposed workout is a long run",
-        "tempo_run": "Proposed workout is a tempo run",
-        "intervals": "Proposed workout is intervals",
-        "easy_run": "Proposed workout is an easy run",
-        "high_intensity_workout": "Proposed workout is high intensity",
-        "hard_workout_today": "Today's workout is hard/intense",
-        
-        # Terrain
-        "track_terrain": "Proposed terrain is track",
-        "road_terrain": "Proposed terrain is road",
-        "trail_terrain": "Proposed terrain is trail",
-        "treadmill_terrain": "Proposed terrain is treadmill",
-        "hard_surface": "Proposed terrain is a hard surface",
-        
-        # Derived
-        "excessive_distance": "Distance exceeds safe limit for weekly mileage",
-    }
+    derived = _compute_derived_facts(facts, profile)
+    facts.update(derived)
     
-    return explanations.get(fact, f"Unknown fact: {fact}")
+    return facts
+
+# Alias for backward compatibility if needed by other modules
+extract_facts = profile_to_facts
