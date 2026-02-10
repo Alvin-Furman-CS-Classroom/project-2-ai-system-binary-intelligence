@@ -23,6 +23,7 @@ class SearchResult:
     expanded_nodes: int
 
 
+#calculate the number of week
 def _weeks_until(race_date_str: str) -> int:
     # Expect YYYY-MM-DD
     rd = datetime.strptime(race_date_str, "%Y-%m-%d").date()
@@ -31,12 +32,12 @@ def _weeks_until(race_date_str: str) -> int:
     # Minimum 1 week
     return max(1, (delta_days + 6) // 7)
 
-
+#return the facts based on the profile, which will be used for the safety validator
 def _is_goal(state: TrainingState) -> bool:
     # Goal when we've planned all required weeks
     return state.week_idx >= state.weeks_total
 
-
+# This function checks the safety of a proposed week plan and repairs it if necessary using the safety validator.
 def _validate_and_repair_week(
     runner_profile: Dict[str, Any],
     week_plan: WeekPlan,
@@ -68,19 +69,11 @@ def _validate_and_repair_week(
     return repaired
 
 
-def astar_plan(
-    inputs: Inputs,
-    runner_profile: Optional[Dict[str, Any]] = None,
-    safety_validator: Optional[SafetyValidator] = None,
-    max_expansions: int = 50_000,
-) -> SearchResult:
+def astar_plan( inputs: Inputs,runner_profile: Optional[Dict[str, Any]] = None,safety_validator: Optional[SafetyValidator] = None, max_expansions: int = 50_000,) -> SearchResult:
     """
     Generate a training plan using A* search.
-
     inputs must include:
       - goal, race_date (YYYY-MM-DD), days_per_week, current_weekly_miles, experience, available_terrain
-
-    runner_profile is passed to Module 1 validator if provided.
     """
     runner_profile = runner_profile or {}
 

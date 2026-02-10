@@ -6,28 +6,29 @@ from typing import Any, Dict, List, Tuple
 
 WeekPlan = Dict[str, Any]
 
-
 @dataclass(frozen=True)
 class TrainingState:
+    #current week number
     week_idx: int
+    #total number of weeks in the plan
     weeks_total: int
 
+    #previous week's mileage, used for progression rules
     last_week_miles: float
+    #current week's total mileage
     weekly_miles: float
+    #current week's long run distance
     long_run: float
 
-    # Terrain usage in a sliding window (e.g., last 2–3 weeks). Keep small & hashable.
+    # recent terrain usage(trail, road, track)
     terrain_hist: Tuple[Tuple[str, int], ...] = field(default_factory=tuple)
 
-    # We keep the full plan in the state (for output), but DO NOT include it in the key/hash.
+    # complete history of plan generated so far, used for rationale and terrain_hist reconstruction
     plan_so_far: Tuple[WeekPlan, ...] = field(default_factory=tuple)
 
 
+#create hashtable idenfier for duduplication
 def state_key(s: TrainingState) -> Tuple:
-    """
-    Hashable identity for closed-set / g_score.
-    Avoid including plan text; discretize floats to reduce near-duplicates.
-    """
     return (
         s.week_idx,
         round(s.weekly_miles, 1),
@@ -49,6 +50,7 @@ def _update_terrain_hist(prev: Tuple[Tuple[str, int], ...], week_plan: WeekPlan,
 
 
 def apply_week_plan(prev: TrainingState, week_plan: WeekPlan, terrain_window_weeks: int = 3) -> TrainingState:
+    
     new_plan = prev.plan_so_far + (week_plan,)
 
     # Recompute terrain counts across last N weeks in plan_so_far (including this one)

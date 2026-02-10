@@ -30,7 +30,7 @@ def run_demo():
         "race_date": race_date,
         "days_per_week": 4,
         "current_weekly_miles": 20.0,
-        "experience": "intermediate",
+        "experience": "beginner",
         "available_terrain": ["road", "trail"],
         "min_long_run": 6.0
     }
@@ -39,7 +39,7 @@ def run_demo():
     profile = {
         "injuries": [],
         "weekly_mileage": 20.0,
-        "experience_level": "intermediate",
+        "experience_level": "beginner",
         "hydrated": True,
         "proper_footwear": True,
         "weather": "normal"
@@ -76,7 +76,7 @@ def run_demo():
     if not weeks:
         print("No weeks found in output. Plan dictionary keys:", result.output.keys())
         
-    for w in weeks[:3]:
+    for w in weeks:
         print(f"\nWeek {w['week']} (Total: {w['weekly_total']} miles, Long Run: {w['long_run']} miles)")
         for day in w["workouts"]:
             print(f"  {day['day']}: {day['type']} - {day['distance']} miles ({day['terrain']})")
