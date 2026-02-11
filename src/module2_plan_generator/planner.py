@@ -213,6 +213,7 @@ def generate_plan_detailed(
             days_per_week=config["days_per_week"],
             available_terrain=terrain,
             weekly_miles_history=miles_history,
+            experience=config.get("experience", "beginner"),
         )
 
         analysis.append({

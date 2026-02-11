@@ -153,7 +153,7 @@ class TrainingState:
 
         Returns:
             A list of week dicts, each containing ``week``, ``total_miles``,
-            ``workouts``, ``penalty``, and ``violations`` keys.
+            ``weekly_total`` (alias), ``long_run`` (miles), and ``workouts``.
         """
         states: list[TrainingState] = []
         current: TrainingState | None = self
@@ -165,9 +165,16 @@ class TrainingState:
         plan = []
         for i, state in enumerate(states):
             week_workouts = list(state.plan_weeks[i]) if i < len(state.plan_weeks) else []
+            total_miles = state.weekly_miles_history[i] if i < len(state.weekly_miles_history) else 0
+            long_run = 0.0
+            for w in week_workouts:
+                if w.get("type") == "long run":
+                    long_run = max(long_run, float(w.get("distance", 0)))
             plan.append({
                 "week": i + 1,
-                "total_miles": state.weekly_miles_history[i] if i < len(state.weekly_miles_history) else 0,
+                "total_miles": total_miles,
+                "weekly_total": total_miles,
+                "long_run": round(long_run, 1),
                 "workouts": week_workouts,
             })
         return plan

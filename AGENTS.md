@@ -9,7 +9,7 @@
 | Module | Required Topic(s) | Topic Covered By | Checkpoint Due |
 | ------ | ----------------- | ---------------- | -------------- |
 | 1: Safety Validator | Propositional Logic | Weeks 1-2 | Checkpoint 1 (Feb 11) |
-| 2: Plan Generator | Search Algorithms | Weeks 3-4 | Checkpoint 1 (Feb 11) |
+| 2: Plan Generator | Search Algorithms | Weeks 3-4 | Checkpoint 2 |
 | 3: Run Logger | NLP | Weeks 7-8 | Checkpoint 2 (Feb 26) |
 | 4: Motivation Selector | Game Theory | Weeks 8-9 | Checkpoint 3 (Mar 19) |
 | 5: Adaptive Progression | Reinforcement Learning | Weeks 10-11 | Checkpoint 4 (Apr 2) |

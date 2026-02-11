@@ -26,8 +26,7 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | Module | Topic(s) | Inputs | Outputs | Depends On | Checkpoint |
 | ------ | -------- | ------ | ------- | ---------- | ---------- |
 | 1 | Propositional Logic (Knowledge Bases, Inference, Chaining) | Runner profile dict with injuries, symptoms, training load, recovery status, experience level, environment, available terrain, and proposed workout | Safety assessment dict with safe (bool), reason (str), alternative workout (dict or None), and recommendation (str) if no alternative exists | None | Checkpoint 1 (Feb 11) |
-| 2 |  |  |  |  |  |
-| 2 |  |  |  |  |  |
+| 2 | Search (A*, Heuristics, State-Space Search) | Config dict: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile for safety checks | Plan result dict with success (bool), plan (list of week dicts: week, total_miles, long_run, workouts), total_weeks, total_penalty, search_stats, rationale, errors | Module 1 (optional) | Checkpoint 2 |
 | 3 |  |  |  |  |  |
 | 4 |  |  |  |  |  |
 | 5 |  |  |  |  |  |
@@ -61,11 +60,24 @@ result = validate_workout(profile, workout)  # {"safe": bool, "reason": str, "al
 
 ## Testing
 
-**Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module should have corresponding unit tests.
+**Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module has corresponding unit tests.
 
-**Integration Tests** (`integration_tests/`): Create a new subfolder for each module beyond the first, demonstrating how modules work together.
+**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_plan_generator/`), demonstrating how modules work together.
 
-Provide commands to run tests and describe any test data needed.
+**Run tests** (from repo root):
+
+```bash
+# Unit tests only
+PYTHONPATH=. pytest unit_tests/ -v
+
+# Integration tests only (Module 1 + Module 2 pipeline)
+PYTHONPATH=. pytest integration_tests/ -v
+
+# All tests (unit + integration)
+PYTHONPATH=. pytest unit_tests/ integration_tests/ -v
+```
+
+No external test data required; tests use in-memory configs and profiles.
 
 ## Checkpoint Log
 
