@@ -34,6 +34,7 @@
 2. Produce a plan (use "Plan" mode if available).
 3. Wait for approval before writing or editing code.
 4. After implementation, run the code-review skill and list gaps.
+5. Ask me for confirmation before creating or deleting any files.
 
 ## Key References
 

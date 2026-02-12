@@ -46,7 +46,11 @@ your-repo/
 
 ## Setup
 
-List dependencies, setup steps, and any environment variables required to run the system.
+```bash
+pip install -r requirements.txt
+```
+
+No environment variables required. Module 1 and Module 2 use only the Python standard library plus pytest for tests.
 
 ## Running
 
@@ -62,7 +66,7 @@ result = validate_workout(profile, workout)  # {"safe": bool, "reason": str, "al
 
 **Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module has corresponding unit tests.
 
-**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_plan_generator/`), demonstrating how modules work together.
+**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_integration/`), demonstrating how modules work together.
 
 **Run tests** (from repo root):
 

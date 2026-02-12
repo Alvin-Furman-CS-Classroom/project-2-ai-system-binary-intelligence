@@ -2,7 +2,9 @@
   {
     "name": "chest_pain_block",
     "category": "absolute",
-    "conditions": ["chest_pain"],
+    "conditions": [
+      "chest_pain"
+    ],
     "conclusion": "unsafe_critical",
     "severity": "critical",
     "explanation": "Chest pain requires immediate medical attention",
@@ -11,7 +13,9 @@
   {
     "name": "dizziness_block",
     "category": "absolute",
-    "conditions": ["dizziness"],
+    "conditions": [
+      "dizziness"
+    ],
     "conclusion": "unsafe_critical",
     "severity": "critical",
     "explanation": "Dizziness during exercise can indicate serious medical issues",
@@ -20,7 +24,9 @@
   {
     "name": "severe_pain_block",
     "category": "absolute",
-    "conditions": ["severe_pain"],
+    "conditions": [
+      "severe_pain"
+    ],
     "conclusion": "unsafe_critical",
     "severity": "critical",
     "explanation": "Severe pain indicates potential injury requiring rest",
@@ -29,7 +35,10 @@
   {
     "name": "uncleared_injury_block",
     "category": "absolute",
-    "conditions": ["active_injury", "not_cleared_by_doctor"],
+    "conditions": [
+      "active_injury",
+      "not_cleared_by_doctor"
+    ],
     "conclusion": "unsafe_critical",
     "severity": "critical",
     "explanation": "Active injuries require medical clearance before training",
@@ -38,7 +47,10 @@
   {
     "name": "shin_splints_track",
     "category": "injury_terrain",
-    "conditions": ["shin_splints", "track_terrain"],
+    "conditions": [
+      "shin_splints",
+      "track_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Track running aggravates shin splints due to repetitive turns",
@@ -47,7 +59,10 @@
   {
     "name": "shin_splints_road",
     "category": "injury_terrain",
-    "conditions": ["shin_splints", "road_terrain"],
+    "conditions": [
+      "shin_splints",
+      "road_terrain"
+    ],
     "conclusion": "medium_injury_risk",
     "severity": "medium",
     "explanation": "Road running can aggravate shin splints on hard surfaces",
@@ -56,7 +71,10 @@
   {
     "name": "knee_injury_trail",
     "category": "injury_terrain",
-    "conditions": ["knee_injury", "trail_terrain"],
+    "conditions": [
+      "knee_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running stresses knees with uneven surfaces and elevation changes",
@@ -65,7 +83,10 @@
   {
     "name": "knee_injury_road",
     "category": "injury_terrain",
-    "conditions": ["knee_injury", "road_terrain"],
+    "conditions": [
+      "knee_injury",
+      "road_terrain"
+    ],
     "conclusion": "medium_injury_risk",
     "severity": "medium",
     "explanation": "Road running can stress knees on hard surfaces",
@@ -74,7 +95,10 @@
   {
     "name": "plantar_fasciitis_hard_surface",
     "category": "injury_terrain",
-    "conditions": ["plantar_fasciitis", "hard_surface"],
+    "conditions": [
+      "plantar_fasciitis",
+      "hard_surface"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Hard surfaces aggravate plantar fasciitis",
@@ -83,7 +107,10 @@
   {
     "name": "it_band_trail",
     "category": "injury_terrain",
-    "conditions": ["it_band_syndrome", "trail_terrain"],
+    "conditions": [
+      "it_band_syndrome",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with hills and uneven surfaces can aggravate IT band syndrome",
@@ -92,7 +119,10 @@
   {
     "name": "it_band_track",
     "category": "injury_terrain",
-    "conditions": ["it_band_syndrome", "track_terrain"],
+    "conditions": [
+      "it_band_syndrome",
+      "track_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Track running with repetitive turns in one direction aggravates IT band syndrome",
@@ -101,7 +131,10 @@
   {
     "name": "achilles_trail",
     "category": "injury_terrain",
-    "conditions": ["achilles_tendonitis", "trail_terrain"],
+    "conditions": [
+      "achilles_tendonitis",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with elevation changes stresses Achilles tendon",
@@ -110,7 +143,10 @@
   {
     "name": "achilles_hard_surface",
     "category": "injury_terrain",
-    "conditions": ["achilles_tendonitis", "hard_surface"],
+    "conditions": [
+      "achilles_tendonitis",
+      "hard_surface"
+    ],
     "conclusion": "medium_injury_risk",
     "severity": "medium",
     "explanation": "Hard surfaces can aggravate Achilles tendonitis",
@@ -119,7 +155,9 @@
   {
     "name": "stress_fracture_running",
     "category": "injury_terrain",
-    "conditions": ["stress_fracture"],
+    "conditions": [
+      "stress_fracture"
+    ],
     "conclusion": "unsafe_critical",
     "severity": "critical",
     "explanation": "Stress fractures require complete rest from running to heal properly",
@@ -128,7 +166,10 @@
   {
     "name": "hip_injury_trail",
     "category": "injury_terrain",
-    "conditions": ["hip_injury", "trail_terrain"],
+    "conditions": [
+      "hip_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with uneven surfaces stresses hip stabilizers",
@@ -137,7 +178,10 @@
   {
     "name": "hamstring_trail",
     "category": "injury_terrain",
-    "conditions": ["hamstring_injury", "trail_terrain"],
+    "conditions": [
+      "hamstring_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with uneven surfaces and elevation changes stresses hamstrings",
@@ -146,7 +190,10 @@
   {
     "name": "calf_trail",
     "category": "injury_terrain",
-    "conditions": ["calf_injury", "trail_terrain"],
+    "conditions": [
+      "calf_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with elevation changes and uneven surfaces stresses calves",
@@ -155,7 +202,10 @@
   {
     "name": "calf_hard_surface",
     "category": "injury_terrain",
-    "conditions": ["calf_injury", "hard_surface"],
+    "conditions": [
+      "calf_injury",
+      "hard_surface"
+    ],
     "conclusion": "medium_injury_risk",
     "severity": "medium",
     "explanation": "Hard surfaces can aggravate calf injuries",
@@ -164,7 +214,10 @@
   {
     "name": "ankle_trail",
     "category": "injury_terrain",
-    "conditions": ["ankle_injury", "trail_terrain"],
+    "conditions": [
+      "ankle_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with uneven surfaces increases ankle instability and reinjury risk",
@@ -173,7 +226,10 @@
   {
     "name": "back_injury_trail",
     "category": "injury_terrain",
-    "conditions": ["back_injury", "trail_terrain"],
+    "conditions": [
+      "back_injury",
+      "trail_terrain"
+    ],
     "conclusion": "high_injury_risk",
     "severity": "high",
     "explanation": "Trail running with uneven surfaces and impact stresses lower back",
@@ -182,7 +238,10 @@
   {
     "name": "back_injury_hard_surface",
     "category": "injury_terrain",
-    "conditions": ["back_injury", "hard_surface"],
+    "conditions": [
+      "back_injury",
+      "hard_surface"
+    ],
     "conclusion": "medium_injury_risk",
     "severity": "medium",
     "explanation": "Hard surfaces increase impact forces on back",
@@ -191,7 +250,9 @@
   {
     "name": "excessive_distance",
     "category": "training_load",
-    "conditions": ["excessive_distance"],
+    "conditions": [
+      "excessive_distance"
+    ],
     "conclusion": "unsafe_high",
     "severity": "high",
     "explanation": "Long run distance exceeds safe limit (1.5x weekly mileage)",
@@ -200,7 +261,10 @@
   {
     "name": "beginner_high_intensity",
     "category": "training_load",
-    "conditions": ["beginner_runner", "high_intensity_workout"],
+    "conditions": [
+      "beginner_runner",
+      "high_intensity_workout"
+    ],
     "conclusion": "unsafe_high",
     "severity": "high",
     "explanation": "Beginners should not perform high-intensity workouts without proper base",
@@ -209,7 +273,11 @@
   {
     "name": "consecutive_hard_workouts",
     "category": "training_load",
-    "conditions": ["hard_workout_yesterday", "hard_workout_today", "no_rest_yesterday"],
+    "conditions": [
+      "hard_workout_yesterday",
+      "hard_workout_today",
+      "no_rest_yesterday"
+    ],
     "conclusion": "overtraining_risk",
     "severity": "medium",
     "explanation": "Back-to-back hard workouts without rest increases injury risk",
@@ -218,7 +286,10 @@
   {
     "name": "race_week_long_run",
     "category": "training_load",
-    "conditions": ["race_within_7_days", "long_run"],
+    "conditions": [
+      "race_within_7_days",
+      "long_run"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "Long runs within 7 days of race prevent proper taper",
@@ -227,7 +298,10 @@
   {
     "name": "insufficient_recovery_high_intensity",
     "category": "recovery_fatigue",
-    "conditions": ["not_fully_recovered", "high_intensity_workout"],
+    "conditions": [
+      "not_fully_recovered",
+      "high_intensity_workout"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "High-intensity workouts require full recovery from previous training",
@@ -236,7 +310,10 @@
   {
     "name": "poor_sleep_high_intensity",
     "category": "recovery_fatigue",
-    "conditions": ["poor_sleep", "high_intensity_workout"],
+    "conditions": [
+      "poor_sleep",
+      "high_intensity_workout"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "Poor sleep impairs performance and increases injury risk during intense workouts",
@@ -245,7 +322,10 @@
   {
     "name": "no_rest_days",
     "category": "recovery_fatigue",
-    "conditions": ["zero_rest_days_this_week", "six_plus_training_days"],
+    "conditions": [
+      "zero_rest_days_this_week",
+      "six_plus_training_days"
+    ],
     "conclusion": "overtraining_risk",
     "severity": "medium",
     "explanation": "Training 6+ days without rest increases overtraining and injury risk",
@@ -254,7 +334,9 @@
   {
     "name": "extreme_weather",
     "category": "environment_preparation",
-    "conditions": ["extreme_weather"],
+    "conditions": [
+      "extreme_weather"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "Extreme heat or cold increases risk of heat illness or hypothermia",
@@ -263,7 +345,9 @@
   {
     "name": "not_hydrated",
     "category": "environment_preparation",
-    "conditions": ["not_hydrated"],
+    "conditions": [
+      "not_hydrated"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "Dehydration impairs performance and increases health risks",
@@ -272,7 +356,9 @@
   {
     "name": "improper_footwear",
     "category": "environment_preparation",
-    "conditions": ["no_proper_footwear"],
+    "conditions": [
+      "no_proper_footwear"
+    ],
     "conclusion": "unsafe_medium",
     "severity": "medium",
     "explanation": "Improper footwear significantly increases injury risk",

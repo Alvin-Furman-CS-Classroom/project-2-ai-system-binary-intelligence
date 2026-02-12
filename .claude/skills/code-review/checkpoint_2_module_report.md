@@ -9,7 +9,7 @@
 
 ## Summary
 
-Checkpoint 2 is complete and aligned with the README specification. Module 2 adds the plan generator (A* search, constraints, heuristics) with clear inputs (config: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile) and outputs (success, plan with weekly total_miles/long_run/workouts, total_weeks, total_penalty, search_stats, rationale, errors). Integration with Module 1 is implemented (validate_fn, critical-safety block). All **537 tests** pass (518 unit + 19 integration). Integration tests in `integration_tests/module2_plan_generator/` cover the full Module 1 → Module 2 pipeline: plan structure, every-workout safety, critical-safety blocking, advisory notes, generate_plan_detailed, experience levels and terrain, and edge cases. The README module table is filled in for Module 2.
+Checkpoint 2 is complete and aligned with the README specification. Module 2 adds the plan generator (A* search, constraints, heuristics) with clear inputs (config: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile) and outputs (success, plan with weekly total_miles/long_run/workouts, total_weeks, total_penalty, search_stats, rationale, errors). Integration with Module 1 is implemented (validate_fn, critical-safety block). All **537 tests** pass (518 unit + 19 integration). Integration tests in `integration_tests/module2_integration/` cover the full Module 1 → Module 2 pipeline: plan structure, every-workout safety, critical-safety blocking, advisory notes, generate_plan_detailed, experience levels and terrain, and edge cases. The README module table is filled in for Module 2.
 
 ---
 
@@ -36,7 +36,7 @@ Checkpoint 2 is complete and aligned with the README specification. Module 2 add
 **Score: 6/6 (Test Coverage and Design)**
 
 - **Unit tests:** 518 across both modules (Module 1: validator, inference, facts, rules, alternatives, input validation, experience levels; Module 2: planner, search, states, actions, constraints, heuristics, input validation). Core behavior, edge cases, and error paths covered.
-- **Integration tests:** 19 tests in `integration_tests/module2_plan_generator/` using the real Module 1 `validate_workout`: full pipeline, plan structure, every-workout safety validation, critical-safety blocking (e.g. chest_pain), advisory notes, generate_plan_detailed, experience/terrain variants, and edge cases. Clear distinction between unit and integration tests.
+- **Integration tests:** 19 tests in `integration_tests/module2_integration/` using the real Module 1 `validate_workout`: full pipeline, plan structure, every-workout safety validation, critical-safety blocking (e.g. chest_pain), advisory notes, generate_plan_detailed, experience/terrain variants, and edge cases. Clear distinction between unit and integration tests.
 
 ### Documentation  
 **Score: 4/4**
@@ -103,5 +103,5 @@ Participation requirement must be satisfied separately (commit history evidence)
 
 ## Action Items
 
-- [x] Integration tests added in `integration_tests/module2_plan_generator/` (19 tests, full Module 1 → Module 2 pipeline).
+- [x] Integration tests added in `integration_tests/module2_integration/` (19 tests, full Module 1 → Module 2 pipeline).
 - [ ] Confirm commit history and PR usage meet participation and collaboration expectations.

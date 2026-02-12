@@ -1,7 +1,7 @@
 """
 rules.py (JSON-backed)
 
-Loads safety rules from the project-root safety_rules.json and exposes:
+Loads safety rules from rules.json (same directory) and exposes:
 - ABSOLUTE_SAFETY_RULES, INJURY_TERRAIN_RULES, ...
 - SAFETY_RULES (combined list)
 - get_rules_by_category()
@@ -80,8 +80,7 @@ def _load_rules_from_json(path: Path) -> Dict[str, List[SafetyRule]]:
     return rules_by_category
 
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-_RULES_PATH = _PROJECT_ROOT / "data" / "safety_rules.json"
+_RULES_PATH = Path(__file__).resolve().parent / "rules.json"
 
 try:
     _rules_by_category = _load_rules_from_json(_RULES_PATH)

@@ -5,7 +5,7 @@ These tests verify that the full pipeline works: plan generation with real
 Module 1 validation, plan structure, safety of every workout, critical
 safety blocking, advisories, and experience-level behavior.
 
-Run from repo root: pytest integration_tests/module2_plan_generator/ -v
+Run from repo root: pytest integration_tests/module2_integration/ -v
 Or: PYTHONPATH=. pytest integration_tests/ -v
 """
 from __future__ import annotations
