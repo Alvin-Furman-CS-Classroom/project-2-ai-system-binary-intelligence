@@ -13,8 +13,9 @@ class ValidationResult(TypedDict, total=False):
     reason: str
     alternative: Optional[Dict[str, Any]]
     recommendation: str
+    severity: str  # "none" | "medium" | "high" | "critical"; present when safe=False for plan-generator tiering
 from .facts import extract_facts
-from .rules import SAFETY_RULES
+from .rules import SAFETY_RULES, SEVERITY_CRITICAL, SEVERITY_NONE
 from .inference import forward_chain, determine_safety
 from .alternatives import generate_alternative, can_suggest_alternative, suggest_rest_day_message
 
@@ -96,7 +97,8 @@ def validate_workout(
             "safe": False,
             "reason": f"Invalid input: {input_error}",
             "alternative": None,
-            "recommendation": None
+            "recommendation": None,
+            "severity": SEVERITY_CRITICAL,
         }
     
     # Validate input has required fields
@@ -105,7 +107,8 @@ def validate_workout(
             "safe": False,
             "reason": "No proposed workout provided",
             "alternative": None,
-            "recommendation": "rest"
+            "recommendation": "rest",
+            "severity": SEVERITY_CRITICAL,
         }
     
     # Extract propositional facts from input
@@ -122,7 +125,8 @@ def validate_workout(
         return {
             "safe": True,
             "reason": "Workout meets all safety criteria",
-            "alternative": None
+            "alternative": None,
+            "severity": SEVERITY_NONE,
         }
     
     # Workout is unsafe - generate explanation
@@ -133,11 +137,12 @@ def validate_workout(
     if can_suggest_alternative(fired_rules):
         alternative = generate_alternative(runner_profile, proposed_workout, fired_rules)
     
-    # Build response
+    # Build response (severity allows plan generator to tier: critical=block, high=use alt, medium=advisory)
     result = {
         "safe": False,
         "reason": reason,
-        "alternative": alternative
+        "alternative": alternative,
+        "severity": severity,
     }
     
     # Add recommendation if no alternative exists
@@ -225,7 +230,8 @@ def validate_workout_detailed(
         result = {
             "safe": True,
             "reason": "Workout meets all safety criteria",
-            "alternative": None
+            "alternative": None,
+            "severity": SEVERITY_NONE,
         }
     else:
         reason = _generate_reason(fired_rules)
@@ -236,7 +242,8 @@ def validate_workout_detailed(
         result = {
             "safe": False,
             "reason": reason,
-            "alternative": alternative
+            "alternative": alternative,
+            "severity": severity,
         }
         
         if alternative is None:
