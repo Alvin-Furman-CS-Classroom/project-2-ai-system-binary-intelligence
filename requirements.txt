@@ -1,3 +1,6 @@
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.10.0
 iniconfig==2.3.0
 packaging==26.0
 pluggy==1.6.0

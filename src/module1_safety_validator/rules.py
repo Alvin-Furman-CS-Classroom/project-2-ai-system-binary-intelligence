@@ -80,7 +80,9 @@ def _load_rules_from_json(path: Path) -> Dict[str, List[SafetyRule]]:
     return rules_by_category
 
 
-_RULES_PATH = Path(__file__).resolve().parent / "rules.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_RULES_PATH = PROJECT_ROOT / "data" / "rules.json"
+
 
 try:
     _rules_by_category = _load_rules_from_json(_RULES_PATH)

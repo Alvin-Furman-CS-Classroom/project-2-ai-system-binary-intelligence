@@ -1,26 +1,3 @@
-"""
-Main entry point for the training plan generator.
-
-This module provides the public-facing functions that external code calls.
-It orchestrates input validation, state creation, A* search, and result
-formatting, analogous to how ``validator.py`` works in Module 1.
-
-Example:
-    >>> from module2_plan_generator.planner import generate_plan
-    >>> config = {
-    ...     "goal": "complete marathon",
-    ...     "race_date": "2025-10-15",
-    ...     "days_per_week": 4,
-    ...     "current_weekly_miles": 15,
-    ...     "experience": "beginner",
-    ...     "available_terrain": ["road", "trail"],
-    ... }
-    >>> result = generate_plan(config)
-    >>> result["success"]
-    True
-    >>> len(result["plan"]) > 0
-    True
-"""
 
 from __future__ import annotations
 
@@ -38,49 +15,7 @@ def generate_plan(
     runner_profile: dict | None = None,
     max_nodes: int = 50_000,
 ) -> dict[str, Any]:
-    """Generate a complete marathon training plan using A* search.
 
-    This is the main public function. It validates input, sets up the
-    search, and returns a structured plan.
-
-    Args:
-        config: Planner configuration dict with keys:
-            - ``goal`` (str): Race goal, e.g. "complete marathon".
-            - ``race_date`` (str): ISO date string (YYYY-MM-DD).
-            - ``days_per_week`` (int): Training days per week (3-6).
-            - ``current_weekly_miles`` (float): Current base mileage.
-            - ``experience`` (str): "beginner", "intermediate", or
-              "advanced".
-            - ``available_terrain`` (list[str]): Terrain options.
-        validate_fn: Optional reference to Module 1's
-            ``validate_workout(profile, workout)`` function. When
-            provided, every candidate workout is safety-checked.
-        runner_profile: Runner profile dict for Module 1 validation.
-        max_nodes: Maximum search nodes to expand (safety limit).
-
-    Returns:
-        A dict with keys:
-        - ``success`` (bool): Whether a plan was generated.
-        - ``plan`` (list[dict]): List of week dicts, each with ``week``,
-          ``total_miles``, and ``workouts``.
-        - ``total_weeks`` (int): Number of weeks in the plan.
-        - ``total_penalty`` (float): Total constraint violation score.
-        - ``search_stats`` (dict): Nodes explored/generated, algorithm.
-        - ``rationale`` (str): Human-readable plan description.
-        - ``errors`` (list[str]): Validation errors (if any).
-
-    Example:
-        >>> result = generate_plan({
-        ...     "goal": "complete marathon",
-        ...     "race_date": "2025-12-01",
-        ...     "days_per_week": 4,
-        ...     "current_weekly_miles": 20,
-        ...     "experience": "intermediate",
-        ...     "available_terrain": ["road", "track", "trail"],
-        ... })
-        >>> result["success"]
-        True
-    """
     # Step 1: Validate input.
     errors = validate_planner_input(config)
     if errors:
@@ -168,21 +103,7 @@ def generate_plan_detailed(
     runner_profile: dict | None = None,
     max_nodes: int = 50_000,
 ) -> dict[str, Any]:
-    """Generate a plan with additional debug and analysis information.
-
-    Same as ``generate_plan`` but includes per-week penalty breakdowns
-    and search statistics useful for development and testing.
-
-    Args:
-        config: Same as ``generate_plan``.
-        validate_fn: Same as ``generate_plan``.
-        runner_profile: Same as ``generate_plan``.
-        max_nodes: Same as ``generate_plan``.
-
-    Returns:
-        Same as ``generate_plan`` plus:
-        - ``weekly_analysis`` (list[dict]): Per-week penalty breakdown.
-    """
+   
     result = generate_plan(config, validate_fn, runner_profile, max_nodes)
 
     if not result["success"]:
