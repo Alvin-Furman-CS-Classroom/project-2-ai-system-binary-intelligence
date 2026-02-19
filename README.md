@@ -87,8 +87,8 @@ No external test data required; tests use in-memory configs and profiles.
 
 | Checkpoint | Date | Modules Included | Status | Evidence |
 | ---------- | ---- | ---------------- | ------ | -------- |
-| 1 | Feb 14, 2025 | Module 1 | Completed |  |
-| 2 | Feb 14, 2025 | Module 2 | Completed |  |
+| 1 | Feb 14, 2025 | Module 1 & 2 | Completed |  |
+| 2 |  |  |  |  |
 | 3 |  |  |  |  |
 | 4 |  |  |  |  |
 
