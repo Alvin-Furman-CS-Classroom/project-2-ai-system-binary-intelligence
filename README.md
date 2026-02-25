@@ -27,7 +27,7 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | ------ | -------- | ------ | ------- | ---------- | ---------- |
 | 1 | Propositional Logic (Knowledge Bases, Inference, Chaining) | Runner profile dict with injuries, symptoms, training load, recovery status, experience level, environment, available terrain, and proposed workout | Safety assessment dict with safe (bool), reason (str), alternative workout (dict or None), and recommendation (str) if no alternative exists | None | Checkpoint 1 (Feb 11) |
 | 2 | Search (A*, Heuristics, State-Space Search) | Config dict: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile for safety checks | Plan result dict with success (bool), plan (list of week dicts: week, total_miles, long_run, workouts), total_weeks, total_penalty, search_stats, rationale, errors | Module 1 (optional) | Checkpoint 1 (Feb 11) |
-| 3 |  |  |  |  |  |
+| 3 | NLP (regex/n-grams, distributional semantics, sentiment) | Free-text run description (str); optional store_path for log_run / get_run_history | parse_run: dict (type, distance, pace_minutes, terrain, sentiment, notes). log_run: run ID (str). get_run_history: list of run entry dicts | None (integrates with M1/M2 for validation and plan alignment) | Checkpoint 2 (Feb 26) |
 | 4 |  |  |  |  |  |
 | 5 |  |  |  |  |  |
 | 6 (optional) |  |  |  |  |  |
@@ -62,11 +62,20 @@ workout = {"type": "long run", "distance": 10, "terrain": "road"}
 result = validate_workout(profile, workout)  # {"safe": bool, "reason": str, "alternative": ...}
 ```
 
+**Module 3 (run logger):**
+```python
+from src.module3_run_logger import parse_run, log_run, get_run_history
+result = parse_run("easy 5 miles on the road, felt great")
+# result: type, distance, pace_minutes, terrain, sentiment, notes
+run_id = log_run("long run 10 miles on track", store_path="data/run_log.json")
+recent = get_run_history(n=5, store_path="data/run_log.json")
+```
+
 ## Testing
 
 **Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module has corresponding unit tests.
 
-**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_integration/`), demonstrating how modules work together.
+**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_integration/`, `integration_tests/module3_integration/`), demonstrating how modules work together.
 
 **Run tests** (from repo root):
 
