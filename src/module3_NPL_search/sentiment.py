@@ -1,22 +1,4 @@
-"""
-Effort sentiment scoring using a weighted lexicon.
-
-Classifies perceived effort from free-text run descriptions into one of
-four categories: easy, moderate, hard, or struggled. Uses a bag-of-words
-approach with negation detection — the same statistical spirit as n-gram
-language models but applied to a curated domain vocabulary.
-
-Example:
-    >>> from module3_run_logger.sentiment import SentimentScorer
-    >>> scorer = SentimentScorer()
-    >>> scorer.score("felt great, legs were fresh the whole way")
-    'easy'
-    >>> scorer.score("barely made it, dead legs by mile 8")
-    'struggled'
-"""
-
 import re
-
 
 # Words that flip sentiment of the next positive/negative word.
 _NEGATIONS: set[str] = {

@@ -1,34 +1,8 @@
-"""
-Token extraction using n-gram style regex patterns.
-
-Extracts numeric entities (distance, pace) from free-text run descriptions
-by scanning for known word-pair patterns — the same idea as bigram/trigram
-context matching from the course slides.
-
-Example:
-    >>> from module3_run_logger.extractor import TokenExtractor
-    >>> ex = TokenExtractor()
-    >>> ex.extract_distance("ran 10 miles on the trail")
-    10.0
-    >>> ex.extract_pace("finished at 9:30 pace")
-    9.5
-"""
-
 import re
 from typing import Optional
 
 
 class TokenExtractor:
-    """Extracts distance and pace values from free-text run descriptions.
-
-    Uses regex patterns that capture common runner phrasings. Each pattern
-    is essentially a bigram or trigram: a number token paired with a unit
-    token (or a pace token paired with a colon-separated time).
-
-    Distance patterns cover miles, kilometres, and named race distances.
-    Pace patterns cover MM:SS formats with optional /mile or /km suffixes.
-    """
-
     # Named race distances in miles.
     _NAMED_DISTANCES: dict[str, float] = {
         "marathon": 26.2,
