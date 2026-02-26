@@ -4,7 +4,7 @@ Module 3: Natural Language Run Logger.
 Converts free-text run descriptions into structured data using:
 - N-gram regex patterns for distance and pace extraction
 - Word2Vec embeddings + cosine similarity for terrain and workout type
-- Weighted sentiment lexicon for effort classification
+- Sentiment (mood) and effort (workout difficulty) classification
 - JSON persistence for historical run storage
 
 Public API:
@@ -12,12 +12,9 @@ Public API:
     log_run       - Parse and persist a run entry, returning the run ID.
     get_run_history - Retrieve stored run history.
 
-Example:
-    >>> from src.module3_run_logger import parse_run, log_run
-    >>> result = parse_run("easy 5 miles on the road, felt great")
-    >>> result
-    {'type': 'easy run', 'distance': 5.0, 'pace_minutes': None,
-     'terrain': 'road', 'sentiment': 'easy', 'notes': '...'}
+Parsed dict includes:
+    sentiment - how the user feels (positive, neutral, negative)
+    effort    - how hard the run felt (easy, moderate, hard, struggled)
 """
 
 from .parser import RunLogParser
@@ -34,8 +31,8 @@ def parse_run(text: str) -> dict:
         text: Free-text run description from the runner.
 
     Returns:
-        Structured dict with type, distance, pace_minutes, terrain,
-        sentiment, and notes fields.
+        Dict with type, distance, pace_minutes, terrain, sentiment (mood),
+        effort (workout difficulty), and notes.
     """
     return _DEFAULT_PARSER.parse(text)
 

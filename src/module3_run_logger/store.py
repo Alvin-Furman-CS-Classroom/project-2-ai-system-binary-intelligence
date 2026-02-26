@@ -1,16 +1,3 @@
-"""
-Run log storage using JSON persistence.
-
-Stores parsed run entries with timestamps so Module 5 (progression)
-and Module 6 (predictions) can access historical run data.
-
-Example:
-    >>> from module3_run_logger.store import RunLogStore
-    >>> store = RunLogStore("data/run_log.json")
-    >>> store.save_run("felt good today, 5 miles easy", {"type": "easy", "distance": 5.0})
-    >>> runs = store.get_recent_runs(5)
-"""
-
 import json
 import os
 from datetime import datetime
@@ -146,7 +133,7 @@ class RunLogStore:
     def _ensure_file(self) -> None:
         """Create the JSON file and any parent directories if needed."""
         os.makedirs(os.path.dirname(self.filepath) or ".", exist_ok=True)
-        if not os.path.exists(self.filepath):
+        if not os.path.exists(self.filepath) or os.path.getsize(self.filepath) == 0:
             self._save({"runs": [], "next_id": 1})
 
     def _load(self) -> dict[str, Any]:

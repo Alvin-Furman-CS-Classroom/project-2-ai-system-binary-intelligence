@@ -26,7 +26,8 @@ def sample_parsed():
         "distance": 5.0,
         "pace_minutes": 9.5,
         "terrain": "road",
-        "sentiment": "easy",
+        "sentiment": "positive",
+        "effort": "easy",
         "notes": "felt great",
     }
 

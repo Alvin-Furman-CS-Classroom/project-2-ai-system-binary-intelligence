@@ -1,34 +1,8 @@
-"""
-Token extraction using n-gram style regex patterns.
-
-Extracts numeric entities (distance, pace) from free-text run descriptions
-by scanning for known word-pair patterns — the same idea as bigram/trigram
-context matching from the course slides.
-
-Example:
-    >>> from module3_run_logger.extractor import TokenExtractor
-    >>> ex = TokenExtractor()
-    >>> ex.extract_distance("ran 10 miles on the trail")
-    10.0
-    >>> ex.extract_pace("finished at 9:30 pace")
-    9.5
-"""
-
 import re
 from typing import Optional
 
 
 class TokenExtractor:
-    """Extracts distance and pace values from free-text run descriptions.
-
-    Uses regex patterns that capture common runner phrasings. Each pattern
-    is essentially a bigram or trigram: a number token paired with a unit
-    token (or a pace token paired with a colon-separated time).
-
-    Distance patterns cover miles, kilometres, and named race distances.
-    Pace patterns cover MM:SS formats with optional /mile or /km suffixes.
-    """
-
     # Named race distances in miles.
     _NAMED_DISTANCES: dict[str, float] = {
         "marathon": 26.2,
@@ -43,9 +17,9 @@ class TokenExtractor:
     # Ordered list of (pattern, handler) tuples tried in sequence.
     # First match wins.
     _DISTANCE_PATTERNS: list[tuple[str, str]] = [
-        # "10 miles", "10.5 miles", "10 mi"
+        # Reps × meters (e.g. 6x800m); total converted to miles.
+        (r"(\d+)\s*x\s*(\d+)\s*m\b", "reps_meters"),
         (r"(\d+(?:\.\d+)?)\s*(?:miles?|mi\b)", "miles"),
-        # "10 km", "10 kilometers", "10k" (kilom = k+ilo+m for kilometre/kilometer)
         (r"(\d+(?:\.\d+)?)\s*(?:k(?:m|ilom(?:et(?:re|er)s?)?)?\b)", "km"),
     ]
 
@@ -80,6 +54,11 @@ class TokenExtractor:
         for pattern, unit in self._DISTANCE_PATTERNS:
             match = re.search(pattern, lower)
             if match:
+                if unit == "reps_meters":
+                    reps = int(match.group(1))
+                    meters = int(match.group(2))
+                    total_miles = round((reps * meters / 1000) * 0.621371, 2)
+                    return total_miles
                 value = float(match.group(1))
                 if unit == "km":
                     value = round(value * 0.621371, 2)

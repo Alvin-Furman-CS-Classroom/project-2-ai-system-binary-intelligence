@@ -21,7 +21,7 @@ class TestOutputStructure:
 
     def test_has_all_required_keys(self, parser):
         result = parser.parse("easy 5 miles on the road")
-        for key in ("type", "distance", "pace_minutes", "terrain", "sentiment", "notes"):
+        for key in ("type", "distance", "pace_minutes", "terrain", "sentiment", "effort", "notes"):
             assert key in result
 
     def test_notes_preserves_original_text(self, parser):
@@ -41,7 +41,8 @@ class TestProposalExample:
         assert result["distance"] == 10.0
         assert abs(result["pace_minutes"] - 9.5) < 0.01
         assert result["terrain"] == "trail"
-        assert result["sentiment"] in ("hard", "struggled", "moderate")
+        assert result["effort"] in ("hard", "struggled", "moderate")
+        assert result["sentiment"] in ("positive", "neutral", "negative")
 
 
 class TestVariousInputs:
@@ -50,7 +51,8 @@ class TestVariousInputs:
         assert result["type"] == "easy run"
         assert result["distance"] == 5.0
         assert result["terrain"] == "road"
-        assert result["sentiment"] == "easy"
+        assert result["effort"] == "easy"
+        assert result["sentiment"] in ("positive", "neutral")
 
     def test_treadmill_run(self, parser):
         result = parser.parse("5 miles on the treadmill, okay run")
@@ -63,7 +65,8 @@ class TestVariousInputs:
     def test_interval_session(self, parser):
         result = parser.parse("track intervals today, exhausted after")
         assert result["type"] == "interval"
-        assert result["sentiment"] == "struggled"
+        assert result["effort"] == "struggled"
+        assert result["sentiment"] in ("negative", "neutral")
 
     def test_no_distance_is_none(self, parser):
         result = parser.parse("easy jog today, felt good")
