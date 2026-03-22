@@ -28,7 +28,7 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | 1 | Propositional Logic (Knowledge Bases, Inference, Chaining) | Runner profile dict with injuries, symptoms, training load, recovery status, experience level, environment, available terrain, and proposed workout | Safety assessment dict with safe (bool), reason (str), alternative workout (dict or None), and recommendation (str) if no alternative exists | None | Checkpoint 1 (Feb 11) |
 | 2 | Search (A*, Heuristics, State-Space Search) | Config dict: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile for safety checks | Plan result dict with success (bool), plan (list of week dicts: week, total_miles, long_run, workouts), total_weeks, total_penalty, search_stats, rationale, errors | Module 1 (optional) | Checkpoint 1 (Feb 11) |
 | 3 | NLP (regex/n-grams, distributional semantics, sentiment) | Free-text run description (str); optional store_path for log_run / get_run_history | parse_run: dict (type, distance, pace_minutes, terrain, sentiment, effort, notes). log_run: run ID (str). get_run_history: list of run entry dicts | None (integrates with M1/M2 for validation and plan alignment) | Checkpoint 2 (Feb 26) |
-| 4 |  |  |  |  |  |
+| 4 | Game Theory (Sequential Games, Nash-like strategy selection) | Context dict: current_streak, recent_sentiments, terrain_last_week, adherence_percent, days_to_race | Strategy dict with strategy (str), message_tone (str), reasoning (str); detailed variant also returns per-strategy scores and inferred runner state | Module 3 (uses sentiment / history) | Checkpoint 3 (Mar 19) |
 | 5 |  |  |  |  |  |
 | 6 (optional) |  |  |  |  |  |
 
@@ -98,7 +98,7 @@ No external test data required; tests use in-memory configs and profiles.
 | ---------- | ---- | ---------------- | ------ | -------- |
 | 1 | Feb 14, 2025 | Module 1 & 2 | Completed |  |
 | 2 |  |  |  |  |
-| 3 |  |  |  |  |
+| 3 | Mar 19, 2026 | Module 4 | Completed | `checkpoints/checkpoint_3_elegance_report.md`, `checkpoints/checkpoint_3_module_report.md`; `PYTHONPATH=. pytest unit_tests/ integration_tests/ -v` (688 passed) |
 | 4 |  |  |  |  |
 
 ## Required Workflow (Agent-Guided)

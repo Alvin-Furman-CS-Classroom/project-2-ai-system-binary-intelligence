@@ -80,7 +80,7 @@ The module uses word embeddings to match informal workout and terrain descriptio
 
 ### Module 4: Motivation Strategy Selector
 
-**Topics:** Game Theory (Nash Equilibrium, Sequential Move Games)
+**Topics:** Game Theory (Normal-Form Games, Best Responses)
 
 **Input:** Runner's current training streak, recent workout sentiment scores, terrain variety, and plan adherence.
 ```python
@@ -96,7 +96,7 @@ The module uses word embeddings to match informal workout and terrain descriptio
 
 **Prerequisites:** Game Theory content from Weeks 8-9. Requires Module 3 for sentiment input.
 
-The module models the coach-runner interaction as a sequential game where the system chooses between pushing harder, maintaining volume, encouraging rest, or suggesting terrain changes. The runner "responds" through adherence and sentiment in subsequent workouts. Finding Nash equilibrium between maximizing fitness gains and preventing burnout keeps runners consistent. The payoff matrix weighs short-term mileage against long-term injury risk and mental freshness, recognizing that overtraining leads to missed weeks while monotonous training kills motivation.
+The module models the coach-runner interaction as a repeated normal-form game where, at each step, the coach chooses between pushing harder, maintaining volume, encouraging rest, or suggesting terrain changes. The runner's behavior is summarized by adherence and sentiment patterns rather than explicit strategic choices. The system computes the coach's best response (in the sense of BR_coach from the course) to this modeled runner state, using a payoff structure that weighs short-term mileage gains against long-term injury risk and mental freshness. This framing connects directly to the slides' utility-based reasoning while avoiding claims of a full Nash equilibrium between two fully rational agents.
 
 ---
 
