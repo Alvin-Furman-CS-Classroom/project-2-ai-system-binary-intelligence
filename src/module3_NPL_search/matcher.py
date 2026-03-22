@@ -157,7 +157,6 @@ class EmbeddingMatcher:
     # FIX: Added `self` parameter (was missing, caused crash when called as instance method)
     def _extract_miles(self, text: str) -> Optional[float]:
         t = text.lower()
-
         # Handle interval notation: NxDISTunit (e.g., "2x800m", "3x1km")
         m = re.search(r"(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(m|km|mi|mile|miles)\b", t)
         if m:
