@@ -8,7 +8,8 @@ from .input_validation import MotivationContext
 
 COACH_STRATEGIES = ("push_harder", "maintain", "encourage_rest", "encourage_variety")
 
-RUNNER_STATES = ("engaged", "frazzled", "bored", "burnout_risk")
+# "mixed" is the catch-all when no other pattern wins (not a negative label).
+RUNNER_STATES = ("engaged", "mixed", "bored", "burnout_risk")
 
 
 @dataclass
@@ -55,7 +56,7 @@ def infer_runner_state(context: MotivationContext) -> str:
     if good_count >= 2 and high_adherence:
         return "engaged"
 
-    return "frazzled"
+    return "mixed"
 
 
 def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
@@ -72,7 +73,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
         scores["maintain"] += 2.0
         scores["encourage_rest"] += 0.5
         scores["encourage_variety"] += 1.5
-    elif state == "frazzled":
+    elif state == "mixed":
         scores["maintain"] += 2.5
         scores["encourage_rest"] += 2.0
         scores["encourage_variety"] += 1.5
@@ -99,7 +100,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
     # Race proximity: closer to race increases value of maintaining or
     # slightly pushing if not burned out.
     days = context.days_to_race
-    if days <= 21 and state in {"engaged", "frazzled"}:
+    if days <= 21 and state in {"engaged", "mixed"}:
         scores["maintain"] += 1.0
         scores["push_harder"] += 0.5
         scores["encourage_rest"] += 0.5
@@ -108,7 +109,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
         # introducing big terrain changes just for variety.
         scores["maintain"] += 2.0
         scores["encourage_variety"] -= 1.5
-    elif days >= 60 and state in {"frazzled", "burnout_risk"}:
+    elif days >= 60 and state in {"mixed", "burnout_risk"}:
         scores["encourage_rest"] += 1.0
 
     # Terrain monotony: increase value of variety.

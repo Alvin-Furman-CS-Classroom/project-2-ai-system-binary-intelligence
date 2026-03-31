@@ -29,7 +29,7 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | 2 | Search (A*, Heuristics, State-Space Search) | Config dict: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile for safety checks | Plan result dict with success (bool), plan (list of week dicts: week, total_miles, long_run, workouts), total_weeks, total_penalty, search_stats, rationale, errors | Module 1 (optional) | Checkpoint 1 (Feb 11) |
 | 3 | NLP (regex/n-grams, distributional semantics, sentiment) | Free-text run description (str); optional store_path for log_run / get_run_history | parse_run: dict (type, distance, pace_minutes, terrain, sentiment, effort, notes). log_run: run ID (str). get_run_history: list of run entry dicts | None (integrates with M1/M2 for validation and plan alignment) | Checkpoint 2 (Feb 26) |
 | 4 | Game Theory (Sequential Games, Nash-like strategy selection) | Context dict: current_streak, recent_sentiments, terrain_last_week, adherence_percent, days_to_race | Strategy dict with strategy (str), message_tone (str), reasoning (str); detailed variant also returns per-strategy scores and inferred runner state | Module 3 (uses sentiment / history) | Checkpoint 3 (Mar 19) |
-| 5 |  |  |  |  |  |
+| 5 | Reinforcement Learning (MDP, Q-learning, value updates) | Context dict: workout_type, terrain, fatigue_score, history (runs with distance, pace, terrain, sentiment); optional motivation (Module 4: streak, sentiments, terrain_last_week, adherence_percent, days_to_race); optional q_table_path | adapt_progression: next_distance, target_pace, suggested_terrain, confidence, reasoning; detailed adds Q snapshot; train_on_run for online Q-updates | Modules 3 & 4 | Checkpoint 4 (Apr 2) |
 | 6 (optional) |  |  |  |  |  |
 
 ## Repository Layout
@@ -69,6 +69,27 @@ result = parse_run("easy 5 miles on the road, felt great")
 # result: type, distance, pace_minutes, terrain, sentiment, effort, notes
 run_id = log_run("long run 10 miles on track", store_path="data/run_log.json")
 recent = get_run_history(n=5, store_path="data/run_log.json")
+```
+
+**Module 5 (adaptive progression):**
+```python
+from src.module5_adaptive_progression import adapt_progression
+
+result = adapt_progression({
+    "workout_type": "easy run",
+    "terrain": "road",
+    "fatigue_score": 0.3,
+    "history": [{"distance": 5, "pace": 9.0, "terrain": "road", "sentiment": "positive"}],
+    # Optional: Module 4 motivation context (validated by Module 4 rules)
+    "motivation": {
+        "current_streak": 8,
+        "recent_sentiments": ["good", "neutral"],
+        "terrain_last_week": ["road", "trail"],
+        "adherence_percent": 82,
+        "days_to_race": 40,
+    },
+})
+# result: next_distance, target_pace, suggested_terrain, confidence, reasoning
 ```
 
 ## Testing

@@ -63,9 +63,9 @@ class TestInferRunnerState:
         )
         assert infer_runner_state(ctx) == "bored"
 
-    def test_frazzled_default(self):
+    def test_mixed_default_when_no_strong_pattern(self):
         ctx = _ctx(recent_sentiments=["good", "struggled"], adherence_percent=75)
-        assert infer_runner_state(ctx) == "frazzled"
+        assert infer_runner_state(ctx) == "mixed"
 
 
 class TestStrategyScores:

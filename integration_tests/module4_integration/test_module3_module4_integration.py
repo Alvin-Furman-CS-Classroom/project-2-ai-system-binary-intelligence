@@ -99,7 +99,7 @@ class TestModule3OutputFeedsModule4:
             adherence_percent=95,
         )
         result = select_motivation_strategy_detailed(ctx)
-        assert result["inferred_state"] in ("burnout_risk", "frazzled")
+        assert result["inferred_state"] in ("burnout_risk", "mixed")
 
     def test_terrain_from_parsed_run_passes_validation(self):
         """Terrain from Module 3 (road, track, treadmill, trail) is valid for M4."""
@@ -174,4 +174,4 @@ class TestLogRunsThenSelectMotivation:
         result = select_motivation_strategy_detailed(ctx)
         # Bored state favors encourage_variety; near race might favor maintain
         assert result["strategy"] in ("encourage_variety", "maintain", "push_harder")
-        assert result["inferred_state"] in ("bored", "engaged", "frazzled")
+        assert result["inferred_state"] in ("bored", "engaged", "mixed")

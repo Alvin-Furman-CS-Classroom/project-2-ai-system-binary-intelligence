@@ -53,7 +53,7 @@ class TestSelectMotivationStrategyDetailed:
         assert "inferred_state" in result
         assert result["inferred_state"] in (
             "engaged",
-            "frazzled",
+            "mixed",
             "bored",
             "burnout_risk",
         )

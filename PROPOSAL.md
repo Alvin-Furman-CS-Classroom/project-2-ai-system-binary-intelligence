@@ -104,9 +104,9 @@ The module models the coach-runner interaction as a repeated normal-form game wh
 
 **Topics:** Reinforcement Learning (Q-Learning, MDPs, Value Functions)
 
-**Input:** Workout type, terrain, historical performance data, and runner fatigue indicators.
+**Input:** Workout type, terrain, historical performance data, and runner fatigue indicators. Optional **motivation** context from Module 4 (streak, recent sentiments, terrain_last_week, adherence_percent, days_to_race). History **sentiment** fields use Module 3 labels (`positive` / `neutral` / `negative`) or common aliases (`good`, `excellent`, `struggled`, …), which Module 5 normalizes internally.
 ```python
-{"workout_type": "tempo run", "terrain": "track", "history": [{"date": "2025-01-10", "distance": 5, "pace": 8.5, "terrain": "track", "sentiment": "good"}, ...], "fatigue_score": 0.3}
+{"workout_type": "tempo run", "terrain": "track", "history": [{"date": "2025-01-10", "distance": 5, "pace": 8.5, "terrain": "track", "sentiment": "positive"}, ...], "fatigue_score": 0.3, "motivation": {"current_streak": 10, "recent_sentiments": ["good", "neutral"], "terrain_last_week": ["road", "trail"], "adherence_percent": 85, "days_to_race": 60}}
 ```
 
 **Output:** Next session's recommended distance, target pace, and terrain.
