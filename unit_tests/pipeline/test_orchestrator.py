@@ -12,6 +12,7 @@ from src.pipeline import (
     load_runner_profile,
     m3_run_entries_to_m5_history,
     module1_runner_from_profile,
+    pipeline_predict_race_readiness,
     planner_config_from_profile,
     save_runner_profile,
 )
@@ -158,6 +159,23 @@ class TestRepoProfileFile:
             pytest.skip("data/runner_profile.json not in workspace")
         data = load_runner_profile(p)
         assert data["schema_version"] == PROFILE_SCHEMA_VERSION
+
+
+class TestPipelinePredictRaceReadiness:
+    def test_smoke_empty_history_isolated_module6_dir(self, tmp_path):
+        p = _minimal_profile()
+        p["age"] = 31
+        p["race_goal"] = {"target_time": "4:20:00", "terrain": "road", "distance": "marathon"}
+        out = pipeline_predict_race_readiness(
+            p,
+            history=[],
+            module6_dir=tmp_path,
+            auto_train=True,
+        )
+        assert "predicted_finish" in out
+        assert "confidence_interval" in out
+        assert "readiness_score" in out
+        assert isinstance(out["recommendations"], list)
 
 
 class TestApplyModule5ToPlan:

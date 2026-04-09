@@ -25,12 +25,19 @@ The default file is ``DEFAULT_Q_TABLE_PATH`` (``data/q_table.json``); override w
   Module 5's context.
 - ``pipeline_plan_adjusted_by_progression`` passes the selected plan week automatically
   and adds an ``adherence`` breakdown to its return value.
+
+**Module 6 race prediction** (``src.module6_race_predictor``)
+
+- ``pipeline_predict_race_readiness`` builds a snapshot from the profile (optional
+  ``age``, ``race_goal`` / ``goal_race`` block) and Module 5-shaped history from the
+  run log, then returns predicted finish, interval, readiness score, and recommendations.
 """
 
 from __future__ import annotations
 
 import copy
 import json
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -432,6 +439,92 @@ def pipeline_plan_adjusted_by_progression(
     return out
 
 
+def _days_to_race_from_profile(profile: dict[str, Any], override: float | None) -> float:
+    if override is not None:
+        return max(1.0, float(override))
+    pl = profile.get("planner") or {}
+    rd = pl.get("race_date")
+    if not rd or not isinstance(rd, str):
+        return 56.0
+    raw = rd.strip()[:10]
+    try:
+        race = datetime.strptime(raw, "%Y-%m-%d").date()
+    except ValueError:
+        return 56.0
+    delta = (race - date.today()).days
+    return float(max(1, delta))
+
+
+def pipeline_predict_race_readiness(
+    profile: dict[str, Any],
+    *,
+    history: list[dict[str, Any]] | None = None,
+    days_to_race: float | None = None,
+    adherence_percent: float | None = None,
+    age: float | None = None,
+    goal_race: dict[str, Any] | None = None,
+    experience_level: str | None = None,
+    module6_dir: str | Path | None = None,
+    auto_train: bool = True,
+) -> dict[str, Any]:
+    """
+    Run Module 6 on the runner profile: load history from the log unless ``history`` is
+    passed, build ``goal_race`` from ``goal_race=`` or profile keys ``race_goal`` /
+    ``goal_race``, and call ``predict_race_readiness``.
+
+    Profile keys (all optional except implicit planner):
+
+    - ``age``: defaults to 32 if missing.
+    - ``race_goal`` or ``goal_race``: ``target_time`` (``\"4:30:00\"``), ``terrain``,
+      ``distance`` (e.g. ``\"marathon\"``), optional ``adherence_percent`` when not passed
+      as an argument.
+    - ``planner.race_date``: used to set ``days_to_race`` unless overridden.
+    - ``planner.experience`` or ``module1_runner.experience_level``: experience tier.
+    """
+    from src.module6_race_predictor import predict_race_readiness
+
+    if history is None:
+        history = fetch_m5_history(profile)
+
+    pl = profile.get("planner") or {}
+    m1 = profile.get("module1_runner") or {}
+    rg_prof = profile.get("race_goal") or profile.get("goal_race") or {}
+
+    exp = experience_level or pl.get("experience") or m1.get("experience_level") or "beginner"
+    snap_age = float(age) if age is not None else float(profile.get("age", 32))
+
+    if goal_race is not None:
+        gr = dict(goal_race)
+    else:
+        gr = {
+            "distance": rg_prof.get("distance", "marathon"),
+            "target_time": rg_prof.get("target_time", "4:30:00"),
+            "terrain": rg_prof.get("terrain", "road"),
+        }
+
+    adh = adherence_percent
+    if adh is None and "adherence_percent" in rg_prof:
+        adh = float(rg_prof["adherence_percent"])
+    if adh is None:
+        adh = 85.0
+
+    dtr = _days_to_race_from_profile(profile, days_to_race)
+
+    snapshot = {
+        "history": history,
+        "age": snap_age,
+        "experience_level": str(exp).strip().lower(),
+        "days_to_race": dtr,
+        "adherence_percent": float(adh),
+        "goal_race": gr,
+    }
+    return predict_race_readiness(
+        snapshot,
+        module6_dir=module6_dir,
+        auto_train=auto_train,
+    )
+
+
 def regenerate_plan_with_estimated_weekly_load(
     profile: dict[str, Any],
     validate_fn: Any | None = None,
@@ -486,4 +579,5 @@ __all__ = [
     "compute_week_adherence",
     "fetch_module3_entries",
     "motivation_with_plan_adherence",
+    "pipeline_predict_race_readiness",
 ]

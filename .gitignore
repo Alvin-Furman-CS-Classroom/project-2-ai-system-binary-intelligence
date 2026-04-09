@@ -14,3 +14,4 @@ build/
 .idea/
 .vscode/
 data/*.json
+data/module6/

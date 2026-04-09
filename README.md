@@ -30,7 +30,7 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | 3 | NLP (regex/n-grams, distributional semantics, sentiment) | Free-text run description (str); optional store_path for log_run / get_run_history | parse_run: dict (type, distance, pace_minutes, terrain, sentiment, effort, notes). log_run: run ID (str). get_run_history: list of run entry dicts | None (integrates with M1/M2 for validation and plan alignment) | Checkpoint 2 (Feb 26) |
 | 4 | Game Theory (Sequential Games, Nash-like strategy selection) | Context dict: current_streak, recent_sentiments, terrain_last_week, adherence_percent, days_to_race | Strategy dict with strategy (str), message_tone (str), reasoning (str); detailed variant also returns per-strategy scores and inferred runner state | Module 3 (uses sentiment / history) | Checkpoint 3 (Mar 19) |
 | 5 | Reinforcement Learning (MDP, Q-learning, value updates) | Context dict: workout_type, terrain, fatigue_score, history (runs with distance, pace, terrain, sentiment); optional motivation (Module 4: streak, sentiments, terrain_last_week, adherence_percent, days_to_race); optional q_table_path | adapt_progression: next_distance, target_pace, suggested_terrain, confidence, reasoning; detailed adds Q snapshot; train_on_run for online Q-updates | Modules 3 & 4 | Checkpoint 4 (Apr 2) |
-| 6 (optional) |  |  |  |  |  |
+| 6 (optional) | Supervised Learning (linear / logistic regression, metrics) | Runner snapshot: ``history`` (Module 3–style runs), ``age``, ``goal_race`` (distance, target_time, terrain); optional ``experience_level``, ``days_to_race``, ``adherence_percent`` — or use ``pipeline_predict_race_readiness(profile)`` | ``predicted_finish``, ``confidence_interval``, ``readiness_score``, ``recommendations`` | Modules 3 & 5 (history); pipeline ties profile + log | Checkpoint 5 (Apr 16) |
 
 ## Repository Layout
 
@@ -50,7 +50,7 @@ your-repo/
 pip install -r requirements.txt
 ```
 
-No environment variables required. Module 1 and Module 2 use only the Python standard library plus pytest for tests.
+Use the **same** Python for installs and tests (e.g. `python -m pip install -r requirements.txt` then `python -m pytest`). Module 6 needs **NumPy** and **scikit-learn**. No environment variables required. Core modules 1–2 use the standard library plus pytest; later modules add the packages above.
 
 ## Running
 
@@ -92,6 +92,33 @@ result = adapt_progression({
 # result: next_distance, target_pace, suggested_terrain, confidence, reasoning
 ```
 
+**Module 6 (race readiness — requires `numpy`, `scikit-learn`):**
+```python
+from src.module6_race_predictor import predict_race_readiness
+
+out = predict_race_readiness({
+    "age": 34,
+    "experience_level": "intermediate",
+    "days_to_race": 40,
+    "adherence_percent": 85,
+    "history": [
+        {"date": "2026-01-01", "distance": 6, "pace": 9.0, "terrain": "road", "sentiment": "positive"},
+    ],
+    "goal_race": {"distance": "marathon", "target_time": "4:15:00", "terrain": "road"},
+})
+# out: predicted_finish, confidence_interval, readiness_score, recommendations
+```
+
+**Pipeline (race prediction from profile + run log):**
+```python
+from src.pipeline import load_runner_profile, pipeline_predict_race_readiness
+
+profile = load_runner_profile("data/runner_profile.json")
+profile["age"] = 32
+profile["race_goal"] = {"target_time": "4:30:00", "terrain": "road"}
+result = pipeline_predict_race_readiness(profile, module6_dir="data/module6")
+```
+
 ## Testing
 
 **Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module has corresponding unit tests.
@@ -111,7 +138,7 @@ PYTHONPATH=. pytest integration_tests/ -v
 PYTHONPATH=. pytest unit_tests/ integration_tests/ -v
 ```
 
-No external test data required; tests use in-memory configs and profiles.
+No external test data required; tests use in-memory configs and profiles. Module 6 can auto-generate synthetic training CSV and fit models under ``data/module6/`` on first use (ignored by git).
 
 ## Checkpoint Log
 
