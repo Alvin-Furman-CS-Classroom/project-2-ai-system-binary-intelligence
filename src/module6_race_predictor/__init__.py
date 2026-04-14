@@ -1,9 +1,13 @@
 """
 Module 6 — Race Readiness Predictor (supervised learning).
 
-Trains on synthetic tabular data (linear regression for finish time,
-logistic regression for meeting goal). First call can auto-generate data
-and fit models under ``data/module6/``.
+Trains on synthetic tabular data using from-scratch gradient descent:
+  - LinearRegressionGD  for finish time prediction (MSE loss)
+  - LogisticRegressionGD for met_goal classification (cross-entropy loss)
+
+**Public API** (see ``__all__``): ``predict_race_readiness``, ``ensure_training_artifacts``,
+``train_and_save``, ``generate_dataset``, ``write_synthetic_csv``, ``LinearRegressionGD``,
+``LogisticRegressionGD``, ``ValidationError``, ``DEFAULT_MODULE6_DATA_DIR``.
 
 Example
 -------
@@ -27,12 +31,17 @@ out = predict_race_readiness({
 # predicted_finish, confidence_interval, readiness_score, recommendations
 """
 
+from .constants import DEFAULT_MODULE6_DATA_DIR
+from .gradient_descent import LinearRegressionGD, LogisticRegressionGD
 from .input_validation import ValidationError
 from .predictor import predict_race_readiness
 from .synthetic_data import generate_dataset, write_synthetic_csv
 from .training import ensure_training_artifacts, train_and_save
 
 __all__ = [
+    "DEFAULT_MODULE6_DATA_DIR",
+    "LinearRegressionGD",
+    "LogisticRegressionGD",
     "ValidationError",
     "predict_race_readiness",
     "generate_dataset",

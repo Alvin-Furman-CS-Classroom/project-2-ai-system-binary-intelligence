@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from src.pipeline import (
+    DEFAULT_ADHERENCE_DAYS_WINDOW,
     DEFAULT_Q_TABLE_PATH,
     PROFILE_SCHEMA_VERSION,
     apply_module5_to_plan_workout,
@@ -147,6 +148,21 @@ class TestLoadSaveProfile:
         loaded = load_runner_profile(path)
         assert loaded["name"] == "Test"
         assert loaded["schema_version"] == PROFILE_SCHEMA_VERSION
+
+    def test_load_missing_file_clear_error(self, tmp_path):
+        missing = tmp_path / "nope.json"
+        with pytest.raises(FileNotFoundError, match="Runner profile not found"):
+            load_runner_profile(missing)
+
+    def test_load_invalid_json_clear_error(self, tmp_path):
+        bad = tmp_path / "bad.json"
+        bad.write_text("{ not json", encoding="utf-8")
+        with pytest.raises(ValueError, match="not valid JSON"):
+            load_runner_profile(bad)
+
+
+def test_default_adherence_days_exported():
+    assert DEFAULT_ADHERENCE_DAYS_WINDOW == 7
 
 
 class TestRepoProfileFile:

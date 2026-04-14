@@ -1,5 +1,20 @@
 # Long Run: AI Marathon Training System for Beginners
 
+## Contents
+
+- [Overview](#overview)
+- [Team](#team)
+- [Proposal](#proposal)
+- [Module plan](#module-plan)
+- [System architecture](#system-architecture-data-flow)
+- [Repository layout](#repository-layout)
+- [Setup](#setup)
+- [Running](#running)
+- [Testing](#testing)
+- [Checkpoint log](#checkpoint-log)
+- [Required workflow (agent-guided)](#required-workflow-agent-guided)
+- [References](#references)
+
 ## Overview
 
 Novice runners often struggle with pacing, training volume, and progression without professional guidance. Many beginners either follow generic plans that ignore their fitness level, push too hard and risk injury, or lose motivation when they don't see improvement. Long Run addresses these challenges by providing personalized coaching that adapts to each runner's constraints, goals, and progress.
@@ -21,7 +36,7 @@ See the approved project proposal in PROPOSAL.md for complete system design deta
 
 ## Module Plan
 
-Your system must include 5-6 modules. Fill in the table below as you plan each module.
+The implemented system includes **six modules** (see course schedule in the last column). Module 6 (race prediction) is the optional supervised-learning capstone. Summary:
 
 | Module | Topic(s) | Inputs | Outputs | Depends On | Checkpoint |
 | ------ | -------- | ------ | ------- | ---------- | ---------- |
@@ -32,25 +47,48 @@ Your system must include 5-6 modules. Fill in the table below as you plan each m
 | 5 | Reinforcement Learning (MDP, Q-learning, value updates) | Context dict: workout_type, terrain, fatigue_score, history (runs with distance, pace, terrain, sentiment); optional motivation (Module 4: streak, sentiments, terrain_last_week, adherence_percent, days_to_race); optional q_table_path | adapt_progression: next_distance, target_pace, suggested_terrain, confidence, reasoning; detailed adds Q snapshot; train_on_run for online Q-updates | Modules 3 & 4 | Checkpoint 4 (Apr 2) |
 | 6 (optional) | Supervised Learning (linear / logistic regression, metrics) | Runner snapshot: ``history`` (Module 3–style runs), ``age``, ``goal_race`` (distance, target_time, terrain); optional ``experience_level``, ``days_to_race``, ``adherence_percent`` — or use ``pipeline_predict_race_readiness(profile)`` | ``predicted_finish``, ``confidence_interval``, ``readiness_score``, ``recommendations`` | Modules 3 & 5 (history); pipeline ties profile + log | Checkpoint 5 (Apr 16) |
 
+## System architecture (data flow)
+
+Modules stay **independent packages** under ``src/``; the **pipeline** (``src/pipeline/``) is the glue layer. A typical flow:
+
+1. **Profile** — ``data/runner_profile.json`` holds planner goals, Module 1 runner fields, and paths (run log, optional Q-table). Defaults and schema version live in ``src/pipeline/constants.py``.
+2. **Plan** — Module 2 generates weeks of workouts; Module 1 can validate workouts when a ``validate_fn`` is wired in.
+3. **Log** — Module 3 parses natural-language runs and stores structured entries; history feeds Module 4–6.
+4. **Motivation** — Module 4 uses streaks, sentiment, and terrain context from the log.
+5. **Progression** — Module 5 (Q-learning) suggests the next distance/pace/terrain; optional adherence vs plan is computed in ``src/pipeline/adherence.py``.
+6. **Race prediction** — Module 6 builds a tabular snapshot from profile + history and outputs finish time and readiness.
+
+Import orchestration helpers with ``from src.pipeline import ...`` (see examples below). For a full list, see ``src/pipeline/orchestrator.py``.
+
 ## Repository Layout
 
 ```
-your-repo/
-├── src/                              # main system source code
-├── unit_tests/                       # unit tests (parallel structure to src/)
-├── integration_tests/                # integration tests (new folder for each module)
-├── .claude/skills/code-review/SKILL.md  # rubric-based agent review
-├── AGENTS.md                         # instructions for your LLM agent
-└── README.md                         # system overview and checkpoints
+project-root/
+├── src/                              # Modules 1–6 + src/pipeline/ (orchestration)
+├── unit_tests/                       # Mirrors src/ (plus unit_tests/pipeline/)
+├── integration_tests/                # Cross-module tests (e.g. module2_integration/)
+├── checkpoints/                      # Rubric / checkpoint notes (e.g. project_module_report.md)
+├── data/                             # Profile, configs, logs (some paths gitignored)
+├── calibrate_from_real_data.py       # Module 6 calibration utility (repo root)
+├── PROPOSAL.md                       # Approved system design
+├── AGENTS.md                         # Agent / contributor instructions
+├── requirements.txt
+└── README.md
 ```
+
+Rubric-based review skill: `.claude/skills/code-review/SKILL.md`.
 
 ## Setup
 
+Create a virtual environment (recommended), then install dependencies:
+
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m pip install -r requirements.txt
 ```
 
-Use the **same** Python for installs and tests (e.g. `python -m pip install -r requirements.txt` then `python -m pytest`). Module 6 needs **NumPy** and **scikit-learn**. No environment variables required. Core modules 1–2 use the standard library plus pytest; later modules add the packages above.
+Use the **same interpreter** for `pip` and `pytest`. Dependencies include **pytest**, **NumPy**, and **scikit-learn** (Module 6 and tests). Modules 1–2 rely primarily on the standard library at runtime. No environment variables are required for the defaults in `src/pipeline/constants.py`.
 
 ## Running
 
@@ -109,6 +147,8 @@ out = predict_race_readiness({
 # out: predicted_finish, confidence_interval, readiness_score, recommendations
 ```
 
+Training uses **from-scratch** mini-batch gradient descent for linear and logistic regression; **scikit-learn** is only used for feature scaling (`StandardScaler`). The synthetic label weights were informed by real runners in `data/CalibrationData.csv` (see `calibrate_from_real_data.py` at repo root). Models use **average training pace** (from run history) as an explicit feature alongside volume and demographics. If you have an older local `data/module6/` synthetic CSV from before that column existed, delete the CSV and `module6_models.pkl` so training regenerates.
+
 **Pipeline (race prediction from profile + run log):**
 ```python
 from src.pipeline import load_runner_profile, pipeline_predict_race_readiness
@@ -121,33 +161,39 @@ result = pipeline_predict_race_readiness(profile, module6_dir="data/module6")
 
 ## Testing
 
-**Unit Tests** (`unit_tests/`): Mirror the structure of `src/`. Each module has corresponding unit tests.
+- **Unit tests** (`unit_tests/`): Parallel to `src/` (`module1_safety_validator/`, …, `module6_race_predictor/`, plus `pipeline/`). Short scope notes: `unit_tests/module6_race_predictor/README.md`, `unit_tests/pipeline/README.md`.
+- **Integration tests** (`integration_tests/`): Cross-module flows (e.g. `module2_integration/`, `module3_integration/`, `module4_integration/`, `module5_integration/`, `module6_integration/`).
 
-**Integration Tests** (`integration_tests/`): Subfolder per module beyond the first (e.g. `integration_tests/module2_integration/`, `integration_tests/module3_integration/`), demonstrating how modules work together.
-
-**Run tests** (from repo root):
+From the **repository root**, run the full suite (recommended):
 
 ```bash
-# Unit tests only
-PYTHONPATH=. pytest unit_tests/ -v
-
-# Integration tests only (Module 1 + Module 2 pipeline)
-PYTHONPATH=. pytest integration_tests/ -v
-
-# All tests (unit + integration)
-PYTHONPATH=. pytest unit_tests/ integration_tests/ -v
+PYTHONPATH=. pytest
 ```
 
-No external test data required; tests use in-memory configs and profiles. Module 6 can auto-generate synthetic training CSV and fit models under ``data/module6/`` on first use (ignored by git).
+Other useful invocations:
 
-## Checkpoint Log
+```bash
+PYTHONPATH=. pytest unit_tests/ -q
+PYTHONPATH=. pytest integration_tests/ -q
+```
 
-| Checkpoint | Date | Modules Included | Status | Evidence |
-| ---------- | ---- | ---------------- | ------ | -------- |
-| 1 | Feb 14, 2025 | Module 1 & 2 | Completed |  |
-| 2 |  |  |  |  |
-| 3 | Mar 19, 2026 | Module 4 | Completed | `checkpoints/checkpoint_3_elegance_report.md`, `checkpoints/checkpoint_3_module_report.md`; `PYTHONPATH=. pytest unit_tests/ integration_tests/ -v` (688 passed) |
-| 4 |  |  |  |  |
+No external test datasets are required for CI; tests use in-memory configs and temporary paths. **Module 6** can auto-generate a synthetic CSV and train models under `data/module6/` on first use (that directory is gitignored). Latest full run: **945** tests passing (run locally to confirm).
+
+**Project rubric notes** (self-assessment): see `checkpoints/project_module_report.md` and `checkpoints/project_elegance_report.md`.
+
+## Checkpoint log
+
+Indicative tracking (adjust dates and status to match your syllabus and submissions):
+
+| Checkpoint | Modules / focus | Artifacts |
+| ---------- | ----------------- | --------- |
+| 1 | Safety + search (M1–M2) | `src/module1_safety_validator/`, `src/module2_plan_generator/` |
+| 2 | NLP run logger (M3) | `src/module3_run_logger/`; `integration_tests/module3_integration/` |
+| 3 | Motivation / game theory (M4) | `checkpoints/checkpoint_3_*_report.md` |
+| 4 | Adaptive progression (M5) | `src/module5_adaptive_progression/`; `integration_tests/module5_integration/` |
+| 5 | Race predictor (M6) | `checkpoints/checkpoint_5_*_report.md`; `integration_tests/module6_integration/` |
+
+**Whole system:** run `PYTHONPATH=. pytest` from repo root (945 tests at last update). Optional self-assessment writeups: `checkpoints/project_module_report.md`, `checkpoints/project_elegance_report.md`.
 
 ## Required Workflow (Agent-Guided)
 
@@ -175,6 +221,8 @@ Keep `AGENTS.md` updated with your module plan, constraints, and links to APIs/d
 - None for Module 1.
 
 **References**
+
+Girardi, M. (2017). Marathon time predictions [Dataset]. Kaggle. https://www.kaggle.com/datasets/girardi69/marathon-time-predictions
 
 Hospital for Special Surgery. "Injury Prevention for Marathon Runners." *HSS*, https://www.hss.edu/article_injury-prevention-marathon-runners.asp.
 

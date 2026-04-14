@@ -49,29 +49,38 @@ from .adherence import (
     fetch_module3_entries,
     motivation_with_plan_adherence,
 )
-
-DEFAULT_RUNNER_PROFILE_PATH = "data/runner_profile.json"
-DEFAULT_Q_TABLE_PATH = "data/q_table.json"
-PROFILE_SCHEMA_VERSION = 1
+from .constants import (
+    DEFAULT_ADHERENCE_DAYS_WINDOW,
+    DEFAULT_Q_TABLE_PATH,
+    DEFAULT_RUNNER_PROFILE_PATH,
+    PROFILE_SCHEMA_VERSION,
+)
 
 
 def _pop_plan_adherence_kwargs(overrides: dict[str, Any]) -> tuple[dict[str, Any] | None, int, dict[str, Any]]:
     """Split ``plan_week`` / ``adherence_days_window`` from other Module 5 overrides."""
     o = dict(overrides)
     plan_week = o.pop("plan_week", None)
-    raw_days = o.pop("adherence_days_window", 7)
+    raw_days = o.pop("adherence_days_window", DEFAULT_ADHERENCE_DAYS_WINDOW)
     try:
         adherence_days_window = max(1, int(raw_days))
     except (TypeError, ValueError):
-        adherence_days_window = 7
+        adherence_days_window = DEFAULT_ADHERENCE_DAYS_WINDOW
     return plan_week, adherence_days_window, o
 
 
 def load_runner_profile(path: str | Path = DEFAULT_RUNNER_PROFILE_PATH) -> dict[str, Any]:
-    """Load runner profile JSON. Raises FileNotFoundError if missing."""
+    """Load runner profile JSON. Raises FileNotFoundError if missing, ValueError if invalid."""
     p = Path(path)
-    with open(p, encoding="utf-8") as f:
-        data = json.load(f)
+    if not p.is_file():
+        raise FileNotFoundError(f"Runner profile not found: {p.resolve()}")
+    try:
+        with open(p, encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"Runner profile is not valid JSON ({p}): {exc.msg} (line {exc.lineno} col {exc.colno})"
+        ) from exc
     ver = data.get("schema_version", 0)
     if ver != PROFILE_SCHEMA_VERSION:
         raise ValueError(
@@ -198,7 +207,7 @@ def build_module5_context(
     *,
     history: list[dict[str, Any]] | None = None,
     plan_week: dict[str, Any] | None = None,
-    adherence_days_window: int = 7,
+    adherence_days_window: int = DEFAULT_ADHERENCE_DAYS_WINDOW,
     **overrides: Any,
 ) -> dict[str, Any]:
     """
@@ -559,6 +568,7 @@ def regenerate_plan_with_estimated_weekly_load(
 
 
 __all__ = [
+    "DEFAULT_ADHERENCE_DAYS_WINDOW",
     "DEFAULT_RUNNER_PROFILE_PATH",
     "DEFAULT_Q_TABLE_PATH",
     "PROFILE_SCHEMA_VERSION",

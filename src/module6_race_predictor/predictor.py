@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from .constants import EXPERIENCE_LEVELS, FEATURE_COLUMNS
+from .constants import DEFAULT_MODULE6_DATA_DIR, EXPERIENCE_LEVELS, FEATURE_COLUMNS
 from .feature_builder import aggregate_history
 from .input_validation import validate_runner_snapshot
 from .training import ensure_training_artifacts, load_models
@@ -43,6 +43,7 @@ def _feature_vector(validated: dict[str, Any]) -> np.ndarray:
         "weeks_of_training": agg["weeks_of_training"],
         "avg_weekly_miles_last_12w": agg["avg_weekly_miles_last_12w"],
         "peak_weekly_miles": agg["peak_weekly_miles"],
+        "avg_training_pace_min_per_mile": agg["avg_training_pace_min_per_mile"],
         "longest_run_miles": agg["longest_run_miles"],
         "num_runs_20_plus": agg["num_runs_20_plus"],
         "pct_miles_road": agg["pct_miles_road"],
@@ -63,7 +64,7 @@ def _recommendations(validated: dict[str, Any], agg: dict[str, float]) -> list[s
     if rt == "trail" and agg["pct_miles_trail"] < 30:
         out.append("Add trail volume so leg strength and footing match race terrain.")
     if agg["longest_run_miles"] < 16:
-        out.append("Build longest run toward 18–22 miles before taper (marathon).")
+        out.append("Build longest run toward 18-22 miles before taper (marathon).")
     if agg["peak_weekly_miles"] < 32:
         out.append("Gradually raise peak weekly mileage to support marathon endurance.")
     if agg["adherence_pct"] < 72:
@@ -87,43 +88,42 @@ def predict_race_readiness(
     Parameters
     ----------
     runner_snapshot
-        ``history``: list of run dicts (``distance``, ``pace`` or ``pace_minutes``,
-        ``terrain``, optional ``date``, ``sentiment``).
+        ``history``: list of run dicts (distance, pace or pace_minutes,
+        terrain, optional date, sentiment).
         ``age``: int/float.
-        ``goal_race``: ``distance`` (e.g. ``\"marathon\"``), ``target_time`` (``\"4:30:00\"``),
-        ``terrain`` (``road`` | ``trail`` | ``mixed``).
-        Optional: ``experience_level``, ``days_to_race``, ``adherence_percent``.
+        ``goal_race``: distance (e.g. "marathon"), target_time ("4:30:00"),
+        terrain (road | trail | mixed).
+        Optional: experience_level, days_to_race, adherence_percent.
     module6_dir
-        Folder with ``synthetic_race_training.csv`` and ``module6_models.joblib``.
-        Default ``data/module6`` under current working directory.
+        Folder with synthetic_race_training.csv and module6_models.pkl.
     auto_train
-        If True and artifacts are missing, generates synthetic data and trains models.
+        If True and artifacts are missing, generates synthetic data and trains.
     """
     validated = validate_runner_snapshot(runner_snapshot)
-    base = Path(module6_dir or "data/module6")
+    base = Path(module6_dir or DEFAULT_MODULE6_DATA_DIR)
     if auto_train:
         ensure_training_artifacts(base)
+
     bundle = load_models(base)
     finish_model = bundle["finish"]
     ready_model = bundle["readiness"]
+    scaler = bundle["scaler"]
     meta = bundle["metadata"]
+
+    # Use test-set residual std for honest confidence intervals
     resid = float(meta.get("residual_std_minutes", 12.0))
 
-    X = _feature_vector(validated)
-    pred_min = float(finish_model.predict(X)[0])
+    X_raw = _feature_vector(validated)
+    X_scaled = scaler.transform(X_raw)
+
+    pred_min = float(finish_model.predict(X_scaled)[0])
     pred_min = max(120.0, min(480.0, pred_min))
 
-    lo = pred_min - 1.96 * resid
-    hi = pred_min + 1.96 * resid
-    lo = max(120.0, lo)
-    hi = min(480.0, hi)
+    lo = max(120.0, pred_min - 1.96 * resid)
+    hi = min(480.0, pred_min + 1.96 * resid)
 
-    if hasattr(ready_model, "predict_proba"):
-        proba = ready_model.predict_proba(X)[0]
-        # class 1 = met goal in training
-        readiness_score = float(proba[1] if len(proba) > 1 else proba[0])
-    else:
-        readiness_score = float(ready_model.predict(X)[0])
+    proba = ready_model.predict_proba(X_scaled)[0]
+    readiness_score = float(proba[1])
 
     agg = aggregate_history(
         validated["history"],
