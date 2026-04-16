@@ -69,3 +69,13 @@ Starting visuals early helps clarify your thinking and ensures your explanation 
 - [ ] PowerPoint presentation started with visual representations
 - [ ] All code changes pushed to repository
 - [ ] Team participation visible in commit history
+
+---
+
+## Last automated verification (repo maintenance)
+
+| Date | Command | Result |
+|------|---------|--------|
+| **2026-04-16** | `PYTHONPATH=. pytest` (repository root) | **945** passed (~2.2s) |
+
+Companion self-assessment files refreshed the same day: `project_module_report.md`, `project_elegance_report.md`, per-checkpoint `checkpoint_*_*_report.md` under `checkpoints/` (see `checkpoints/checkpoint_4_*` for **Module 5 / Checkpoint 4**).

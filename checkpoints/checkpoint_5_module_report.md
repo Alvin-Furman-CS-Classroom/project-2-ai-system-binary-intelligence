@@ -4,9 +4,9 @@
 
 **Rubric:** [AI System Project Rubric](https://csc-343.path.app/projects/project-2-ai-system/ai-system.rubric.md)
 
-**Report run:** 2026-03-28 — regenerated after integration test, expanded unit tests, constants refactor, and readiness-metric helper.
+**Report run:** 2026-04-16 — checkpoint preparation re-run (full `pytest` + rubric text synced to current `training.py`).
 
-**Test status:** 945 tests collected, full `pytest` run passing (run locally with `PYTHONPATH=.` from repo root).
+**Test status:** **945** tests collected, full `pytest` run passing (`PYTHONPATH=.` from repo root).
 
 ---
 
@@ -23,8 +23,8 @@ Module 6 provides from-scratch gradient-descent linear and logistic models on sc
 | Area | Evidence |
 | ---- | -------- |
 | Inference | `predict_race_readiness`: validation → optional artifact ensure → scale → linear + logistic → CI from test residual std. |
-| Training | `train_and_save`: 70/15/15 split; test metrics include sklearn classification scores; AUC `null` when undefined. |
-| Artifacts | `ensure_training_artifacts`; pickle bundle validated in `load_models`. |
+| Training | `train_and_save`: 70/15/15 split; test metrics include precision/recall/F1/AUC/confusion matrix via `_readiness_test_metrics` (AUC `None` when undefined). |
+| Artifacts | `ensure_training_artifacts`; pickle bundle validated in `load_models` (required keys enforced). |
 | Pipeline | `pipeline_predict_race_readiness` builds snapshot from profile + history (`src/pipeline/orchestrator.py`). |
 
 ### 1.2 Code Elegance and Quality — **Suggested: 7 / 7**
@@ -37,13 +37,13 @@ See `checkpoint_5_elegance_report.md`: average **4.0** on the 8 elegance criteri
 | --------- |
 | Package docstring lists **public API** and points to `__all__` (`__init__.py`). |
 | `train_and_save` documents split and test-set residual behavior. |
-| README: Module 6 usage, gradient descent + `StandardScaler`, calibration CSV, stale-artifact note. |
+| README: Module 6 usage, gradient descent + feature scaling, calibration CSV, stale-artifact note. |
 
 ### 1.4 I/O Clarity — **Suggested: 3 / 3**
 
 - **Inputs:** Runner snapshot (`age`, `goal_race`, `history`, optional experience/days/adherence).
 - **Outputs:** Finish time (string + minutes), CI, `readiness_score`, `recommendations`.
-- **Metrics:** `metadata.json` includes finish test RMSE/MAE/residual std; readiness accuracy, precision, recall, F1, AUC (or `null`), confusion matrix.
+- **Metrics:** Pickle `metadata` / `train_and_save` return dict includes finish test RMSE, residual std, readiness precision/recall/F1/AUC (or `None`), confusion matrix.
 
 ### 1.5 Topic Engagement (Supervised Learning) — **Suggested: 5 / 5**
 
@@ -102,15 +102,15 @@ Supervised learning (linear + logistic regression via GD), train/val/test, featu
 
 ## Presentation checklist (`checkpoint_preparation.md`)
 
-- [ ] Data-flow slide: snapshot → features → scaler → two models → outputs + `metadata.json`.
+- [ ] Data-flow slide: snapshot → features → scaler → two models → outputs + training metadata (pickle / `train_and_save` return dict).
 - [ ] Calibration slide (volume + pace).
-- [ ] Screenshot or paste: training log line and/or `metadata.json` (AUC, F1, confusion matrix).
+- [ ] Screenshot or paste: training log line and/or sample metadata keys (AUC, F1, confusion matrix).
 
 ---
 
 ## Action items before submission
 
 1. Run `pytest` (945 tests) and keep a log/screenshot if the course asks.
-2. Re-run training if you need fresh `data/module6/metadata.json` for the appendix (`train_and_save` or `ensure_training_artifacts`).
+2. Re-run training if you need a fresh `data/module6/module6_models.pkl` for the appendix (`train_and_save` or `ensure_training_artifacts`).
 3. Confirm **both** teammates have meaningful git history for this checkpoint.
 4. Finish slides / in-person explanation using sections above.

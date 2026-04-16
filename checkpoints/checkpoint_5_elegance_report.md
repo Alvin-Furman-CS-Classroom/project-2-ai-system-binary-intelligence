@@ -4,13 +4,13 @@
 
 **Rubric:** [Code Elegance Rubric](https://csc-343.path.app/rubrics/code-elegance.rubric.md)
 
-**Report run:** 2026-03-28 (regenerated after refactors: `_readiness_test_metrics`, `SYNTHETIC_*` constants, `feature_builder` helpers, AUC safeguards).
+**Report run:** 2026-04-16 — checkpoint preparation re-run (aligned with current `training.py`, `feature_builder.py`, `gradient_descent.py`).
 
 ---
 
 ## Summary
 
-Module 6 is well structured: `train_and_save` orchestrates small helpers (`_scale_splits`, `_fit_finish_model`, `_fit_readiness_model`, `_compose_metadata`, `_print_training_summary`); test-set classification metrics use `_readiness_test_metrics`; synthetic generation pulls tunables from `constants.py`; history aggregation uses `_select_recent_runs` and `_terrain_percentages`. Naming, style, and control flow match the rest of the project.
+Module 6 keeps concerns separated: **synthetic data** (`synthetic_data.py`, tunables in `constants.py`), **from-scratch gradient descent** (`gradient_descent.py`), **training** (`training.py`: `_StandardScaler`, `_train`, `train_and_save`, `_readiness_test_metrics`, `ensure_training_artifacts`, `load_models`), **features from history** (`feature_builder.py`), and **inference** (`predictor.py`). Test-set readiness metrics use **`_readiness_test_metrics`** (NumPy-based ROC AUC via ranks; `None` when only one class). **`load_models`** rejects incomplete bundles with a clear `ValueError`.
 
 ---
 
@@ -18,37 +18,35 @@ Module 6 is well structured: `train_and_save` orchestrates small helpers (`_scal
 
 ### 1. Naming Conventions — **Score: 4**
 
-- Evidence: `LinearRegressionGD`, `LogisticRegressionGD`, `_readiness_test_metrics`, `ensure_training_artifacts`, `FEATURE_COLUMNS`, `_select_recent_runs`, `validate_runner_snapshot`.
-- PEP 8–aligned; private helpers use a single leading underscore where appropriate.
+Evidence: `LinearRegressionGD`, `LogisticRegressionGD`, `_readiness_test_metrics`, `ensure_training_artifacts`, `train_and_save`, `FEATURE_COLUMNS`, `aggregate_history`, `validate_runner_snapshot`.
 
 ### 2. Function and Method Design — **Score: 4**
 
-- Evidence: Test-set readiness metrics live in `_readiness_test_metrics` (`training.py`); `aggregate_history` delegates to `_select_recent_runs` and `_terrain_percentages` (`feature_builder.py`).
-- Core GD `fit`/`predict` paths stay focused in `gradient_descent.py`.
+Training paths are split between artifact auto-generation (`ensure_training_artifacts` + `_train`) and explicit `train_and_save` with a 70/15/15 split; GD `fit`/`predict` stay in `gradient_descent.py`.
 
 ### 3. Abstraction and Modularity — **Score: 4**
 
-- Evidence: `constants.py` (features + synthetic knobs), `synthetic_data.py`, `training.py`, `predictor.py`, `input_validation.py`, `gradient_descent.py`; calibration script remains outside the package.
+Constants, synthetic generation, training, validation, and prediction live in separate modules; pipeline integration is in `src/pipeline/`.
 
 ### 4. Style Consistency — **Score: 4**
 
-- Evidence: `from __future__ import annotations`, type hints on public APIs, uniform docstrings, sklearn/numpy usage aligned with course style.
+`from __future__ import annotations`, type hints on public APIs, uniform docstrings, NumPy idioms throughout.
 
 ### 5. Code Hygiene — **Score: 4**
 
-- Evidence: Synthetic sampling and finish-label coefficients are named in `constants.py` (`SYNTHETIC_*`, `SYNTHETIC_FINISH_*`) and imported in `synthetic_data.py`; no stray magic numbers in the main label expression.
+Synthetic coefficients and ranges are named in `constants.py` (`SYNTHETIC_*`); training filenames centralized (`_CSV_NAME`, `_PKL_NAME`).
 
 ### 6. Control Flow Clarity — **Score: 4**
 
-- Evidence: Split → scale → fit → metrics → persist; GD early stopping is straightforward; confusion matrix uses explicit `labels=[0, 1]` for a stable 2×2 matrix.
+Load → split → scale → fit regressors → test metrics → persist; early stopping inside GD is easy to follow.
 
 ### 7. Pythonic Idioms — **Score: 4**
 
-- Evidence: Pathlib, context managers, NumPy arrays, sklearn metrics for evaluation (not for core GD learners).
+Pathlib, pickle bundles, vectorized NumPy; no unnecessary wrappers.
 
 ### 8. Error Handling — **Score: 4**
 
-- Evidence: `ValidationError` on bad snapshots; `load_models` checks bundle keys; AUC is omitted (`null`) when only one class is present or `roc_auc_score` raises; `ValueError` from sklearn caught in `_readiness_test_metrics`.
+`ValidationError` on bad snapshots; `load_models` requires `finish`, `readiness`, `scaler`, `metadata`; `FileNotFoundError` when bundle missing; AUC safely `None` for single-class test labels.
 
 ---
 
@@ -67,12 +65,10 @@ Module 6 is well structured: `train_and_save` orchestrates small helpers (`_scal
 
 **Average:** **4.0**
 
-**Mapped “Code Elegance and Quality” (7-point module scale):** **7 / 7** — average ≥ 3.5 on the 0–4 elegance scale maps to the top band; structure and hygiene improvements support full credit pending instructor review.
+**Mapped “Code Elegance and Quality” (7-point module scale):** **7 / 7** — average ≥ 3.5 on the 0–4 elegance scale maps to the top band; instructor review applies.
 
 ---
 
 ## Optional follow-ups (not required for checkpoint)
 
-- Add type aliases for large `tuple[...]` return types in `gradient_descent.py` for readability only.
-
-**Note:** `train_and_save` is already split into `_scale_splits`, `_fit_finish_model`, `_fit_readiness_model`, `_compose_metadata`, and `_print_training_summary` (`training.py`).
+- Add type aliases for large tuple returns in public APIs if the course wants even more readability.

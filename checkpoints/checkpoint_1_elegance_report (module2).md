@@ -3,7 +3,7 @@
 **Module:** Module 2 (Training Plan Generator) — and overall `src/` (Modules 1 & 2)  
 **Scope:** `src/module2_plan_generator/`, `src/module1_safety_validator/`  
 **Rubric:** [Code Elegance Rubric](https://csc-343.path.app/rubrics/code-elegance.rubric.md) (0–4 per criterion)  
-**Last updated:** After Module 2 implementation, integration tests, and rubric review.
+**Last updated:** 2026-04-16 (checkpoint preparation re-run).
 
 ---
 

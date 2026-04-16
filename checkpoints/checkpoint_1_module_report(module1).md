@@ -3,13 +3,13 @@
 **Module:** Module 1 (Safety Validator)  
 **Scope:** `src/module1_safety_validator/`, `unit_tests/module1_safety_validator/`  
 **Rubric:** AI System Module Rubric (Part 1: Source, Part 2: Testing)  
-**Last updated:** After type validation, workout-type validation, severity constants, TypedDict, and README example.
+**Last updated:** 2026-04-16 (checkpoint preparation re-run). Previously: type validation, workout-type validation, severity constants, TypedDict, README example.
 
 ---
 
 ## Summary
 
-Module 1 is complete and aligned with the README specification. Inputs and outputs are clearly defined and implemented (runner profile + proposed workout → safety assessment with `safe`, `reason`, `alternative`, `recommendation`). Input validation (including type checks for profile and workout and workout-type allowlist) and experience-level checks run before inference. Return shape is documented via `ValidationResult` TypedDict; README includes a quick copy-paste example. Test suite is comprehensive (294 tests passing) with clear organization and documentation. Integration tests are not required for the first module.
+Module 1 is complete and aligned with the README specification. Inputs and outputs are clearly defined and implemented (runner profile + proposed workout → safety assessment with `safe`, `reason`, `alternative`, `recommendation`). Input validation (including type checks for profile and workout and workout-type allowlist) and experience-level checks run before inference. Return shape is documented via `ValidationResult` TypedDict; README includes a quick copy-paste example. **Module 1 unit tests:** 294 passing. **Full project regression (2026-04-16):** 945 tests. Integration tests are not required for the first module.
 
 ---
 

@@ -1,14 +1,14 @@
 # Module Rubric Report — Full Project (Long Run AI System)
 
 **Rubric:** [AI System Project Rubric](https://csc-343.path.app/projects/project-2-ai-system/ai-system.rubric.md)  
-**Updated:** 2026-03-28  
+**Updated:** 2026-04-16 (checkpoint preparation re-run: full rubric refresh + `pytest` verification).  
 **Tests:** **945** passed, full `pytest` with `PYTHONPATH=.` from repo root.
 
 ---
 
 ## Summary
 
-The repository implements **six modules** plus **`src/pipeline`** orchestration. **README** now includes a **System architecture (data flow)** section and points to `src/pipeline/constants.py`. **Unit tests** include `unit_tests/pipeline/README.md`. **945** tests pass. **GitHub practices and participation** remain **instructor-verified** from real history (not scored from code alone).
+The repository implements **six modules** plus **`src/pipeline`** orchestration. **README** includes a **System architecture (data flow)** section and points to `src/pipeline/constants.py`. **Unit tests** include `unit_tests/pipeline/README.md`. **945** tests pass as of the **2026-04-16** preparation run. **GitHub practices and participation** remain **instructor-verified** from real history (not scored from code alone).
 
 ---
 
@@ -84,7 +84,7 @@ Parallel `unit_tests/` layout; README files under `module6_race_predictor/` and 
 
 - [ ] End-to-end diagram (can mirror README **System architecture**).
 - [ ] Per-module slides: input → output → technique.
-- [ ] **945** tests green (or CI screenshot).
+- [ ] **945** tests green (or CI screenshot); last local verification **2026-04-16**.
 - [ ] Module 6 metrics optional slide.
 
 ---

@@ -3,13 +3,13 @@
 **Modules:** Module 1 (Safety Validator) + Module 2 (Training Plan Generator)  
 **Scope:** `src/`, `unit_tests/`, `integration_tests/`  
 **Rubric:** [AI System Module Rubric](https://csc-343.path.app/projects/project-2-ai-system/ai-system.rubric.md)  
-**Last updated:** After Module 2 implementation, integration tests, README module table update, and rubric review.
+**Last updated:** 2026-04-16 (checkpoint preparation re-run; full suite **945** tests green).
 
 ---
 
 ## Summary
 
-Checkpoint 2 is complete and aligned with the README specification. Module 2 adds the plan generator (A* search, constraints, heuristics) with clear inputs (config: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile) and outputs (success, plan with weekly total_miles/long_run/workouts, total_weeks, total_penalty, search_stats, rationale, errors). Integration with Module 1 is implemented (validate_fn, critical-safety block). All **537 tests** pass (518 unit + 19 integration). Integration tests in `integration_tests/module2_integration/` cover the full Module 1 → Module 2 pipeline: plan structure, every-workout safety, critical-safety blocking, advisory notes, generate_plan_detailed, experience levels and terrain, and edge cases. The README module table is filled in for Module 2.
+Checkpoint 2 is complete and aligned with the README specification. Module 2 adds the plan generator (A* search, constraints, heuristics) with clear inputs (config: goal, race_date, days_per_week, current_weekly_miles, experience, available_terrain; optional validate_fn and runner_profile) and outputs (success, plan with weekly total_miles/long_run/workouts, total_weeks, total_penalty, search_stats, rationale, errors). Integration with Module 1 is implemented (validate_fn, critical-safety block). **Full project suite:** **945** tests pass (2026-04-16); historical note — previously reported **537** when fewer modules were present. Integration tests in `integration_tests/module2_integration/` cover the full Module 1 → Module 2 pipeline: plan structure, every-workout safety, critical-safety blocking, advisory notes, generate_plan_detailed, experience levels and terrain, and edge cases. The README module table is filled in for Module 2.
 
 ---
 

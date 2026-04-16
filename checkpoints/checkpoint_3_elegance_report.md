@@ -3,13 +3,13 @@
 **Module:** Module 4 (Motivation Strategy Selector)  
 **Scope:** `src/module4_motivation_selector/`  
 **Rubric:** Code Elegance Rubric (0–4 per criterion)  
-**Last updated:** Post implementation, validation strictness, M3 integration tests, full suite green.
+**Last updated:** 2026-04-16 (checkpoint preparation re-run; full suite **945** tests).
 
 ---
 
 ## Summary
 
-Module 4 code is clear, modular, and consistent with the rest of the project. Validation, payoff scoring, and selection are separated; public APIs are documented; `ValueError` is used for bad inputs like other modules. Minor opportunity: align README Module 4 topic line with PROPOSAL wording (best response vs. “Nash-like”) for external consistency only—no structural code issues.
+Module 4 code is clear, modular, and consistent with the rest of the project. Validation, payoff scoring, and selection are separated; public APIs are documented; `ValueError` is used for bad inputs like other modules. The **README** module plan row for Module 4 matches **`PROPOSAL.md`** (normal-form framing, coach best response / BR_coach), consistent with the package docstring.
 
 ---
 
@@ -32,15 +32,15 @@ Module 4 code is clear, modular, and consistent with the rest of the project. Va
 
 ## Findings
 
-| Severity | Finding | Suggested fix |
-|----------|---------|----------------|
-| Minor | README Module 4 row still says “Sequential Games, Nash-like strategy selection” while PROPOSAL emphasizes normal-form / best response. | Update README table to match PROPOSAL for checkpoint narrative alignment. |
+| Severity | Finding | Status |
+|----------|---------|--------|
+| — | (none) | README Module 4 topic line updated to align with `PROPOSAL.md`. |
 
 ---
 
 ## Action Items
 
-- [ ] (Optional) Sync README Module 4 topic description with `PROPOSAL.md` Module 4 section.
+- [x] Sync README Module 4 topic description with `PROPOSAL.md` Module 4 section.
 
 ---
 

@@ -18,6 +18,7 @@ def test_train_and_save_includes_classification_metric_keys(tmp_path: Path):
         "readiness_auc",
         "readiness_confusion_matrix",
         "finish_rmse_test",
+        "finish_mae_test",
         "residual_std_minutes",
     ):
         assert key in meta

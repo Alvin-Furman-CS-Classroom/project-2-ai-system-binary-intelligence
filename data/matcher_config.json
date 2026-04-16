@@ -18,6 +18,7 @@
     "track": "track",
     "oval": "track",
     "treadmill": "treadmill",
+    "indoor": "treadmill",
     "grass": "grass",
     "road": "road",
     "pavement": "road"
@@ -29,6 +30,8 @@
     "recovery": "recovery run",
     "tempo": "tempo run",
     "intervals": "interval",
+    "fartlek": "interval",
+    "speed": "interval",
     "race": "race"
   }
 }

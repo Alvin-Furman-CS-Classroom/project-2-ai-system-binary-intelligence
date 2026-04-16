@@ -3,14 +3,14 @@
 **Module:** Module 4 (Motivation Strategy Selector)  
 **Scope:** `src/module4_motivation_selector/`, `unit_tests/module4_motivation_selector/`, `integration_tests/module4_integration/`  
 **Rubric:** AI System Module Rubric (Part 1: Source, Part 2: Testing)  
-**Last updated:** Checkpoint 3 preparation run.  
-**Test run:** 688 passed (full `unit_tests/` + `integration_tests/`), including 38 tests scoped to Module 4 (33 unit + 5 integration).
+**Last updated:** 2026-04-16 (checkpoint preparation re-run; full suite verification).  
+**Test run:** **945** passed (full `unit_tests/` + `integration_tests/`). Module 4–scoped: 38 tests (33 unit + 5 integration) — counts unchanged; full project regression now larger.
 
 ---
 
 ## Summary
 
-Module 4 implements a **game-theoretic motivation selector**: it validates runner context, infers a coarse runner state, assigns utility scores to four coach strategies, selects the coach’s **best response** (`BR_coach`), and returns strategy, tone, and reasoning (detailed output includes per-strategy scores and inferred state). Inputs align with the proposal (streak, sentiments, terrain, adherence, days to race). **Game theory** is engaged via explicit payoff structure, best-response selection, and reasoning that references payoff comparisons. Unit tests cover validation, state inference, scoring edge cases (e.g. bored near race, overreaching), and API shape; integration tests pipe **Module 3** `parse_run` / `log_run` / `get_run_history` output into Module 4 context builders. Documentation exists in package `__init__.py` and `PROPOSAL.md`; README module table could be tightened to match PROPOSAL wording (minor).
+Module 4 implements a **game-theoretic motivation selector**: it validates runner context, infers a coarse runner state (including **`mixed`** when positive and negative signals both appear without a stronger pattern), assigns utility scores to four coach strategies, selects the coach’s **best response** (`BR_coach`), and returns strategy, tone, and reasoning (detailed output includes per-strategy scores and inferred state). Inputs align with the proposal (streak, sentiments, terrain, adherence, days to race). **Game theory** is engaged via explicit payoff structure, best-response selection, and reasoning that references payoff comparisons. Unit tests cover validation, state inference, scoring edge cases (e.g. bored near race, overreaching), and API shape; integration tests pipe **Module 3** `parse_run` / `log_run` / `get_run_history` output into Module 4 context builders. Documentation exists in package `__init__.py`, **`PROPOSAL.md` (Module 4: normal-form games, best responses)**, and the **README module plan** row for Module 4 (aligned with the proposal).
 
 ---
 
@@ -32,7 +32,7 @@ Module 4 implements a **game-theoretic motivation selector**: it validates runne
 | Criterion | Score | Justification |
 |-----------|-------|----------------|
 | **2.1 Test Coverage and Design (6)** | 6 | Unit: validation (`test_validation.py`), game model (`test_game_model.py`), selector (`test_selector.py`). Integration: Module 3 → Module 4 pipeline (`integration_tests/module4_integration/`). Covers excellent→good, overreaching burnout, bored+near race, invalid inputs, simple vs detailed API. |
-| **2.2 Test Quality and Correctness (5)** | 5 | Full suite 688 passed; Module 4 tests assert behaviour and messages (e.g. payoff/BR language in detailed reasoning). `tmp_path` used for log store in integration tests. |
+| **2.2 Test Quality and Correctness (5)** | 5 | Full suite **945** passed; Module 4 tests assert behaviour and messages (e.g. payoff/BR language in detailed reasoning). `tmp_path` used for log store in integration tests. |
 | **2.3 Test Documentation and Organization (4)** | 4 | Test modules named to avoid pytest import clashes (`test_validation.py` vs M2’s `test_input_validation.py`); classes group scenarios; integration file documents purpose and run command. |
 | **Part 2 total** | **15** | **15** |
 
@@ -58,6 +58,6 @@ Participation requirement and Part 3 (GitHub) are not scored here.
 
 ## Action Items (from preparation guide)
 
-- [ ] Optional: align README Module 4 topic row with `PROPOSAL.md` (terminology).
+- [x] README Module 4 topic row aligned with `PROPOSAL.md` (normal-form / best response wording).
 - [ ] Ensure team commits / push reflect Checkpoint 3 work (Part 3).
 - [ ] Demo: walk through context dict → scores → chosen strategy → reasoning (and M3→M4 integration path).

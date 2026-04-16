@@ -3,8 +3,8 @@
 **Module:** Module 3 (Run Logger)  
 **Scope:** `src/module3_run_logger/`, `unit_tests/module3_run_logger/`, `integration_tests/module3_integration/`  
 **Rubric:** AI System Module Rubric (Part 1: Source, Part 2: Testing)  
-**Last updated:** Re-run after sentiment/effort split and demo updates.  
-**Test run:** 113 passed (unit: 99, integration: 14).
+**Last updated:** 2026-04-16 (checkpoint preparation re-run).  
+**Test run (Module 3–scoped):** 113 passed (unit: 99, integration: 14). **Full project:** **945** passed.
 
 ---
 
