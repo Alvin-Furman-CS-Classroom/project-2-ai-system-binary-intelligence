@@ -35,7 +35,7 @@ def _pace_minutes(row: dict[str, Any]) -> float:
 
 
 def _distance(row: dict[str, Any]) -> float:
-    d = row.get("distance")
+    d = row.get("distance") if row.get("distance") is not None else row.get("distance_miles")
     return float(d) if d is not None else 0.0
 
 
@@ -136,11 +136,17 @@ def aggregate_history(
     last_dt = max((d for d in dates if d is not None), default=None)
     recent = _select_recent_runs(runs, dates, last_dt=last_dt, weeks_window=weeks_window)
 
+    first_dt = min((d for d in dates if d is not None), default=None)
+    if first_dt and last_dt:
+        span_weeks = max(1, (last_dt - first_dt).days // 7 + 1)
+    else:
+        span_weeks = min(weeks_window, max(1, len(runs) // 3))
+
     miles_by_week: defaultdict[int, float] = defaultdict(float)
-    for r in recent:
+    for i, r in enumerate(recent):
         d = _parse_date(r.get("date"))
         if d is None or last_dt is None:
-            wk = 0
+            wk = i % span_weeks  # distribute undated runs evenly across estimated weeks
         else:
             wk = (last_dt - d).days // 7
         miles_by_week[wk] += _distance(r)
@@ -157,12 +163,6 @@ def aggregate_history(
     neg_rate = neg / max(1, len(runs))
 
     avg_training_pace = _avg_pace_distance_weighted(recent)
-
-    first_dt = min((d for d in dates if d is not None), default=None)
-    if first_dt and last_dt:
-        span_weeks = max(1, (last_dt - first_dt).days // 7 + 1)
-    else:
-        span_weeks = min(weeks_window, max(1, len(runs) // 3))
 
     return {
         "weeks_of_training": float(span_weeks),

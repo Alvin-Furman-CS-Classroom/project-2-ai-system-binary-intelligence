@@ -1,3 +1,8 @@
-numpy>=1.26.0
-scikit-learn>=1.4.0
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.10.0
+iniconfig==2.3.0
+packaging==26.0
+pluggy==1.6.0
+Pygments==2.19.2
 pytest==9.0.2

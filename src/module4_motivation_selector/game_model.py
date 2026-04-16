@@ -8,8 +8,7 @@ from .input_validation import MotivationContext
 
 COACH_STRATEGIES = ("push_harder", "maintain", "encourage_rest", "encourage_variety")
 
-# "mixed" is the catch-all when no other pattern wins (not a negative label).
-RUNNER_STATES = ("engaged", "mixed", "bored", "burnout_risk")
+RUNNER_STATES = ("engaged", "default", "bored", "burnout_risk")
 
 
 @dataclass
@@ -56,7 +55,7 @@ def infer_runner_state(context: MotivationContext) -> str:
     if good_count >= 2 and high_adherence:
         return "engaged"
 
-    return "mixed"
+    return "default"
 
 
 def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
@@ -73,7 +72,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
         scores["maintain"] += 2.0
         scores["encourage_rest"] += 0.5
         scores["encourage_variety"] += 1.5
-    elif state == "mixed":
+    elif state == "default":
         scores["maintain"] += 2.5
         scores["encourage_rest"] += 2.0
         scores["encourage_variety"] += 1.5
@@ -100,7 +99,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
     # Race proximity: closer to race increases value of maintaining or
     # slightly pushing if not burned out.
     days = context.days_to_race
-    if days <= 21 and state in {"engaged", "mixed"}:
+    if days <= 21 and state in {"engaged", "default"}:
         scores["maintain"] += 1.0
         scores["push_harder"] += 0.5
         scores["encourage_rest"] += 0.5
@@ -109,7 +108,7 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
         # introducing big terrain changes just for variety.
         scores["maintain"] += 2.0
         scores["encourage_variety"] -= 1.5
-    elif days >= 60 and state in {"mixed", "burnout_risk"}:
+    elif days >= 60 and state in {"default", "burnout_risk"}:
         scores["encourage_rest"] += 1.0
 
     # Terrain monotony: increase value of variety.
@@ -118,4 +117,3 @@ def compute_strategy_scores(context: MotivationContext) -> StrategyScores:
         scores["encourage_variety"] += 1.0
 
     return StrategyScores(scores=scores)
-

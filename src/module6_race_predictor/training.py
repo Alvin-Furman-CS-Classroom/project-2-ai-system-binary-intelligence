@@ -1,395 +1,128 @@
 """
-Train and persist the Module 6 models.
+Train and persist the Module 6 race prediction models.
 
-Uses from-scratch gradient descent (LinearRegressionGD, LogisticRegressionGD)
-so the training loop is academically transparent and matches course slides.
-
-Split: 70% train / 15% validation / 15% test
-  - Train:      learn θ via gradient descent
-  - Validation: early stopping + loss curve logging
-  - Test:       final reported metrics (never seen during training or tuning)
-
-Confidence interval for finish time prediction uses TEST set residual std,
-not training set residual std.
+Artifacts saved inside `base` directory:
+  synthetic_race_training.csv  – synthetic training data (auto-generated)
+  module6_models.pkl           – scaler + models + metadata
 """
 
 from __future__ import annotations
 
-import json
 import pickle
 from pathlib import Path
 
 import numpy as np
-from sklearn.metrics import (
-    confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
-from sklearn.preprocessing import StandardScaler
 
 from .constants import DEFAULT_MODULE6_DATA_DIR, FEATURE_COLUMNS
 from .gradient_descent import LinearRegressionGD, LogisticRegressionGD
-from .synthetic_data import load_synthetic_csv, write_synthetic_csv
+
+_CSV_NAME = "synthetic_race_training.csv"
+_PKL_NAME = "module6_models.pkl"
 
 
-def _readiness_test_metrics(
-    ready_model: LogisticRegressionGD,
-    X_test_s: np.ndarray,
-    y_g_test: np.ndarray,
-) -> tuple[float, float, float, float | None, list[list[int]]]:
-    """
-    Classification metrics on the test split only.
-    ``readiness_auc`` is None if only one class is present (AUC undefined).
-    """
-    y_int = y_g_test.astype(int)
-    test_preds_class = ready_model.predict(X_test_s)
-    test_proba = ready_model.predict_proba(X_test_s)[:, 1]
-    precision = float(precision_score(y_int, test_preds_class, zero_division=0))
-    recall = float(recall_score(y_int, test_preds_class, zero_division=0))
-    f1 = float(f1_score(y_int, test_preds_class, zero_division=0))
-    cm = confusion_matrix(y_int, test_preds_class, labels=[0, 1]).tolist()
-    auc: float | None
-    if len(np.unique(y_int)) < 2:
-        auc = None
-    else:
-        try:
-            auc = float(roc_auc_score(y_int, test_proba))
-        except ValueError:
-            auc = None
-    return precision, recall, f1, auc, cm
+class _StandardScaler:
+    """Zero-mean, unit-variance scaler built from scratch (no sklearn)."""
+
+    def __init__(self) -> None:
+        self.mean_: np.ndarray | None = None
+        self.std_: np.ndarray | None = None
+
+    def fit(self, X: np.ndarray) -> "_StandardScaler":
+        self.mean_ = X.mean(axis=0)
+        self.std_ = X.std(axis=0)
+        self.std_[self.std_ == 0] = 1.0  # avoid division by zero on constant cols
+        return self
+
+    def transform(self, X: np.ndarray) -> np.ndarray:
+        return (X - self.mean_) / self.std_
+
+    def fit_transform(self, X: np.ndarray) -> np.ndarray:
+        return self.fit(X).transform(X)
 
 
-def _three_way_split(
-    X: np.ndarray,
-    y_time: np.ndarray,
-    y_goal: np.ndarray,
-    *,
-    val_frac: float = 0.15,
-    test_frac: float = 0.15,
-    seed: int = 42,
-) -> tuple[
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-    np.ndarray,
-]:
-    """
-    Returns X_train, X_val, X_test, y_t_train, y_t_val, y_t_test,
-            y_g_train, y_g_val, y_g_test.
-    """
-    n = X.shape[0]
-    rng = np.random.default_rng(seed)
-    idx = rng.permutation(n)
-
-    n_test = int(n * test_frac)
-    n_val = int(n * val_frac)
-    n_train = n - n_test - n_val
-
-    train_i = idx[:n_train]
-    val_i = idx[n_train : n_train + n_val]
-    test_i = idx[n_train + n_val :]
-
-    return (
-        X[train_i], X[val_i], X[test_i],
-        y_time[train_i], y_time[val_i], y_time[test_i],
-        y_goal[train_i], y_goal[val_i], y_goal[test_i],
-    )
-
-
-def _scale_splits(
-    X_train: np.ndarray,
-    X_val: np.ndarray,
-    X_test: np.ndarray,
-) -> tuple[StandardScaler, np.ndarray, np.ndarray, np.ndarray]:
-    scaler = StandardScaler()
-    X_train_s = scaler.fit_transform(X_train)
-    return scaler, X_train_s, scaler.transform(X_val), scaler.transform(X_test)
-
-
-def _fit_finish_model(
-    X_train_s: np.ndarray,
-    y_t_train: np.ndarray,
-    X_val_s: np.ndarray,
-    y_t_val: np.ndarray,
-    X_test_s: np.ndarray,
-    y_t_test: np.ndarray,
-    *,
-    lr_finish: float,
-    n_epochs: int,
-    batch_size: int,
-) -> tuple[LinearRegressionGD, float, float, float]:
-    finish_model = LinearRegressionGD(
-        learning_rate=lr_finish,
-        n_epochs=n_epochs,
-        batch_size=batch_size,
-    )
-    finish_model.fit(X_train_s, y_t_train, X_val_s, y_t_val)
-    test_residuals = y_t_test - finish_model.predict(X_test_s)
-    residual_std_test = float(np.std(test_residuals))
-    rmse_test = finish_model.rmse(X_test_s, y_t_test)
-    mae_test = finish_model.mae(X_test_s, y_t_test)
-    return finish_model, rmse_test, mae_test, residual_std_test
-
-
-def _fit_readiness_model(
-    X_train_s: np.ndarray,
-    y_g_train: np.ndarray,
-    X_val_s: np.ndarray,
-    y_g_val: np.ndarray,
-    X_test_s: np.ndarray,
-    y_g_test: np.ndarray,
-    *,
-    lr_readiness: float,
-    n_epochs: int,
-    batch_size: int,
-) -> tuple[
-    LogisticRegressionGD,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float | None,
-    list[list[int]],
-]:
-    ready_model = LogisticRegressionGD(
-        learning_rate=lr_readiness,
-        n_epochs=n_epochs,
-        batch_size=batch_size,
-        class_weight="balanced",
-    )
-    ready_model.fit(X_train_s, y_g_train, X_val_s, y_g_val)
-    val_acc = ready_model.accuracy(X_val_s, y_g_val)
-    test_acc = ready_model.accuracy(X_test_s, y_g_test)
-    precision, recall, f1, auc, cm = _readiness_test_metrics(
-        ready_model, X_test_s, y_g_test
-    )
-    return (
-        ready_model,
-        val_acc,
-        test_acc,
-        precision,
-        recall,
-        f1,
-        auc,
-        cm,
-    )
-
-
-def _compose_metadata(
-    *,
-    finish_model: LinearRegressionGD,
-    ready_model: LogisticRegressionGD,
-    X_train: np.ndarray,
-    X_val: np.ndarray,
-    X_test: np.ndarray,
-    rmse_test: float,
-    mae_test: float,
-    residual_std_test: float,
-    val_acc: float,
-    test_acc: float,
-    precision: float,
-    recall: float,
-    f1: float,
-    auc: float | None,
-    cm: list[list[int]],
-) -> dict:
-    return {
-        "feature_names": list(FEATURE_COLUMNS),
-        "n_train": int(X_train.shape[0]),
-        "n_val": int(X_val.shape[0]),
-        "n_test": int(X_test.shape[0]),
-        "finish_rmse_test": round(rmse_test, 4),
-        "finish_mae_test": round(mae_test, 4),
-        "residual_std_minutes": round(residual_std_test, 4),
-        "readiness_val_accuracy": round(val_acc, 4),
-        "readiness_test_accuracy": round(test_acc, 4),
-        "readiness_precision": round(precision, 4),
-        "readiness_recall": round(recall, 4),
-        "readiness_f1": round(f1, 4),
-        "readiness_auc": None if auc is None else round(auc, 4),
-        "readiness_confusion_matrix": cm,
-        "finish_train_loss_final": round(finish_model.train_losses_[-1], 4),
-        "finish_val_loss_final": round(finish_model.val_losses_[-1], 4) if finish_model.val_losses_ else None,
-        "readiness_train_loss_final": round(ready_model.train_losses_[-1], 6),
-        "readiness_val_loss_final": round(ready_model.val_losses_[-1], 6) if ready_model.val_losses_ else None,
-        "class_weights": ready_model.class_weights_,
-    }
-
-
-def _print_training_summary(
-    *,
-    rmse_test: float,
-    mae_test: float,
-    residual_std_test: float,
-    val_acc: float,
-    test_acc: float,
-    precision: float,
-    recall: float,
-    f1: float,
-    auc: float | None,
-    cm: list[list[int]],
-) -> None:
-    print(
-        f"[training] Finish time  | RMSE={rmse_test:.2f} min  MAE={mae_test:.2f} min  "
-        f"ResidualStd={residual_std_test:.2f} min (test set)"
-    )
-    auc_s = f"{auc:.3f}" if auc is not None else "n/a"
-    print(
-        f"[training] Readiness    | val_acc={val_acc:.3f}  test_acc={test_acc:.3f}  "
-        f"P={precision:.3f}  R={recall:.3f}  F1={f1:.3f}  AUC={auc_s}  CM={cm}"
-    )
-
-
-def train_and_save(
-    csv_path: str | Path,
-    models_dir: str | Path,
-    *,
-    lr_finish: float = 0.01,
-    lr_readiness: float = 0.05,
-    n_epochs: int = 500,
-    batch_size: int = 32,
-) -> dict:
-    """
-    Train LinearRegressionGD (finish time) and LogisticRegressionGD (met_goal)
-    on the synthetic CSV.
-
-    Saves module6_models.pkl and metadata.json.
-    Confidence interval residual_std is computed on the TEST set.
-    """
-    csv_path = Path(csv_path)
-    models_dir = Path(models_dir)
-    models_dir.mkdir(parents=True, exist_ok=True)
+def _train(csv_path: Path) -> dict:
+    from .synthetic_data import load_synthetic_csv
 
     X, y_time, y_goal = load_synthetic_csv(csv_path)
 
-    (
-        X_train, X_val, X_test,
-        y_t_train, y_t_val, y_t_test,
-        y_g_train, y_g_val, y_g_test,
-    ) = _three_way_split(X, y_time, y_goal)
+    # 80/20 train / validation split
+    n = len(X)
+    split = int(n * 0.8)
+    rng = np.random.default_rng(42)
+    idx = rng.permutation(n)
+    tr, val = idx[:split], idx[split:]
 
-    scaler, X_train_s, X_val_s, X_test_s = _scale_splits(X_train, X_val, X_test)
+    X_tr, X_val = X[tr], X[val]
+    y_time_tr, y_time_val = y_time[tr], y_time[val]
+    y_goal_tr, y_goal_val = y_goal[tr], y_goal[val]
 
-    finish_model, rmse_test, mae_test, residual_std_test = _fit_finish_model(
-        X_train_s,
-        y_t_train,
-        X_val_s,
-        y_t_val,
-        X_test_s,
-        y_t_test,
-        lr_finish=lr_finish,
-        n_epochs=n_epochs,
-        batch_size=batch_size,
+    scaler = _StandardScaler()
+    X_tr_s = scaler.fit_transform(X_tr)
+    X_val_s = scaler.transform(X_val)
+
+    # Finish-time regressor (linear regression via gradient descent)
+    finish_model = LinearRegressionGD(
+        learning_rate=0.01, n_epochs=600, batch_size=64, tol=1e-5
     )
+    finish_model.fit(X_tr_s, y_time_tr, X_val_s, y_time_val)
 
-    (
-        ready_model,
-        val_acc,
-        test_acc,
-        precision,
-        recall,
-        f1,
-        auc,
-        cm,
-    ) = _fit_readiness_model(
-        X_train_s,
-        y_g_train,
-        X_val_s,
-        y_g_val,
-        X_test_s,
-        y_g_test,
-        lr_readiness=lr_readiness,
-        n_epochs=n_epochs,
-        batch_size=batch_size,
+    preds_val = finish_model.predict(X_val_s)
+    residual_std = float(np.std(preds_val - y_time_val))
+    rmse = finish_model.rmse(X_val_s, y_time_val)
+
+    # Readiness classifier (logistic regression via gradient descent)
+    ready_model = LogisticRegressionGD(
+        learning_rate=0.05, n_epochs=500, batch_size=64, tol=1e-5
     )
+    ready_model.fit(X_tr_s, y_goal_tr, X_val_s, y_goal_val)
+    acc = ready_model.accuracy(X_val_s, y_goal_val)
 
-    metadata = _compose_metadata(
-        finish_model=finish_model,
-        ready_model=ready_model,
-        X_train=X_train,
-        X_val=X_val,
-        X_test=X_test,
-        rmse_test=rmse_test,
-        mae_test=mae_test,
-        residual_std_test=residual_std_test,
-        val_acc=val_acc,
-        test_acc=test_acc,
-        precision=precision,
-        recall=recall,
-        f1=f1,
-        auc=auc,
-        cm=cm,
-    )
+    print(f"[training] finish RMSE={rmse:.2f} min | readiness acc={acc:.3f}")
 
-    _print_training_summary(
-        rmse_test=rmse_test,
-        mae_test=mae_test,
-        residual_std_test=residual_std_test,
-        val_acc=val_acc,
-        test_acc=test_acc,
-        precision=precision,
-        recall=recall,
-        f1=f1,
-        auc=auc,
-        cm=cm,
-    )
-
-    bundle = {
+    return {
         "finish": finish_model,
         "readiness": ready_model,
         "scaler": scaler,
-        "metadata": metadata,
+        "metadata": {
+            "residual_std_minutes": residual_std,
+            "val_rmse_minutes": rmse,
+            "val_accuracy": acc,
+            "n_train": split,
+            "n_val": n - split,
+            "feature_columns": FEATURE_COLUMNS,
+        },
     }
-    out_path = models_dir / "module6_models.pkl"
-    with open(out_path, "wb") as f:
-        pickle.dump(bundle, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-    with open(models_dir / "metadata.json", "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
-
-    return metadata
 
 
-def load_models(models_dir: str | Path) -> dict:
-    path = Path(models_dir) / "module6_models.pkl"
-    if not path.exists():
+def ensure_training_artifacts(base: Path | None = None) -> None:
+    """Generate synthetic data and train models if the pkl bundle is missing."""
+    base = Path(base or DEFAULT_MODULE6_DATA_DIR)
+    pkl_path = base / _PKL_NAME
+    if pkl_path.exists():
+        return
+
+    csv_path = base / _CSV_NAME
+    if not csv_path.exists():
+        from .synthetic_data import write_synthetic_csv
+        print(f"[training] Generating synthetic data → {csv_path}")
+        write_synthetic_csv(csv_path, n_rows=2000)
+
+    print("[training] Training models...")
+    bundle = _train(csv_path)
+    pkl_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(pkl_path, "wb") as f:
+        pickle.dump(bundle, f)
+    print(f"[training] Saved models → {pkl_path}")
+
+
+def load_models(base: Path | None = None) -> dict:
+    """Load the trained model bundle (scaler + models + metadata) from disk."""
+    base = Path(base or DEFAULT_MODULE6_DATA_DIR)
+    pkl_path = base / _PKL_NAME
+    if not pkl_path.exists():
         raise FileNotFoundError(
-            f"Trained models not found at {path}. Run ensure_training_artifacts() or train_and_save()."
+            f"Model bundle not found at {pkl_path}. "
+            "Call ensure_training_artifacts() first, or set auto_train=True."
         )
-    with open(path, "rb") as f:
-        bundle = pickle.load(f)
-    required = ("finish", "readiness", "scaler", "metadata")
-    missing = [k for k in required if k not in bundle]
-    if missing:
-        raise ValueError(
-            f"{path} is missing keys {missing}. Delete the pickle and retrain "
-            "(e.g. remove module6_models.pkl and run ensure_training_artifacts)."
-        )
-    return bundle
-
-
-def ensure_training_artifacts(
-    module6_dir: str | Path | None = None,
-    *,
-    n_synthetic_rows: int = 2000,
-) -> Path:
-    """
-    Create module6_dir, write synthetic CSV if missing, train if model pickle missing.
-    Returns path to module6_dir.
-    """
-    base = Path(module6_dir or DEFAULT_MODULE6_DATA_DIR)
-    base.mkdir(parents=True, exist_ok=True)
-    csv_p = base / "synthetic_race_training.csv"
-    if not csv_p.exists():
-        write_synthetic_csv(csv_p, n_rows=n_synthetic_rows, seed=42)
-    if not (base / "module6_models.pkl").exists():
-        train_and_save(csv_p, base)
-    return base
+    with open(pkl_path, "rb") as f:
+        return pickle.load(f)

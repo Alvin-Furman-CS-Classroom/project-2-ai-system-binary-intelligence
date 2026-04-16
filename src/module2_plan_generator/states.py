@@ -1,29 +1,3 @@
-"""
-Search state representation for the training plan generator.
-
-A ``TrainingState`` captures everything A* needs to know about a partially
-built training plan. It is the "node" in the search graph. States are
-immutable so they can be stored in sets and used as dictionary keys.
-
-Terminology (matches Informed Search lecture slides):
-    - g(n): path cost from start to this state (accumulated penalties)
-    - h(n): heuristic estimate of remaining cost to goal
-    - f(n) = g(n) + h(n): total estimated cost through this state
-
-Example:
-    >>> from module2_plan_generator.states import TrainingState
-    >>> start = TrainingState.create_start(
-    ...     total_weeks=16,
-    ...     current_weekly_miles=15.0,
-    ...     days_per_week=4,
-    ...     experience="beginner",
-    ...     available_terrain=["road", "trail"],
-    ... )
-    >>> start.week_number
-    0
-    >>> start.is_goal()
-    False
-"""
 
 from __future__ import annotations
 
@@ -117,20 +91,7 @@ class TrainingState:
         week_miles: float,
         week_penalty: float,
     ) -> TrainingState:
-        """Return a new state with one additional week appended.
-
-        This is the "action" in the search: transitioning from week k to
-        week k+1 by choosing a specific set of workouts.
-
-        Args:
-            workouts: Tuple of workout dicts for the new week.
-            week_miles: Total mileage for the new week.
-            week_penalty: The cost c(n, n') for this transition (the
-                penalty score of the new week).
-
-        Returns:
-            A new ``TrainingState`` representing the successor.
-        """
+        
         return TrainingState(
             week_number=self.week_number + 1,
             total_weeks=self.total_weeks,

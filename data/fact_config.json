@@ -11,7 +11,10 @@
   "injury_mappings": [
     { "contains": ["shin splint"], "fact": "shin_splints" },
     { "contains": ["knee"], "fact": "knee_injury" },
-    { "contains": ["plantar fasciitis", "plantar"], "fact": "plantar_fasciitis" },
+    {
+      "contains": ["plantar fasciitis", "plantar"],
+      "fact": "plantar_fasciitis"
+    },
     { "contains": ["it band", "itb"], "fact": "it_band_syndrome" },
     { "contains": ["achilles"], "fact": "achilles_tendonitis" },
     { "contains": ["stress fracture", "fracture"], "fact": "stress_fracture" },

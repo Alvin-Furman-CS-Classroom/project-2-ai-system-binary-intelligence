@@ -45,6 +45,13 @@ DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 # distance_fraction is relative to the target weekly mileage.
 
 _BEGINNER_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
+    1: [
+        [("long run", 1.0)],
+    ],
+    2: [
+        [("easy run", 0.50), ("long run", 0.50)],
+        [("easy run", 0.40), ("long run", 0.60)],
+    ],
     3: [
         [("easy run", 0.30), ("easy run", 0.30), ("long run", 0.40)],
         [("easy run", 0.35), ("easy run", 0.25), ("long run", 0.40)],
@@ -64,9 +71,20 @@ _BEGINNER_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
         [("easy run", 0.18), ("easy run", 0.15), ("easy run", 0.15),
          ("easy run", 0.15), ("easy run", 0.12), ("long run", 0.25)],
     ],
+    7: [
+        [("easy run", 0.15), ("easy run", 0.12), ("easy run", 0.13),
+         ("recovery run", 0.10), ("easy run", 0.15), ("easy run", 0.15), ("long run", 0.20)],
+    ],
 }
 
 _INTERMEDIATE_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
+    1: [
+        [("long run", 1.0)],
+    ],
+    2: [
+        [("tempo", 0.45), ("long run", 0.55)],
+        [("easy run", 0.40), ("long run", 0.60)],
+    ],
     3: [
         [("easy run", 0.30), ("tempo", 0.30), ("long run", 0.40)],
     ],
@@ -84,9 +102,20 @@ _INTERMEDIATE_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
         [("easy run", 0.15), ("tempo", 0.15), ("easy run", 0.15),
          ("recovery run", 0.10), ("easy run", 0.15), ("long run", 0.30)],
     ],
+    7: [
+        [("easy run", 0.14), ("tempo", 0.14), ("easy run", 0.12),
+         ("recovery run", 0.10), ("intervals", 0.14), ("easy run", 0.12), ("long run", 0.24)],
+    ],
 }
 
 _ADVANCED_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
+    1: [
+        [("long run", 1.0)],
+    ],
+    2: [
+        [("tempo", 0.50), ("long run", 0.50)],
+        [("intervals", 0.45), ("long run", 0.55)],
+    ],
     3: [
         [("tempo", 0.30), ("intervals", 0.25), ("long run", 0.45)],
     ],
@@ -101,6 +130,10 @@ _ADVANCED_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
     6: [
         [("easy run", 0.12), ("tempo", 0.15), ("easy run", 0.12),
          ("intervals", 0.15), ("recovery run", 0.11), ("long run", 0.35)],
+    ],
+    7: [
+        [("easy run", 0.12), ("tempo", 0.14), ("easy run", 0.10),
+         ("intervals", 0.14), ("recovery run", 0.10), ("race pace", 0.12), ("long run", 0.28)],
     ],
 }
 

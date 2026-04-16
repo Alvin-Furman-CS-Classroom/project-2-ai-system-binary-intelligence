@@ -1,52 +1,63 @@
-# Checkpoint 4 — Code Elegance Report
-
-**Module:** Module 5 (Adaptive Progression) + pipeline wiring used at this checkpoint  
-**Scope:** `src/module5_adaptive_progression/`, `src/pipeline/` (orchestration and adherence helpers)  
-**Rubric:** [Code Elegance Rubric](https://csc-343.path.app/rubrics/code-elegance.rubric.md) (0–4 per criterion)  
-**Last updated:** 2026-03-28 — checkpoint preparation re-run after advisor refactor (local `.venv`, `pytest` from `requirements.txt`).
+# Code Elegance Report — Checkpoint 4
+**Module:** Module 4 — Motivation Manager
+**Date:** 2026-03-22
+**Reviewer:** Claude Code (rubric-based)
 
 ---
 
 ## Summary
 
-Module 5 and the pipeline read as a coherent extension of earlier modules: MDP discretization, tabular Q-learning, validation, and feature extraction stay in focused modules; `advisor.py` now centralizes the adapt path in **`_compute_adapt_session`** with **`_AdaptSession`** (`NamedTuple`), thin public **`adapt_progression`** / **`adapt_progression_detailed`** wrappers, and small helpers for the simple result dict and Q snapshot. Outcome-based volume inference uses named thresholds (**`VOLUME_COMPLETED_ABOVE_BASE`** / **`VOLUME_COMPLETED_BELOW_BASE`**) in `features.py`. The optional Module 1 hook catches a **defined tuple** of exception types (`_M1_HOOK_ERRORS`) so typical integration slips degrade gracefully while unexpected failures still propagate.
+Module 4 is written with professional clarity and strong architectural decomposition across five focused files (`state.py`, `payoff.py`, `equilibrium.py`, `recommender.py`, `manager.py`). The primary weaknesses are scattered magic numbers throughout `payoff.py` and a near-complete absence of error handling on the public API boundary.
 
 ---
 
-## Rubric Scores (Code Elegance)
+## Criterion Scores
 
-| Criterion | Score | Justification |
-|-----------|-------|----------------|
-| 1. Naming Conventions | 4 | `discretize_state`, `QLearningEngine`, `_compute_adapt_session`, `_AdaptSession`, `compute_week_adherence`, `build_module5_context`, etc., read clearly and match project conventions. |
-| 2. Function and Method Design | 4 | Public adapt APIs are short; shared logic lives in `_compute_adapt_session`; `_build_reasoning` and engine helpers remain single-purpose. |
-| 3. Abstraction and Modularity | 4 | Same layered split as before: `mdp`, `q_learning`, `features`, `input_validation`, `advisor`, plus pipeline I/O separate from RL core. |
-| 4. Style Consistency | 4 | Type hints, `NamedTuple`, sectioned files, docstrings on public APIs; aligned with Modules 1–4. |
-| 5. Code Hygiene | 4 | No duplicated adapt path; inference thresholds named beside other feature constants; enums and payoff constants centralized. |
-| 6. Control Flow Clarity | 4 | Linear validate → load engine → compute session → map to output; MDP rationale documented in-module. |
-| 7. Pythonic Idioms | 4 | `NamedTuple` for structured internal result, dict comprehensions, `pathlib` persistence, appropriate `typing`. |
-| 8. Error Handling | 4 | `ValidationError` for bad context; `_apply_module1_safety` documents and uses a **specific** exception tuple for the hook; other hook failures propagate (intentional). |
+### 1. Naming Conventions — 4/4
 
-**Average:** **4.0** across eight criteria.
+Names are descriptive and consistently follow PEP 8. `RunnerState`, `PayoffMatrix`, `NashResult`, `MotivationRecommendation`, and all builder/finder functions (`build_runner_state`, `compute_payoff_matrix`, `find_nash_equilibrium`, `build_recommendation`) reveal intent without needing explanation. Single-letter locals in `payoff.py` (`f`, `s`, `se`, `e`, `a`) are immediately documented via inline comments on the same lines.
+
+### 2. Function and Method Design — 4/4
+
+Every function does exactly one thing. The pipeline stages are each delegated to a dedicated function. Private helpers (`_dominant_strategy_coach`, `_find_pure_ne`, `_find_mixed_ne`, `_map_intensity`, `_compute_adherence`, `_build_message`) keep the public functions lean. The longest function (`compute_payoff_matrix`) is ~65 lines, justified by the complexity of constructing the full 2×2 matrix.
+
+### 3. Abstraction and Modularity — 4/4
+
+File-level responsibilities are exceptionally clear: `state.py` (data model), `payoff.py` (game construction), `equilibrium.py` (solver), `recommender.py` (output translation), `manager.py` (public API + re-exports). No premature generalization; no under-abstraction. The `demo.py` user-input adapter is correctly separated from the core logic.
+
+### 4. Style Consistency — 4/4
+
+PEP 8 throughout. Type hints used consistently on all function signatures. Docstrings follow a uniform Args/Returns format. The ─── decorators in comments are non-standard but applied uniformly, so they aid scanning rather than confusing it. Would pass a linter with minimal warnings.
+
+### 5. Code Hygiene — 3/4
+
+No dead code, no commented-out blocks, no duplication. However, `payoff.py` contains numerous bare magic numbers (`8.0`, `10.0`, `-3.0`, `-2.0`, `5.0`, `4.0`, `6.0`, `3.0`, `2.0`) directly in formulas without named constants. These numbers are the entire payoff design and should be named (e.g., `ADAPTATION_GAIN_WEIGHT = 8.0`, `INJURY_PENALTY_WEIGHT = 10.0`) to make tuning and interpretation easier.
+
+### 6. Control Flow Clarity — 4/4
+
+`find_nash_equilibrium` documents its three-step priority order at the top and implements it with clear early returns. `build_recommendation` applies overrides in an obvious stack (game theory → safety → overtraining). Nesting depth never exceeds 2 levels. Complex conditions are broken into named predicates (`is_overtraining_risk()`).
+
+### 7. Pythonic Idioms — 4/4
+
+Dataclasses used appropriately for all data containers. `__post_init__` used for clamping. `all(... for rs in RUNNER_STRATEGIES)` for dominant strategy checks. `max(0.0, min(1.0, ...))` pattern for probability clamping. `__all__` in `manager.py` for explicit re-exports. `zip` used in `demo.py` for pairing sentiments with terrains.
+
+### 8. Error Handling — 2/4
+
+The internal pipeline trusts its inputs, which is acceptable. However, `get_daily_recommendation()` is the public API entry point and performs zero validation. Invalid `runner_profile` types, missing keys, or a malformed `safety_result` dict will produce silent incorrect behavior or a `KeyError`. `PayoffMatrix.get()` will raise `KeyError` on invalid strategy strings with no helpful message. `_SENTIMENT_SCORE` lookup in `demo.py` silently falls back to `0.0` for unknown labels without logging.
 
 ---
 
-## Findings
+## Overall Score
 
-| Severity | Finding | Suggested fix |
-|----------|---------|---------------|
-| Minor | `_compute_adapt_session` is still one cohesive block (~60 lines). | Optional: extract “cold start note” or “motivation + M1” into tiny helpers if the file grows further. |
-| Minor | Integrators should know a broken `validate_fn` that raises e.g. `RuntimeError` will **not** be swallowed. | Document in README or package doc if course staff expect “never fail” hook semantics like Module 2’s planner. |
-
----
-
-## Refinements already applied
-
-Earlier review items are implemented in code: shared adapt logic (`_compute_adapt_session`, `_AdaptSession`, `_simple_recommendation_dict`, `_snapshot_q_values` in `advisor.py`); named completed-distance thresholds in `features.py`; Module 1 hook uses `_M1_HOOK_ERRORS` instead of a bare `except Exception`.
-
-**Open actions:** see **Findings** (optional helper split, optional `validate_fn` documentation).
-
----
-
-## Questions
-
-None blocking submission.
+| Criterion | Score |
+|-----------|-------|
+| 1. Naming Conventions | 4/4 |
+| 2. Function and Method Design | 4/4 |
+| 3. Abstraction and Modularity | 4/4 |
+| 4. Style Consistency | 4/4 |
+| 5. Code Hygiene | 3/4 |
+| 6. Control Flow Clarity | 4/4 |
+| 7. Pythonic Idioms | 4/4 |
+| 8. Error Handling | 2/4 |
+| **Average** | **3.63/4** |
+| **Module Rubric Mapping** | **4 (Exceeds expectations)** |

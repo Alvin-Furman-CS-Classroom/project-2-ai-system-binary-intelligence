@@ -33,14 +33,30 @@ def _goal_distance_km(distance: Any) -> float:
     if isinstance(distance, (int, float)):
         return float(distance)
     d = str(distance or "marathon").strip().lower()
+
+    # Named short-distance aliases
+    _NAMED: dict[str, float] = {
+        "5k": 5.0,
+        "5km": 5.0,
+        "10k": 10.0,
+        "10km": 10.0,
+    }
+    if d in _NAMED:
+        return _NAMED[d]
+
     if "half" in d:
         return HALF_MARATHON_KM
     if "marathon" in d or d in ("42", "42.2", "42k"):
         return MARATHON_KM
+
+    # Generic "NNkm" pattern
     m = re.match(r"^(\d+(?:\.\d+)?)\s*km$", d)
     if m:
         return float(m.group(1))
-    raise ValidationError(f"Unknown goal distance: {distance!r}")
+    raise ValidationError(
+        f"Unknown goal distance: {distance!r}. "
+        "Use '5k', '10k', 'half marathon', 'marathon', or a numeric km value."
+    )
 
 
 def validate_runner_snapshot(raw: Any) -> dict[str, Any]:

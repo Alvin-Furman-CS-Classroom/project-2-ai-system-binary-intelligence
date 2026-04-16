@@ -1,34 +1,3 @@
-"""
-A* search implementation for the training plan generator.
-
-Implements A* search as presented in the Informed Search lecture (slide 12),
-with a configurable beam width to keep the search tractable for deep plans
-(16-20+ weeks). The beam width limits how many states are kept at each
-depth level, combining A*'s informed heuristic guidance with beam search's
-memory efficiency (slide 22).
-
-When beam_width is None (unlimited), this is standard A*. When set to a
-finite value, it becomes beam A*: at each depth, only the best beam_width
-states (by f-cost) are retained. This trades optimality for tractability,
-which your professor's slides (slide 22-23) discuss as a practical
-consideration for large search spaces.
-
-The heuristic is consistent (slide 16), so within each beam the first
-expansion of a state is optimal.
-
-Example:
-    >>> from module2_plan_generator.search import a_star_search
-    >>> from module2_plan_generator.states import TrainingState
-    >>> start = TrainingState.create_start(
-    ...     total_weeks=8, current_weekly_miles=15.0,
-    ...     days_per_week=4, experience="beginner",
-    ...     available_terrain=["road", "trail"],
-    ... )
-    >>> result = a_star_search(start)
-    >>> result["success"]
-    True
-"""
-
 from __future__ import annotations
 
 import heapq
@@ -51,33 +20,7 @@ def a_star_search(
     validate_fn: Any = None,
     runner_profile: dict | None = None,
 ) -> dict:
-    """Run A* search to find the optimal training plan.
-
-    Uses A* with beam pruning: at each week (depth), only the best
-    ``beam_width`` partial plans are kept. This ensures the search
-    completes in O(beam_width * branching_factor * total_weeks) time.
-
-    With beam_width=10 and ~6 candidates per state, a 20-week plan
-    explores roughly 10 * 6 * 20 = 1,200 states (very fast).
-
-    Args:
-        start: The initial search state (empty plan).
-        max_nodes: Safety limit on total nodes expanded.
-        beam_width: Number of best states to keep at each depth.
-            Set to a large number for closer-to-pure A* behavior.
-        validate_fn: Optional Module 1 ``validate_workout`` function.
-        runner_profile: Runner profile dict passed to ``validate_fn``.
-
-    Returns:
-        A dict with keys:
-        - ``success`` (bool): Whether a complete plan was found.
-        - ``plan`` (list[dict]): The training plan.
-        - ``total_penalty`` (float): g(n) of the goal state.
-        - ``nodes_explored`` (int): States expanded.
-        - ``nodes_generated`` (int): Successor states created.
-        - ``algorithm`` (str): ``"a_star"`` (with beam annotation).
-        - ``rationale`` (str): Human-readable plan summary.
-    """
+    
     global _counter
     _counter = 0
 
@@ -205,11 +148,7 @@ def _validate_workouts(
     runner_profile: dict,
     state: TrainingState,
 ) -> tuple[dict, ...] | None:
-    """Validate each workout through Module 1; severity decides accept / use-alt / reject.
 
-    Critical → reject week. High + alternative → use alt. High + no alt → drop or reject week.
-    Medium → accept workout (advisory_notes built later from plan in planner).
-    """
     validated: list[dict] = []
     for w in workouts:
         profile = {

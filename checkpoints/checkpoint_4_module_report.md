@@ -1,70 +1,151 @@
-# Checkpoint 4 — Module Rubric Report
-
-**Module:** Module 5 (Adaptive Progression) and pipeline integration  
-**Scope:** `src/module5_adaptive_progression/`, `src/pipeline/` (`orchestrator.py`, `adherence.py`), `unit_tests/module5_adaptive_progression/`, `unit_tests/pipeline/`, `integration_tests/module5_integration/`  
-**Rubric:** [AI System Module Rubric](https://csc-343.path.app/projects/project-2-ai-system/ai-system.rubric.md)  
-**Last updated:** 2026-03-28 (checkpoint preparation re-run).  
-**Test run:** **886 passed** (full `unit_tests/` + `integration_tests/`). Scoped collection: **172** tests in `unit_tests/module5_adaptive_progression/`, **13** in `integration_tests/module5_integration/`, **13** in `unit_tests/pipeline/` (**198** combined).
+# Module Review Report — Checkpoint 4
+**Module:** Module 4 — Motivation Manager
+**Date:** 2026-03-22
+**Reviewer:** Claude Code (rubric-based)
 
 ---
 
 ## Summary
 
-Module 5 implements **model-free adaptive progression**: validated context and history map to a **discrete MDP state**; **tabular Q-learning** chooses **volume × intensity**; terrain follows explicit rules; **rewards** incorporate sentiment, fatigue, terrain change, and optional **Module 4** motivation shaping; **`train_on_run`** applies online Q-updates with optional persistence. **`src.pipeline`** wires the runner profile, Module 3 history, Module 2 planning, plan-vs-log **adherence** into motivation, and progression-adjusted plans. Implementation matches the README / proposal for Module 5. Recent cleanup: shared **`_compute_adapt_session`** path, named inference constants, and **targeted** exception handling for the optional Module 1 hook (see `checkpoint_4_elegance_report.md`).
+The Module 4 source code is a genuinely strong implementation of game theory applied to training motivation — the Nash Equilibrium solver is correct, the domain modeling is thoughtful, and the code architecture is clean. However, **the module has zero tests**, the README module table is not updated for Module 4, and Module 4 was delivered in a single large commit from one team member. These gaps will significantly reduce the final checkpoint score.
 
 ---
 
-## Part 1: Source Code Review (27 pts)
+## Part 1: Source Code Review (27 points)
 
-| Criterion | Score | Justification |
-|-----------|-------|----------------|
-| **1.1 Functionality (8)** | 8 | `adapt_progression`, `adapt_progression_detailed`, and `train_on_run` behave end-to-end; validation and Q persistence are covered; pipeline (`pipeline_plan_adjusted_by_progression`, adherence-aware context) stays green under full suite. |
-| **1.2 Code Elegance and Quality (7)** | 7 | Elegance average **4.0** per `checkpoint_4_elegance_report.md` (exemplary band for module rubric 1.2). |
-| **1.3 Documentation (4)** | 4 | Package `__init__.py` example context; `mdp.py` / `q_learning.py` explain formulation and updates; orchestrator module docstring covers progression feedback and adherence; advisor documents hook exception behavior in `_apply_module1_safety`. |
-| **1.4 I/O Clarity (3)** | 3 | Context and return shapes documented and tested; detailed output includes `q_values` and state. Full optional-key contract still requires `validate_context` for edge cases. |
-| **1.5 Topic Engagement (5)** | 5 | Strong RL engagement: state/action/reward design, ε-greedy policy, Bellman-style updates, persistence, explicit rationale for model-free choice over model-based planning. |
-| **Part 1 total** | **27** | **27** |
+### 1.1 Functionality — 6/8
 
----
+The four-stage pipeline (`build_runner_state → compute_payoff_matrix → find_nash_equilibrium → build_recommendation`) executes correctly. All three equilibrium types are implemented (dominant, pure, mixed NE via Indifference Principle). Safety overrides and overtraining circuit breakers are present and correct. Division-by-zero in `_find_mixed_ne` is guarded (`abs(denom) < 1e-9`). Score is not 8 because:
 
-## Part 2: Testing Review (15 pts)
+- `get_daily_recommendation()` has no input validation — passing `None`, a missing key, or a wrong type crashes silently or with a generic error.
+- No tests confirm behavior at edge cases (e.g., streak=0, all-negative sentiments, `safe=True` but `fatigue=1.0`).
 
-| Criterion | Score | Justification |
-|-----------|-------|----------------|
-| **2.1 Test Coverage and Design (6)** | 6 | Unit tests across validation, MDP, Q-learning, features, advisor; M5 integration simulates M3/M4-shaped data; pipeline tests cover profile, plan patching, adherence. |
-| **2.2 Test Quality and Correctness (5)** | 5 | **886** tests pass; behavior- and message-oriented assertions in Module 5 and pipeline tests. |
-| **2.3 Test Documentation and Organization (4)** | 4 | Parallel `unit_tests/` layout, per-module integration folders, docstrings on integration modules. |
-| **Part 2 total** | **15** | **15** |
+### 1.2 Code Elegance and Quality — 6/7
 
----
+Elegance report average: **3.63/4 → exceeds expectations**. Code quality is excellent across naming, modularity, control flow, and idioms. Deduction of one point for magic numbers scattered throughout `payoff.py` (see elegance report criterion 5) and missing error handling on the public API (criterion 8).
 
-## Part 3: GitHub Practices (8 pts)
+### 1.3 Documentation — 3/4
 
-Not scored here; depends on commit messages, branches/PRs, and visible team participation (participation gate applies per course rubric).
+| Location | Status |
+|----------|--------|
+| Module-level docstrings (all 5 files) | Present and informative |
+| `get_daily_recommendation()` | No docstring |
+| `build_runner_state()` | Full Args/Returns docstring |
+| `compute_payoff_matrix()` | Full docstring with design principles |
+| `find_nash_equilibrium()` | Full docstring with priority order |
+| `build_recommendation()` | Full docstring |
+| Private helpers (`_map_intensity`, `_compute_adherence`) | No docstrings |
+| Type hints | Consistent throughout |
 
----
+`get_daily_recommendation()` is the single public entry point and lacks a docstring. Private helpers in `recommender.py` are undocumented.
 
-## Scores Summary
+### 1.4 I/O Clarity — 2/3
 
-| Section | Points | Max |
-|---------|--------|-----|
-| Part 1: Source Code | 27 | 27 |
-| Part 2: Testing | 15 | 15 |
-| **Total (Parts 1 & 2)** | **42** | **42** |
+The return dict from `get_daily_recommendation()` is rich and self-describing (14 keys covering recommendation, equilibrium, state, and matrix). `demo.py` provides three concrete scenarios with printed output. The module-level pipeline diagram in `manager.py` is a strong I/O reference.
 
-Participation requirement and Part 3 (GitHub) are not scored in this report.
+Deduction: The README module table for Module 4 (row 4) is **completely blank** — no topic, inputs, outputs, dependencies, or checkpoint listed. The system spec exists only inside the Python files, not in the project's shared documentation.
 
----
+### 1.5 Topic Engagement — 5/5
 
-## Action Items (from preparation guide)
+Module 4 demonstrates deep, accurate engagement with game theory:
 
-- [ ] Demo: **context** → **state** → **Q action** → **next_distance / target_pace / terrain** → optional **`train_on_run`**.
-- [ ] Demo: **pipeline** — profile + Module 3 log → **plan adjusted by progression** and **adherence** vs plan week (if showing integration).
-- [ ] **Commits pushed** and **team participation** visible for the participation gate.
-- [ ] (Optional) If instructors expect Module-2-style “hook never raises,” document or align `validate_fn` error policy.
+- 2×2 normal-form game correctly modeled as a Coach vs Runner interaction.
+- Dominant strategy detection checks all opponent responses (strict dominance), correctly implemented.
+- Pure Nash Equilibrium uses the best-response method exactly as described in the slides.
+- Mixed NE uses the Indifference Principle: each player's mixing probability makes the *opponent* indifferent, not themselves — the most commonly misunderstood nuance. The math is correct.
+- Payoff design explicitly references Prisoner's Dilemma structure when both push while fatigued (payoff comments cite Slides 38–39, 53, 64–65).
+
+**Part 1 Total: 6 + 6 + 3 + 2 + 5 = 22/27**
 
 ---
 
-## Questions
+## Part 2: Testing Review (15 points)
 
-- Confirm with the instructor whether the live demo should lead with **Module 5 internals** or **end-to-end pipeline** (both are reasonable for Checkpoint 4).
+### 2.1 Test Coverage and Design — 0/6
+
+There are no tests for Module 4. `unit_tests/` contains folders for modules 1 and 2 only. `integration_tests/` has only a Module 1+2 integration test. Module 4 is entirely untested.
+
+### 2.2 Test Quality and Correctness — 0/5
+
+N/A — no tests exist.
+
+### 2.3 Test Documentation and Organization — 0/4
+
+N/A — no tests exist.
+
+**Part 2 Total: 0/15**
+
+---
+
+## Part 3: GitHub Practices (8 points)
+
+### 3.1 Commit Quality and History — 2/4
+
+The entire Module 4 implementation (929 lines across 7 files) was delivered in a single commit with the message `"module 4"`. This is too large for a single commit and the message does not describe what was built or why. Prior commits (`"clean comment again"`, `"clean comment"`) are vague. A better history would show iterative commits: state model → payoff matrix → equilibrium solver → recommender → demo.
+
+### 3.2 Collaboration Practices — 2/4
+
+Only one team member (Mengsrunnit) has commits for Module 4. Module 4 was pushed directly to the `demo` branch with no pull request. No evidence of code review from the second team member (Tanya Masvimbo) for this module. Collaboration requirement may need attention to avoid the automatic zero condition.
+
+**Part 3 Total: 4/8**
+
+---
+
+## Scoring Summary
+
+| Section | Score | Max |
+|---------|-------|-----|
+| Part 1: Source Code | 22 | 27 |
+| Part 2: Testing | 0 | 15 |
+| Part 3: GitHub Practices | 4 | 8 |
+| **Total** | **26** | **50** |
+
+---
+
+## Findings
+
+### Critical
+
+**C1 — No tests for Module 4**
+- Evidence: `unit_tests/` has no `module4_*` folder; `integration_tests/` has no module4 subfolder.
+- Impact: -15 points (entire Part 2).
+- Fix: Create `unit_tests/module4_Motivation_Manager/` with tests for at minimum: `test_state.py` (build_runner_state edge cases), `test_payoff.py` (matrix values for known inputs), `test_equilibrium.py` (dominant/pure/mixed cases), `test_recommender.py` (intensity mapping, safety override, overtraining override). Add `integration_tests/module4_integration/test_module1_module4.py` showing the M1 → M4 pipeline.
+
+### Major
+
+**M1 — README Module 4 row is blank**
+- Evidence: `README.md` line 30 — `| 4 |  |  |  |  |  |`
+- Impact: Reduces I/O Clarity score (1.4).
+- Fix: Fill in the table row with: topic (Game Theory / Nash Equilibrium), inputs (runner_profile dict, run_history list, safety_result dict), outputs (recommendation dict with intensity/adherence/message/rationale/equilibrium details), depends on (Module 1, Module 3), checkpoint (Checkpoint 4).
+
+**M2 — Magic numbers in `payoff.py`**
+- Evidence: `payoff.py` lines 81–109 — raw floats `8.0`, `10.0`, `-3.0`, `-2.0`, `5.0`, `4.0`, `6.0`, `3.0`, `2.0` in formulas.
+- Impact: Reduces Code Hygiene score (elegance criterion 5).
+- Fix: Define module-level constants such as `ADAPTATION_GAIN_WEIGHT`, `INJURY_PENALTY_WEIGHT`, `FEEL_GOOD_SCALE`, `EFFORT_COST_SCALE`, etc.
+
+**M3 — Only one contributor visible for Module 4**
+- Evidence: `git log` shows only Mengsrunnit authored the module 4 commit.
+- Impact: Collaboration score (3.2) and potential participation gate risk for teammate.
+- Fix: Second team member must make substantive commits (tests, documentation, or code additions) to Module 4 before submission.
+
+### Minor
+
+**m1 — `get_daily_recommendation()` has no docstring**
+- Evidence: `manager.py` line 20 — function body begins immediately after `def` line.
+- Fix: Add a docstring describing the three parameters and the return dict structure.
+
+**m2 — Single large commit for all of Module 4**
+- Evidence: Commit `7f7cee0` — "module 4" — 929 lines across 7 files.
+- Fix: Future modules should be committed incrementally (data model, then logic, then tests, then demo).
+
+---
+
+## Action Items
+
+- [ ] Create `unit_tests/module4_Motivation_Manager/` with tests covering all four submodules
+- [ ] Create `integration_tests/module4_integration/` with at least one M1 → M4 pipeline test
+- [ ] Update README module table row 4 with inputs, outputs, topic, and dependencies
+- [ ] Add docstring to `get_daily_recommendation()` in `manager.py`
+- [ ] Replace magic numbers in `payoff.py` with named module-level constants
+- [ ] Ensure second team member has substantive commits for Module 4 (tests or documentation)
+- [ ] Push Module 4 work via a pull request rather than directly to branch

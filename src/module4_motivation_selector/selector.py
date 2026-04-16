@@ -136,4 +136,3 @@ def select_motivation_strategy_detailed(context: Dict) -> Dict:
         "scores": scores.scores,
         "inferred_state": state,
     }
-

@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Race Predictor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f7f7f8;
+      color: #222;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    /* ── Header ── */
+    header { text-align: center; margin-bottom: 48px; }
+    header h1 { font-size: 1.75rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
+    header p  { margin-top: 6px; font-size: 0.92rem; color: #666; }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+      margin: 40px 0 12px;
+    }
+
+    /* ── Scenario label ── */
+    .scenario-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Meta row ── */
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .meta strong { color: #222; }
+
+    /* ── Stat grid ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: #fafafa;
+      border: 1px solid #ebebeb;
+      border-radius: 8px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+    .stat .val { font-size: 1.3rem; font-weight: 700; color: #e67e22; }
+    .stat .lbl { font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+
+    /* ── Readiness bar ── */
+    .bar-wrap { height: 6px; background: #eee; border-radius: 3px; margin: 8px 0 0; overflow: hidden; }
+    .bar-fill  { height: 100%; background: #e67e22; border-radius: 3px; }
+
+    /* ── Recommendations ── */
+    .recs {
+      list-style: none;
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.65;
+      border-left: 3px solid #e67e22;
+      padding-left: 12px;
+      margin-top: 12px;
+    }
+    .recs li + li { margin-top: 4px; }
+
+    /* ── History toggle ── */
+    details { margin-top: 14px; }
+    summary {
+      font-size: 0.8rem;
+      color: #888;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+    summary::before { content: "+ "; }
+    details[open] summary::before { content: "− "; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
+    th { color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; padding: 6px 8px; text-align: left; border-bottom: 1px solid #eee; }
+    td { padding: 5px 8px; color: #555; border-bottom: 1px solid #f5f5f5; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Load button ── */
+    .load-btn {
+      margin-top: 14px;
+      padding: 7px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: none;
+      border: 1px solid #e67e22;
+      color: #e67e22;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .load-btn:hover { background: #e67e22; color: #fff; }
+
+    /* ── Form ── */
+    form { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 24px 22px; margin-bottom: 16px; }
+
+    .fieldset-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin: 20px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .fieldset-title:first-child { margin-top: 0; }
+
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .run-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 10px; }
+
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 5px; }
+    .hint { font-weight: 400; color: #aaa; }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      color: #222;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: #e67e22; background: #fff; }
+
+    .btn-add {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: none;
+      border: 1px solid #ccc;
+      color: #555;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-add:hover { border-color: #888; color: #222; }
+
+    .btn-remove {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      background: none;
+      border: 1px solid #eee;
+      color: #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      margin-bottom: 0;
+    }
+    .btn-remove:hover { border-color: #e74c3c; color: #e74c3c; }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 20px;
+      padding: 11px;
+      background: #e67e22;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-submit:hover { background: #ca6f1e; }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #888;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #e67e22; }
+
+    @media (max-width: 600px) {
+      .stat-row, .grid-3, .grid-2 { grid-template-columns: 1fr 1fr; }
+      .run-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Race Readiness Predictor</h1>
+    <p>Estimate your finish time and race-day readiness from your training data.</p>
+  </header>
+
+  <!-- ── Demo scenarios ── -->
+  {% for s in scenario_results %}
+  <p class="section-title">{{ loop.index == 1 and "Demo scenarios" or "" }}</p>
+  <p class="scenario-label">{{ loop.index }}. {{ s.label }}</p>
+  <div class="card">
+    <div class="meta">
+      <span><strong>Age</strong> {{ s.snapshot.age }}</span>
+      <span><strong>Level</strong> {{ s.snapshot.experience_level }}</span>
+      <span><strong>Race</strong> {{ s.snapshot.goal_race.distance }} · {{ s.snapshot.goal_race.terrain }}</span>
+      <span><strong>Goal</strong> {{ s.snapshot.goal_race.target_time }}</span>
+      <span><strong>Days out</strong> {{ s.snapshot.days_to_race }}</span>
+      <span><strong>Adherence</strong> {{ s.snapshot.adherence_percent }}%</span>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="val">{{ s.result.predicted_finish }}</div>
+        <div class="lbl">Predicted finish</div>
+      </div>
+      <div class="stat">
+        <div class="val" style="font-size:1rem;">{{ s.result.confidence_interval[0] }}–{{ s.result.confidence_interval[1] }}</div>
+        <div class="lbl">95% interval</div>
+      </div>
+      <div class="stat">
+        <div class="val">{{ (s.result.readiness_score * 100) | round | int }}%</div>
+        <div class="lbl">Readiness</div>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:{{ (s.result.readiness_score * 100) | round | int }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="recs">
+      {% for rec in s.result.recommendations %}
+      <li>{{ rec }}</li>
+      {% endfor %}
+    </ul>
+
+    {% if s.snapshot.history %}
+    <details>
+      <summary>Training history ({{ s.snapshot.history | length }} runs)</summary>
+      <table>
+        <thead><tr><th>#</th><th>Distance (mi)</th><th>Pace (min/mi)</th><th>Terrain</th><th>Sentiment</th></tr></thead>
+        <tbody>
+          {% for run in s.snapshot.history %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ run.distance_miles }}</td>
+            <td>{{ run.pace_minutes }}</td>
+            <td>{{ run.terrain }}</td>
+            <td>{{ run.sentiment }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
+    {% endif %}
+
+    <button class="load-btn" onclick="loadScenario({{ loop.index0 }})">Load into form &darr;</button>
+  </div>
+  {% endfor %}
+
+  <!-- Scenario data -->
+  <script>
+    const SCENARIOS = [
+      {% for s in scenario_results %}
+      {
+        age: {{ s.snapshot.age }},
+        experience_level: {{ s.snapshot.experience_level | tojson }},
+        adherence_percent: {{ s.snapshot.adherence_percent }},
+        distance: {{ s.snapshot.goal_race.distance | tojson }},
+        target_time: {{ s.snapshot.goal_race.target_time | tojson }},
+        terrain: {{ s.snapshot.goal_race.terrain | tojson }},
+        days_to_race: {{ s.snapshot.days_to_race }},
+        history: [
+          {% for run in s.snapshot.history %}
+          { distance_miles: {{ run.distance_miles }}, pace_minutes: {{ run.pace_minutes }}, terrain: {{ run.terrain | tojson }}, sentiment: {{ run.sentiment | tojson }} }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+  </script>
+
+  <!-- ── Custom form ── -->
+  <p class="section-title" id="custom-form-heading" style="margin-top:48px;">Try your own</p>
+  <form action="/race/custom" method="post">
+
+    <p class="fieldset-title">Runner profile</p>
+    <div class="grid-3">
+      <div>
+        <label>Age</label>
+        <input type="number" id="f-age" name="age" value="30" min="16" max="80" required />
+      </div>
+      <div>
+        <label>Experience level</label>
+        <select id="f-experience_level" name="experience_level">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div>
+        <label>Adherence <span class="hint">(%)</span></label>
+        <input type="number" id="f-adherence_percent" name="adherence_percent" value="80" min="0" max="100" step="1" required />
+      </div>
+    </div>
+
+    <p class="fieldset-title">Goal race</p>
+    <div class="grid-3">
+      <div>
+        <label>Distance</label>
+        <select id="f-race_distance" name="race_distance">
+          <option value="5k">5K</option>
+          <option value="10k">10K</option>
+          <option value="half marathon">Half Marathon</option>
+          <option value="marathon" selected>Marathon</option>
+        </select>
+      </div>
+      <div>
+        <label>Target time <span class="hint">h:mm:ss</span></label>
+        <input type="text" id="f-target_time" name="target_time"
+          value="4:00:00" placeholder="e.g. 3:55:00"
+          pattern="\d+:\d{2}(:\d{2})?" autocomplete="off" required />
+      </div>
+      <div>
+        <label>Terrain</label>
+        <select id="f-race_terrain" name="race_terrain">
+          <option value="road" selected>Road</option>
+          <option value="trail">Trail</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:12px; max-width:200px;">
+      <label>Days to race</label>
+      <input type="number" id="f-days_to_race" name="days_to_race" value="42" min="1" max="365" required />
+    </div>
+
+    <p class="fieldset-title">Recent runs <span style="font-weight:400; text-transform:none; letter-spacing:0; color:#bbb; font-size:0.75rem;">oldest → newest</span></p>
+    <div id="run-rows"></div>
+    <button type="button" class="btn-add" onclick="addRunRow()">+ Add run</button>
+
+    <button type="submit" class="btn-submit">Predict race readiness</button>
+  </form>
+
+  <a href="/" class="back-link">&larr; Home</a>
+
+  <script>
+    let runCount = 0;
+    const MAX_RUNS = 15;
+
+    function addRunRow(dist, pace, terrain, sentiment) {
+      if (runCount >= MAX_RUNS) return;
+      runCount++;
+      const n = runCount;
+      const container = document.getElementById('run-rows');
+      const row = document.createElement('div');
+      row.className = 'run-row';
+      row.id = 'run-row-' + n;
+
+      const terrainOpts = ['road','trail','track','treadmill']
+        .map(t => `<option${t === (terrain || 'road') ? ' selected' : ''}>${t}</option>`).join('');
+      const sentimentOpts = ['neutral','positive','good','great','negative','bad','tired','struggled']
+        .map(s => `<option${s === (sentiment || 'neutral') ? ' selected' : ''}>${s}</option>`).join('');
+
+      row.innerHTML = `
+        <div>
+          <label>Distance <span class="hint">mi</span></label>
+          <input type="number" name="run_distance${n}" step="0.1" min="0.1"
+            value="${dist !== undefined ? dist : ''}" placeholder="6.0" />
+        </div>
+        <div>
+          <label>Pace <span class="hint">min/mi</span></label>
+          <input type="number" name="run_pace${n}" step="0.1" min="1"
+            value="${pace !== undefined ? pace : ''}" placeholder="9.5" />
+        </div>
+        <div>
+          <label>Terrain</label>
+          <select name="run_terrain${n}">${terrainOpts}</select>
+        </div>
+        <div>
+          <label>Sentiment</label>
+          <select name="run_sentiment${n}">${sentimentOpts}</select>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="button" class="btn-remove" onclick="removeRunRow(${n})" title="Remove">✕</button>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeRunRow(n) {
+      const row = document.getElementById('run-row-' + n);
+      if (row) row.remove();
+    }
+
+    function setSelect(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      for (const opt of el.options) {
+        if (opt.value === value || opt.text === value) { opt.selected = true; return; }
+      }
+    }
+
+    function loadScenario(index) {
+      const s = SCENARIOS[index];
+      document.getElementById('f-age').value = s.age;
+      setSelect('f-experience_level', s.experience_level);
+      document.getElementById('f-adherence_percent').value = s.adherence_percent;
+      setSelect('f-race_distance', s.distance);
+      document.getElementById('f-target_time').value = s.target_time;
+      setSelect('f-race_terrain', s.terrain);
+      document.getElementById('f-days_to_race').value = s.days_to_race;
+      document.getElementById('run-rows').innerHTML = '';
+      runCount = 0;
+      for (const run of s.history) addRunRow(run.distance_miles, run.pace_minutes, run.terrain, run.sentiment);
+      document.getElementById('custom-form-heading').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    addRunRow(); addRunRow(); addRunRow();
+  </script>
+</body>
+</html>

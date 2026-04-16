@@ -129,4 +129,3 @@ def validate_and_normalize_context(raw: dict) -> MotivationContext:
         adherence_percent=adherence_percent,
         days_to_race=days_to_race,
     )
-
