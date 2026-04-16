@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Plan Result</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      h2 {
+        color: #555;
+        margin-top: 30px;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+      }
+      .summary {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .summary p {
+        margin: 10px 0;
+        color: #666;
+      }
+      .summary strong {
+        color: #333;
+      }
+      table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        text-align: left;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+      tr:hover {
+        background-color: #f8f9fa;
+      }
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      li {
+        margin: 5px 0;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .back-link:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Generated Training Plan</h1>
+
+    <div class="summary">
+      <p><strong>Race Type:</strong> {{ result.race_type }}</p>
+      <p><strong>Race Distance:</strong> {{ result.race_distance }}</p>
+      <p><strong>Race Date:</strong> {{ result.race_date }}</p>
+      <p><strong>Training Duration:</strong> {{ result.total_weeks }} weeks</p>
+      <p><strong>Training Days:</strong> {{ result.training_days }}</p>
+      <p><strong>Success:</strong> {{ result.success }}</p>
+      <p><strong>Total Penalty:</strong> {{ result.total_penalty }}</p>
+      <p><strong>Nodes Explored:</strong> {{ result.nodes_explored }}</p>
+    </div>
+
+    <h2>Rationale</h2>
+    <div class="summary">
+      <p>{{ result.rationale }}</p>
+    </div>
+
+    {% if result.plan %}
+    <h2>Weekly Plan Breakdown</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Week</th>
+          <th>Total Miles</th>
+          <th>Long Run (miles)</th>
+          <th>Workouts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in result.plan %}
+        <tr>
+          <td>{{ week.week }}</td>
+          <td>{{ "%.1f"|format(week.total_miles) }}</td>
+          <td>{{ "%.1f"|format(week.long_run) }}</td>
+          <td>
+            <ul style="margin: 0; padding-left: 20px">
+              {% for workout in week.workouts %}
+              <li>
+                <strong>{{ workout.day }}</strong> -
+                <strong>{{ workout.type|title }}</strong>: {{
+                "%.1f"|format(workout.distance) }} miles ({{ workout.terrain }})
+              </li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <a href="/plans" class="back-link">Create Another Plan</a>
+  </body>
+</html>

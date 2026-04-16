@@ -1,0 +1,16 @@
+{
+  "real_coefficients": {
+    "theta_0_intercept": 134.62014909154811,
+    "theta_1_weekly_miles": -2.822245986411329,
+    "theta_2_pace_min_per_mile": 11.358774996137678,
+    "rmse_minutes": 14.760407180899143,
+    "mae_minutes": 11.450225337628705,
+    "r_squared": 0.5608925371111213,
+    "n_rows": 86
+  },
+  "suggested_updates": {
+    "suggested_avg_weekly_miles_coeff": -1.834,
+    "suggested_pace_min_per_mile_coeff": 7.383,
+    "note": "Scale factor 0.65: real data are mostly sub-4h runners; synthetic population is wider. Intercept 310.0 retained; pace term added in code."
+  }
+}

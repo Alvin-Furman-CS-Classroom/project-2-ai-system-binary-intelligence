@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Workout Safety Validator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      /* Your page uses h2/h3, so style those too */
+      h2 {
+        color: #333;
+        text-align: center;
+      }
+      h3 {
+        color: #333;
+        margin-top: 0;
+      }
+
+      form {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: bold;
+      }
+
+      input[type="number"],
+      input[type="date"],
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 8px;
+      }
+
+      .checkbox-group {
+        margin-bottom: 15px;
+      }
+      .checkbox-group label {
+        display: inline;
+        font-weight: normal;
+        margin-left: 5px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Nice-to-have styling for the result area */
+      hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+      }
+      pre#result {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        overflow: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Workout Safety Validator</h2>
+
+    <form id="validatorForm">
+      <h3>Runner Profile</h3>
+
+      <label>Injuries (comma separated):</label><br />
+      <input type="text" id="injuries" value="shin splints" /><br /><br />
+
+      <label>Weekly Mileage:</label><br />
+      <input type="number" id="weekly_mileage" value="15" /><br /><br />
+
+      <label>Rest Days This Week:</label><br />
+      <input type="number" id="rest_days_this_week" value="1" /><br /><br />
+
+      <label>Available Terrain (comma separated):</label><br />
+      <input
+        type="text"
+        id="available_terrain"
+        value="treadmill, track"
+      /><br /><br />
+
+      <h3>Proposed Workout</h3>
+
+      <label>Type:</label><br />
+      <select id="workout_type">
+        <option value="easy run">easy run</option>
+        <option value="long run" selected>long run</option>
+        <option value="tempo">tempo</option>
+        <option value="intervals">intervals</option></select
+      ><br /><br />
+
+      <label>Distance:</label><br />
+      <input type="number" id="distance" value="12" /><br /><br />
+
+      <label>Terrain:</label><br />
+      <select id="terrain">
+        <option value="track" selected>track</option>
+        <option value="road">road</option>
+        <option value="trail">trail</option>
+        <option value="treadmill">treadmill</option></select
+      ><br /><br />
+
+      <button type="button" onclick="submitForm()">Validate</button>
+    </form>
+
+    <hr />
+
+    <h3>Result:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      function submitForm() {
+        const ignoredValues = ["no", "none", "n/a", "na", "nil", "nope", "nothing", "not applicable", ""];
+        const noInjuryPatterns = /\b(no injur|don'?t have|have no|not injured|no issues|nothing wrong|injury.?free)\b/i;
+        const injuries = document
+          .getElementById("injuries")
+          .value.split(",")
+          .map((i) => i.trim())
+          .filter(
+            (i) => i.length > 0 && !ignoredValues.includes(i.toLowerCase()) && !noInjuryPatterns.test(i),
+          );
+
+        const availableTerrain = document
+          .getElementById("available_terrain")
+          .value.split(",")
+          .map((t) => t.trim())
+          .filter((t) => t.length > 0);
+
+        const data = {
+          injuries: injuries,
+          weekly_mileage: Number(
+            document.getElementById("weekly_mileage").value,
+          ),
+          rest_days_this_week: Number(
+            document.getElementById("rest_days_this_week").value,
+          ),
+          available_terrain: availableTerrain,
+          proposed_workout: {
+            type: document.getElementById("workout_type").value,
+            distance: Number(document.getElementById("distance").value),
+            terrain: document.getElementById("terrain").value,
+          },
+        };
+
+        fetch("/safety-validator/validate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            document.getElementById("result").textContent = JSON.stringify(
+              result,
+              null,
+              2,
+            );
+          })
+          .catch((error) => {
+            document.getElementById("result").textContent = "Error: " + error;
+          });
+      }
+    </script>
+  </body>
+</html>

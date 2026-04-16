@@ -1,0 +1,37 @@
+{
+  "canonical_terrain": ["road", "trail", "track", "treadmill", "grass"],
+
+  "canonical_workout_types": [
+    "easy run",
+    "long run",
+    "tempo run",
+    "interval",
+    "recovery run",
+    "race"
+  ],
+
+  "terrain_keywords": {
+    "trail": "trail",
+    "trails": "trail",
+    "dirt": "trail",
+    "gravel": "trail",
+    "track": "track",
+    "oval": "track",
+    "treadmill": "treadmill",
+    "indoor": "treadmill",
+    "grass": "grass",
+    "road": "road",
+    "pavement": "road"
+  },
+
+  "workout_keywords": {
+    "long run": "long run",
+    "easy": "easy run",
+    "recovery": "recovery run",
+    "tempo": "tempo run",
+    "intervals": "interval",
+    "fartlek": "interval",
+    "speed": "interval",
+    "race": "race"
+  }
+}

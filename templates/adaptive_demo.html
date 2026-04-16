@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Adaptive Progression – Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 860px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 { color: #333; text-align: center; }
+      h2 {
+        color: #555;
+        margin-top: 30px;
+        border-bottom: 2px solid #1abc9c;
+        padding-bottom: 5px;
+      }
+      .card {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 28px;
+      }
+      .card h3 { margin: 0 0 14px; color: #333; font-size: 1.05rem; }
+      .meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 24px;
+        font-size: 0.88rem;
+        color: #666;
+        margin-bottom: 14px;
+      }
+      .meta span strong { color: #333; }
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .stat {
+        background: #f0fdf9;
+        border-radius: 6px;
+        padding: 10px 14px;
+        text-align: center;
+      }
+      .stat .val { font-size: 1.4rem; font-weight: bold; color: #1abc9c; }
+      .stat .lbl { font-size: 0.76rem; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+      .badge {
+        display: inline-block;
+        background-color: #1abc9c;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.82rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .reasoning {
+        font-size: 0.9rem;
+        color: #444;
+        line-height: 1.6;
+        border-left: 3px solid #1abc9c;
+        padding-left: 12px;
+        margin-top: 10px;
+      }
+      .q-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: monospace; margin-top: 8px; }
+      .q-table td { padding: 3px 8px; }
+      .q-table tr.best td { font-weight: bold; color: #1abc9c; }
+      /* form */
+      form {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 28px;
+      }
+      fieldset { border: 1px solid #ddd; border-radius: 6px; padding: 14px 18px; margin-bottom: 16px; }
+      legend { font-weight: bold; color: #555; font-size: 0.9rem; padding: 0 6px; }
+      label { display: block; margin-bottom: 4px; color: #555; font-weight: bold; font-size: 0.9rem; }
+      .hint { font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 5px; }
+      select, input[type="number"], input[type="text"] {
+        width: 100%; padding: 8px; margin-bottom: 12px;
+        border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+      }
+      .run-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+      .run-row > div { margin-bottom: 0; }
+      .remove-btn {
+        background: #e74c3c; padding: 8px 12px; width: auto;
+        font-size: 0.85rem; margin-bottom: 12px; border-radius: 4px;
+      }
+      .remove-btn:hover { background: #c0392b; }
+      .add-run-btn {
+        width: auto; padding: 8px 18px; background: #2980b9;
+        font-size: 0.9rem; margin-top: 10px; border-radius: 4px;
+      }
+      .add-run-btn:hover { background: #2471a3; }
+      button {
+        width: 100%; padding: 12px;
+        background-color: #1abc9c; color: white;
+        border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 6px;
+      }
+      button:hover { background-color: #17a589; }
+      .back-link {
+        display: inline-block; margin-top: 24px; padding: 10px 20px;
+        background-color: #1abc9c; color: white; text-decoration: none; border-radius: 4px;
+      }
+      .back-link:hover { background-color: #17a589; }
+    </style>
+  </head>
+  <body>
+    <h1>Adaptive Progression</h1>
+
+    <!-- ── Demo scenarios ── -->
+    {% for s in scenario_results %}
+    <h2>Scenario {{ loop.index }}: {{ s.label }}</h2>
+    <div class="card">
+      <div class="meta">
+        <span><strong>Workout type:</strong> {{ s.context.workout_type }}</span>
+        <span><strong>Terrain:</strong> {{ s.context.terrain }}</span>
+        <span><strong>Fatigue score:</strong> {{ s.context.fatigue_score }}</span>
+        <span><strong>History runs:</strong> {{ s.context.history | length }}</span>
+        {% if s.context.motivation %}
+        <span><strong>Streak:</strong> {{ s.context.motivation.current_streak }} days</span>
+        <span><strong>Adherence:</strong> {{ s.context.motivation.adherence_percent }}%</span>
+        {% endif %}
+      </div>
+
+      <div class="result-grid">
+        <div class="stat">
+          <div class="val">{{ s.result.next_distance }} mi</div>
+          <div class="lbl">Next distance</div>
+        </div>
+        <div class="stat">
+          <div class="val">{{ s.result.target_pace }} min/mi</div>
+          <div class="lbl">Target pace</div>
+        </div>
+        <div class="stat">
+          <div class="val">{{ (s.result.confidence * 100) | round | int }}%</div>
+          <div class="lbl">Confidence</div>
+        </div>
+        <div class="stat">
+          <div class="val">{{ s.result.weekly_miles }} mi</div>
+          <div class="lbl">Weekly miles</div>
+        </div>
+        <div class="stat">
+          <div class="val">{{ s.result.suggested_terrain }}</div>
+          <div class="lbl">Suggested terrain</div>
+        </div>
+        <div class="stat">
+          <div class="val">{{ s.result.sentiment_trend }}</div>
+          <div class="lbl">Sentiment trend</div>
+        </div>
+      </div>
+
+      <div><span class="badge">State: {{ s.result.state | join(" · ") }}</span></div>
+
+      <details style="margin-top:10px;">
+        <summary style="cursor:pointer; font-size:0.88rem; color:#555;">Q-values</summary>
+        <table class="q-table">
+          {% for action, q in s.result.q_values.items() | sort(attribute='1', reverse=true) %}
+          <tr {% if loop.first %}class="best"{% endif %}>
+            <td>{{ action }}</td>
+            <td>{{ q }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </details>
+
+      <div class="reasoning">{{ s.result.reasoning }}</div>
+    </div>
+    {% endfor %}
+
+    <!-- ── Custom form ── -->
+    <h2>Try Your Own</h2>
+    <form action="/progression/custom" method="post">
+      <label>Workout type</label>
+      <select name="workout_type">
+        <option>easy run</option>
+        <option>tempo run</option>
+        <option>long run</option>
+        <option>interval</option>
+        <option>recovery run</option>
+        <option>hill workout</option>
+        <option>fartlek</option>
+        <option>race</option>
+        <option>time trial</option>
+        <option>cross training</option>
+      </select>
+
+      <label>Current terrain</label>
+      <select name="terrain">
+        <option>road</option>
+        <option>trail</option>
+        <option>track</option>
+        <option>treadmill</option>
+      </select>
+
+      <label>Fatigue score <span class="hint">(0 = fresh, 1 = exhausted)</span></label>
+      <input type="number" name="fatigue_score" value="0.3" min="0" max="1" step="0.05" required />
+
+      <fieldset>
+        <legend>Motivation <span class="hint">(optional)</span></legend>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div>
+            <label>Adherence <span class="hint">(%)</span></label>
+            <input type="number" name="adherence_percent" min="0" max="100" step="1" placeholder="e.g. 67" />
+          </div>
+          <div>
+            <label>Current streak <span class="hint">(days)</span></label>
+            <input type="number" name="current_streak" min="0" step="1" placeholder="e.g. 7" />
+          </div>
+          <div>
+            <label>Days to race <span class="hint">(optional)</span></label>
+            <input type="number" name="days_to_race" min="0" step="1" placeholder="e.g. 30" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Recent runs (oldest → newest)</legend>
+        <div id="run-rows"></div>
+        <button type="button" class="add-run-btn" onclick="addRunRow()">+ Add Run</button>
+      </fieldset>
+
+      <button type="submit">Get Recommendation</button>
+    </form>
+
+    <a href="/" class="back-link">&larr; Home</a>
+
+    <script>
+      let runCount = 0;
+      const MAX_RUNS = 10;
+
+      function addRunRow() {
+        if (runCount >= MAX_RUNS) return;
+        runCount++;
+        const n = runCount;
+        const container = document.getElementById('run-rows');
+        const row = document.createElement('div');
+        row.className = 'run-row';
+        row.id = 'run-row-' + n;
+        row.innerHTML = `
+          <div>
+            <label>Run ${n} distance <span class="hint">(mi)</span></label>
+            <input type="number" name="distance${n}" step="0.1" min="0.1" placeholder="e.g. 5.0" />
+          </div>
+          <div>
+            <label>Pace <span class="hint">(min/mi)</span></label>
+            <input type="number" name="pace${n}" step="0.1" min="1" placeholder="e.g. 9.5" />
+          </div>
+          <div>
+            <label>Terrain</label>
+            <select name="terrain${n}">
+              <option>road</option>
+              <option>trail</option>
+              <option>track</option>
+              <option>treadmill</option>
+            </select>
+          </div>
+          <div>
+            <label>Sentiment</label>
+            <select name="sentiment${n}">
+              <option>neutral</option>
+              <option>positive</option>
+              <option>good</option>
+              <option>great</option>
+              <option>negative</option>
+              <option>bad</option>
+              <option>tired</option>
+              <option>struggled</option>
+            </select>
+          </div>
+          <div>
+            <button type="button" class="remove-btn" onclick="removeRunRow(${n})">✕</button>
+          </div>
+        `;
+        container.appendChild(row);
+      }
+
+      function removeRunRow(n) {
+        const row = document.getElementById('run-row-' + n);
+        if (row) row.remove();
+      }
+
+      // Start with 3 rows by default
+      addRunRow(); addRunRow(); addRunRow();
+    </script>
+  </body>
+</html>

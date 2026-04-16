@@ -1,0 +1,121 @@
+{
+  "symptom_aliases": {
+    "chest_pain": ["chest_pain", "chest pain"],
+    "dizziness": ["dizziness"]
+  },
+
+  "pain_level_facts": {
+    "severe": "severe_pain"
+  },
+
+  "injury_mappings": [
+    { "contains": ["shin splint"], "fact": "shin_splints" },
+    { "contains": ["knee"], "fact": "knee_injury" },
+    {
+      "contains": ["plantar fasciitis", "plantar"],
+      "fact": "plantar_fasciitis"
+    },
+    { "contains": ["it band", "itb"], "fact": "it_band_syndrome" },
+    { "contains": ["achilles"], "fact": "achilles_tendonitis" },
+    { "contains": ["stress fracture", "fracture"], "fact": "stress_fracture" },
+    { "contains": ["hip"], "fact": "hip_injury" },
+    { "contains": ["hamstring"], "fact": "hamstring_injury" },
+    { "contains": ["calf"], "fact": "calf_injury" },
+    { "contains": ["ankle"], "fact": "ankle_injury" },
+    { "contains": ["back"], "fact": "back_injury" }
+  ],
+
+  "experience_level_facts": {
+    "beginner": "beginner_runner",
+    "intermediate": "intermediate_runner",
+    "advanced": "advanced_runner"
+  },
+
+  "extreme_weather_values": ["extreme_heat", "extreme_cold"],
+
+  "workout_type_mappings": [
+    {
+      "contains": ["long run", "long"],
+      "facts": ["long_run", "hard_workout_today"]
+    },
+    {
+      "contains": ["tempo"],
+      "facts": ["tempo_run", "high_intensity_workout", "hard_workout_today"]
+    },
+    {
+      "contains": ["interval"],
+      "facts": ["intervals", "high_intensity_workout", "hard_workout_today"]
+    },
+    {
+      "contains": ["easy"],
+      "facts": ["easy_run"]
+    }
+  ],
+
+  "terrain_mappings": [
+    { "contains": ["track"], "facts": ["track_terrain", "hard_surface"] },
+    { "contains": ["road"], "facts": ["road_terrain", "hard_surface"] },
+    { "contains": ["trail"], "facts": ["trail_terrain"] },
+    { "contains": ["treadmill"], "facts": ["treadmill_terrain"] }
+  ],
+
+  "derived_rules": {
+    "excessive_distance": {
+      "enabled": true,
+      "long_run_multiplier": 1.5
+    },
+    "race_within_days": 7
+  },
+
+  "fact_explanations": {
+    "chest_pain": "Runner experiencing chest pain",
+    "dizziness": "Runner experiencing dizziness",
+    "severe_pain": "Runner experiencing severe pain",
+
+    "shin_splints": "Runner has shin splints injury",
+    "knee_injury": "Runner has knee injury",
+    "plantar_fasciitis": "Runner has plantar fasciitis",
+    "it_band_syndrome": "Runner has IT band syndrome",
+    "achilles_tendonitis": "Runner has Achilles tendonitis",
+    "stress_fracture": "Runner has a stress fracture",
+    "hip_injury": "Runner has hip injury",
+    "hamstring_injury": "Runner has hamstring injury",
+    "calf_injury": "Runner has calf injury",
+    "ankle_injury": "Runner has ankle injury",
+    "back_injury": "Runner has back injury",
+
+    "active_injury": "Runner has an active injury",
+    "not_cleared_by_doctor": "Injury not cleared by medical professional",
+
+    "not_fully_recovered": "Runner not fully recovered from previous workout",
+    "poor_sleep": "Runner had poor sleep quality",
+    "zero_rest_days_this_week": "No rest days taken this week",
+    "six_plus_training_days": "Trained 6 or more days this week",
+    "hard_workout_yesterday": "Completed hard workout yesterday",
+    "no_rest_yesterday": "No rest day yesterday",
+
+    "beginner_runner": "Runner is a beginner",
+    "intermediate_runner": "Runner is intermediate level",
+    "advanced_runner": "Runner is advanced level",
+    "race_within_7_days": "Race scheduled within 7 days",
+
+    "extreme_weather": "Extreme heat or cold conditions",
+    "not_hydrated": "Runner is not properly hydrated",
+    "no_proper_footwear": "Runner does not have proper footwear",
+
+    "long_run": "Proposed workout is a long run",
+    "tempo_run": "Proposed workout is a tempo run",
+    "intervals": "Proposed workout is intervals",
+    "easy_run": "Proposed workout is an easy run",
+    "high_intensity_workout": "Proposed workout is high intensity",
+    "hard_workout_today": "Today's workout is hard/intense",
+
+    "track_terrain": "Proposed terrain is track",
+    "road_terrain": "Proposed terrain is road",
+    "trail_terrain": "Proposed terrain is trail",
+    "treadmill_terrain": "Proposed terrain is treadmill",
+    "hard_surface": "Proposed terrain is a hard surface",
+
+    "excessive_distance": "Distance exceeds safe limit for weekly mileage"
+  }
+}
