@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Race Predictor – Result</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f7f7f8;
+      color: #222;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    header { text-align: center; margin-bottom: 40px; }
+    header h1 { font-size: 1.6rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
+    header p  { margin-top: 6px; font-size: 0.88rem; color: #888; }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin: 32px 0 10px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+
+    /* ── Profile grid ── */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .profile-grid strong { color: #222; }
+
+    /* ── Stat row ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .stat {
+      background: #fafafa;
+      border: 1px solid #ebebeb;
+      border-radius: 8px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat .val { font-size: 1.35rem; font-weight: 700; color: #e67e22; }
+    .stat .val-sm { font-size: 1rem; font-weight: 700; color: #e67e22; line-height: 1.4; }
+    .stat .lbl { font-size: 0.68rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+    .bar-wrap { height: 6px; background: #eee; border-radius: 3px; margin: 8px 0 0; overflow: hidden; }
+    .bar-fill  { height: 100%; background: #e67e22; border-radius: 3px; }
+
+    /* ── Recommendations ── */
+    .recs {
+      list-style: none;
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.65;
+      border-left: 3px solid #e67e22;
+      padding-left: 12px;
+    }
+    .recs li + li { margin-top: 5px; }
+
+    /* ── Actions ── */
+    .actions { margin-top: 28px; display: flex; gap: 10px; }
+    .btn {
+      padding: 9px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-primary { background: #e67e22; color: #fff; border: none; }
+    .btn-primary:hover { background: #ca6f1e; }
+    .btn-ghost { background: none; color: #888; border: 1px solid #ddd; }
+    .btn-ghost:hover { border-color: #aaa; color: #444; }
+
+    @media (max-width: 500px) {
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Race Prediction</h1>
+    <p>Here's what your training data says about race day.</p>
+  </header>
+
+  <p class="section-title">Runner profile</p>
+  <div class="card">
+    <div class="profile-grid">
+      <span><strong>Age</strong> {{ snapshot.age }}</span>
+      <span><strong>Experience</strong> {{ snapshot.experience_level }}</span>
+      <span><strong>Race</strong> {{ snapshot.goal_race.distance }} · {{ snapshot.goal_race.terrain }}</span>
+      <span><strong>Goal time</strong> {{ snapshot.goal_race.target_time }}</span>
+      <span><strong>Days to race</strong> {{ snapshot.days_to_race }}</span>
+      <span><strong>Adherence</strong> {{ snapshot.adherence_percent }}%</span>
+      <span><strong>Runs logged</strong> {{ snapshot.history | length }}</span>
+    </div>
+  </div>
+
+  <p class="section-title">Prediction</p>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="val">{{ result.predicted_finish }}</div>
+      <div class="lbl">Predicted finish</div>
+    </div>
+    <div class="stat">
+      <div class="val-sm">{{ result.confidence_interval[0] }}<br>– {{ result.confidence_interval[1] }}</div>
+      <div class="lbl">95% interval</div>
+    </div>
+    <div class="stat">
+      <div class="val">{{ (result.readiness_score * 100) | round | int }}%</div>
+      <div class="lbl">Readiness</div>
+      <div class="bar-wrap">
+        <div class="bar-fill" style="width:{{ (result.readiness_score * 100) | round | int }}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-title">Recommendations</p>
+  <div class="card">
+    <ul class="recs">
+      {% for rec in result.recommendations %}
+      <li>{{ rec }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="actions">
+    <a href="/race/demo" class="btn btn-primary">&larr; Try another</a>
+    <a href="/" class="btn btn-ghost">Home</a>
+  </div>
+
+</body>
+</html>
