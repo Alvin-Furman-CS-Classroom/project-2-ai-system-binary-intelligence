@@ -3,13 +3,11 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date
 from fastapi import Request
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
+from app_templates import templates
 from src.module2_plan_generator.search import a_star_search
 from src.module2_plan_generator.states import TrainingState
-
-templates = Jinja2Templates(directory="templates")
 
 
 def show_form(request: Request):

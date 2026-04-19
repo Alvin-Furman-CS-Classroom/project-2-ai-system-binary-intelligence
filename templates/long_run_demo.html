@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Long Run · Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f0ede8;color:#111;max-width:940px;margin:0 auto;padding:0 20px 80px;}
+#pb{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;display:flex;overflow-x:auto;}
+#pb::-webkit-scrollbar{display:none;}
+.pbi{flex:1;min-width:68px;padding:10px 4px;text-align:center;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#333;cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;}
+.pbi.on{color:#fff;border-bottom-color:#fff;}
+body{padding-top:48px;}
+.db{padding:0 0 3rem;}
+.sec{margin-bottom:2.5rem;scroll-margin-top:56px;}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-top:2rem;border-top:2.5px solid #111;}
+.sec-hdr.first{border-top:none;padding-top:.5rem;}
+.snum{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#111;padding:4px 9px;border-radius:5px;flex-shrink:0;}
+.stitle{font-size:17px;font-weight:800;color:#111;}
+.stech{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:5px;flex-shrink:0;margin-left:auto;}
+.tl{background:#E4E1FC;color:#1E1850;}
+.ta{background:#D6E8F7;color:#0A3560;}
+.tn{background:#FDE8C0;color:#5A3000;}
+.tg{background:#E4E1FC;color:#1E1850;}
+.tr{background:#C8EDE0;color:#023020;}
+.tm{background:#FDE8C0;color:#5A3000;}
+.card{background:#fff;border:1.5px solid #d0ccc6;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;}
+.ctitle{font-size:13px;font-weight:800;color:#111;margin-bottom:10px;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.chip{background:#fff;border:1.5px solid #d0ccc6;border-radius:8px;padding:6px 11px;}
+.clbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#444;margin-bottom:2px;}
+.cval{font-size:13px;font-weight:800;color:#111;}
+.sg6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.sg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.sg4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.stat{background:#f0ede8;border-radius:10px;padding:12px 8px;text-align:center;border:1.5px solid #d0ccc6;}
+.sv{font-size:20px;font-weight:800;color:#111;}
+.sl{font-size:10px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;}
+.three{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:12px;}
+.badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;}
+.bd{background:#FCEBEB;color:#7A1F1F;}
+.bg{background:#D6EFCC;color:#1A4A08;}
+.bp{background:#E4E1FC;color:#1E1850;}
+.ba{background:#FDE8C0;color:#5A3000;}
+.bt{background:#C8EDE0;color:#023020;}
+.rr{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #e8e4de;}
+.rr:last-child{border-bottom:none;}
+.ri{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.ri.f{background:#FCEBEB;color:#7A1F1F;border:1.5px solid #F7C1C1;}
+.ri.p{background:#D6EFCC;color:#1A4A08;border:1.5px solid #9FDB7A;}
+.rtxt{font-size:13px;font-weight:700;color:#111;}
+.rsub{font-size:12px;color:#222;margin-top:2px;line-height:1.5;}
+.wo-b{border:2px solid #E24B4A;border-radius:10px;padding:12px 14px;background:#FFF5F5;}
+.wo-g{border:2px solid #1D9E75;border-radius:10px;padding:12px 14px;background:#F0FDF8;}
+.wlbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.wlbl.bad{color:#7A1F1F;}
+.wlbl.good{color:#023020;}
+.wval{font-size:15px;font-weight:800;color:#111;}
+.wsub{font-size:12px;color:#444;margin-top:4px;font-weight:600;}
+.ebtn{background:#f0ede8;border:1.5px solid #d0ccc6;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;color:#333;cursor:pointer;margin-top:8px;width:100%;}
+.ebtn:hover{background:#e8e4de;}
+.wrow{padding:9px 0;border-bottom:1px solid #e8e4de;}
+.wrow:last-child{border-bottom:none;}
+.whdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.wt{font-size:13px;font-weight:800;color:#111;}
+.ws{font-size:11px;font-weight:700;color:#333;}
+.wpills{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;padding-left:4px;}
+.pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.pill.long{background:#D6E8F7;color:#0A3560;border:1.5px solid #85B7EB;}
+.pill.tempo{background:#FDE8C0;color:#5A3000;border:1.5px solid #EF9F27;}
+.pill.easy{background:#D6EFCC;color:#1A4A08;border:1.5px solid #97C459;}
+.pill.interval{background:#E4E1FC;color:#1E1850;border:1.5px solid #7F77DD;}
+.logsc{max-height:280px;overflow-y:auto;border:1.5px solid #d0ccc6;border-radius:10px;}
+.logr{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #e8e4de;cursor:pointer;}
+.logr:last-child{border-bottom:none;}
+.logr:hover{background:#f8f5f0;}
+.logr.on{background:#EAF3FF;}
+.lstr{width:5px;height:30px;border-radius:3px;flex-shrink:0;}
+.ld{font-size:13px;font-weight:800;color:#111;width:48px;flex-shrink:0;}
+.lp{font-size:12px;font-weight:700;color:#444;width:54px;flex-shrink:0;}
+.lt{font-size:12px;color:#333;width:68px;flex-shrink:0;}
+.lx{font-size:12px;color:#222;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.pi{background:#f8f5f0;border-radius:8px;padding:9px 12px;border:1px solid #e0dcd6;}
+.pk{font-size:10px;font-weight:800;color:#444;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.pv{font-size:14px;font-weight:800;color:#111;}
+/* motivation */
+.logsel{width:100%;padding:8px 10px;border:1.5px solid #d0ccc6;border-radius:8px;font-size:13px;font-weight:700;color:#111;background:#fff;margin-bottom:10px;cursor:pointer;}
+.mot-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:12px;}
+.mot-state{background:#f8f5f0;border-radius:8px;padding:8px 12px;border:1px solid #e0dcd6;}
+.mot-state-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid #e8e4de;gap:8px;}
+.mot-state-row:last-child{border-bottom:none;}
+.mot-lbl{font-weight:700;color:#333;flex-shrink:0;}
+.mot-val{font-weight:800;color:#111;text-align:right;}
+.mot-quote-wrap{background:#f8f5f0;border-radius:8px;padding:8px 12px;border:1px solid #e0dcd6;display:flex;flex-direction:column;gap:8px;}
+.chat{background:#111;color:#fff;border-radius:12px 12px 12px 2px;padding:14px 16px;font-size:14px;font-weight:600;line-height:1.7;}
+.clb{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#444;margin-bottom:4px;}
+.user-quote{font-size:12px;font-weight:600;color:#222;font-style:italic;border-left:3px solid #d0ccc6;padding:6px 10px;border-radius:0 6px 6px 0;line-height:1.5;background:#fff;}
+/* payoff matrix — full width large */
+.mtx{overflow-x:auto;}
+.mt{border-collapse:collapse;font-size:13px;width:100%;}
+.mt th{background:#f0ede8;padding:9px 10px;text-align:center;font-size:12px;font-weight:800;color:#111;border:1.5px solid #d0ccc6;}
+.mt td{padding:9px 10px;text-align:center;border:1.5px solid #d0ccc6;font-size:13px;font-weight:700;color:#333;}
+.mt td.hi{background:#1E1850;color:#E4E1FC;font-weight:800;font-size:14px;}
+.mt td.mid{background:#E4E1FC;color:#1E1850;font-weight:800;}
+.mt .rl{text-align:left;font-weight:800;color:#111;background:#f8f5f0;font-size:12px;min-width:130px;}
+.mt .ar td{background:#F5F3FE;}
+.mt .ar .rl{background:#E4E1FC;color:#1E1850;}
+/* Q grid */
+.qdims{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.qd-lbl{font-size:12px;font-weight:800;color:#222;}
+.qd-sel{padding:6px 10px;border:1.5px solid #d0ccc6;border-radius:8px;font-size:12px;font-weight:700;color:#111;background:#fff;cursor:pointer;}
+.qgrid{display:grid;grid-template-columns:70px repeat(3,1fr);gap:3px;margin-top:4px;}
+.qcell{border-radius:6px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.qcell.hdr{background:transparent;font-size:10px;font-weight:800;color:#333;text-transform:uppercase;letter-spacing:.05em;padding:4px 2px;}
+.qcell.rhdr{background:transparent;font-size:10px;font-weight:800;color:#333;text-align:right;padding-right:6px;align-items:flex-end;justify-content:center;}
+.qval{font-size:16px;font-weight:800;}
+.qstar{font-size:11px;margin-top:1px;font-weight:700;}
+.dims{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.dc{background:#f8f5f0;border:1.5px solid #d0ccc6;border-radius:8px;padding:7px 11px;}
+.dl{font-size:9px;font-weight:800;color:#444;text-transform:uppercase;letter-spacing:.07em;}
+.dv{font-size:13px;font-weight:800;color:#111;margin-top:2px;}
+/* CI */
+.ci-container{margin:16px 0 8px;padding:0 8px;}
+.ci-svg{width:100%;overflow:visible;}
+/* chart */
+.cwrap{position:relative;width:100%;height:280px;}
+.tt{position:absolute;background:#111;border-radius:10px;padding:10px 14px;font-size:12px;color:#fff;pointer-events:none;display:none;min-width:160px;z-index:10;}
+.ttt{font-weight:800;margin-bottom:5px;font-size:13px;}
+.ttr{color:#ccc;margin-top:3px;}
+.ttr strong{color:#fff;}
+.crow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.clbl2{font-size:12px;font-weight:800;color:#333;white-space:nowrap;}
+.cval2{font-size:13px;font-weight:800;color:#111;min-width:40px;}
+.tbtn{background:#f0ede8;border:1.5px solid #d0ccc6;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:800;color:#333;cursor:pointer;}
+.tbtn.on{background:#FCEBEB;border-color:#E24B4A;color:#7A1F1F;}
+.lgrow{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;font-weight:700;color:#444;}
+.lgsw{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:#d0ccc6;border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#111;cursor:pointer;}
+#pred-bar{font-size:13px;font-weight:700;color:#333;margin-bottom:10px;padding:8px 12px;background:#fff;border-radius:8px;border:1.5px solid #d0ccc6;line-height:1.6;}
+@media(max-width:640px){
+  .two,.three{grid-template-columns:1fr;}
+  .sg6{grid-template-columns:repeat(3,1fr);}
+  .sg4{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<div id="pb">
+  <div class="pbi on" onclick="goTo('s-profile')" id="pb-0">Profile</div>
+  <div class="pbi" onclick="goTo('s-plan')" id="pb-1">M2 Plan</div>
+  <div class="pbi" onclick="goTo('s-safety')" id="pb-2">M1 Safety</div>
+  <div class="pbi" onclick="goTo('s-log')" id="pb-3">M3 Log</div>
+  <div class="pbi" onclick="goTo('s-motivation')" id="pb-4">M4 Motivation</div>
+  <div class="pbi" onclick="goTo('s-adaptive')" id="pb-5">M5 Adaptive</div>
+  <div class="pbi" onclick="goTo('s-race')" id="pb-6">M6 Race</div>
+  <div class="pbi" onclick="goTo('s-chart')" id="pb-7">Progression</div>
+</div>
+
+<div class="db">
+
+<!-- PROFILE -->
+<div class="sec" id="s-profile">
+  <div class="sec-hdr first">
+    <span class="snum">Profile</span>
+    <span class="stitle">Maya Chen</span>
+  </div>
+  <div class="sg6">
+    <div class="stat"><div class="sv">28</div><div class="sl">Age</div></div>
+    <div class="stat"><div class="sv">Inter.</div><div class="sl">Level</div></div>
+    <div class="stat"><div class="sv">28</div><div class="sl">Wk miles</div></div>
+    <div class="stat"><div class="sv">5</div><div class="sl">Day streak</div></div>
+    <div class="stat"><div class="sv">72%</div><div class="sl">Adherence</div></div>
+    <div class="stat"><div class="sv">42</div><div class="sl">Days to race</div></div>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">Goal race</div><div class="cval">Full marathon · road</div></div>
+    <div class="chip"><div class="clbl">Target time</div><div class="cval">4:15:00</div></div>
+    <div class="chip"><div class="clbl">Injury</div><div class="cval">Mild shin splints</div></div>
+    <div class="chip"><div class="clbl">Available terrain</div><div class="cval">Road, treadmill, track</div></div>
+    <div class="chip"><div class="clbl">Avg training pace</div><div class="cval">9:41 min/mi</div></div>
+  </div>
+</div>
+
+<!-- M2 PLAN -->
+<div class="sec" id="s-plan">
+  <div class="sec-hdr">
+    <span class="snum">M2</span>
+    <span class="stitle">Training Plan Generator</span>
+    <span class="stech ta">A* Search</span>
+  </div>
+  <div class="chips">
+    {% if m2_nodes is not none %}
+    <div class="chip"><div class="clbl">Nodes explored</div><div class="cval">{{ m2_nodes }}</div></div>
+    <div class="chip"><div class="clbl">Nodes generated</div><div class="cval">{{ m2_generated }}</div></div>
+    <div class="chip"><div class="clbl">Total penalty</div><div class="cval">{{ '%.1f'|format(m2_penalty) }}</div></div>
+    <div class="chip"><div class="clbl">Weeks to race</div><div class="cval">{{ m2_weeks }}</div></div>
+    <div class="chip"><div class="clbl">Algorithm</div><div class="cval">{{ m2_algorithm }}</div></div>
+    {% else %}
+    <div class="chip"><div class="clbl">Plan generator</div><div class="cval">Unavailable</div></div>
+    <div class="chip"><div class="clbl">Reason</div><div class="cval" style="font-size:11px;">{{ m2_plan_error }}</div></div>
+    {% endif %}
+    <div class="chip"><div class="clbl">Plan terrain</div><div class="cval">Road + treadmill only</div></div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="ctitle">Generated plan — click any week to expand</div>
+    <div id="plan-weeks"></div>
+    <button class="ebtn" id="plan-toggle" onclick="togglePlan()">Show all 12 weeks ↓</button>
+  </div>
+</div>
+
+<!-- M1 SAFETY -->
+<div class="sec" id="s-safety">
+  <div class="sec-hdr">
+    <span class="snum">M1</span>
+    <span class="stitle">Safety Validator</span>
+    <span class="stech tl">Propositional Logic · {{ m1_rule_count }} rules</span>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">Rules in knowledge base</div><div class="cval">{{ m1_rule_count }} (data/rules.json)</div></div>
+    <div class="chip"><div class="clbl">Scenario</div><div class="cval">Shin splints (cleared) — tries track surface</div></div>
+  </div>
+  <div class="two" style="margin-bottom:12px;">
+    <div class="wo-b">
+      <div class="wlbl bad">⚠ {{ m1_bad_label }}</div>
+      <div class="wval">{{ m1_bad_title }}</div>
+      <div class="wsub">{{ m1_bad_sub }}</div>
+    </div>
+    <div class="wo-g">
+      <div class="wlbl good">✓ {{ m1_good_label }}</div>
+      <div class="wval">{{ m1_good_title }}</div>
+      <div class="wsub">{{ m1_good_sub }}</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    {% for rule in m1_bad_rules %}
+    <div class="rr"><div class="ri f">✕</div><div><div class="rtxt">{{ rule.name }}</div><div class="rsub">{{ rule.explanation }}</div></div></div>
+    {% endfor %}
+    {% for row in m1_pass_rows %}
+    <div class="rr"><div class="ri p">✓</div><div><div class="rtxt">{{ row.title }}</div><div class="rsub">{% if row.ok %}Passes Module 1 forward chaining (no blocking rules){% else %}Unexpected{% endif %}</div></div></div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- M3 LOG -->
+<div class="sec" id="s-log">
+  <div class="sec-hdr">
+    <span class="snum">M3</span>
+    <span class="stitle">Run Log Parser</span>
+    <span class="stech tn">Regex + Word2Vec + Sentiment</span>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">Input</div><div class="cval">Free-text run descriptions</div></div>
+    <div class="chip"><div class="clbl">Runs logged</div><div class="cval">20 sessions</div></div>
+    <div class="chip"><div class="clbl">Parser output</div><div class="cval">6 keys from parse() incl. notes</div></div>
+  </div>
+  <div class="two">
+    <div>
+      <div style="font-size:12px;font-weight:800;color:#222;margin-bottom:6px;">Click any run to re-parse →</div>
+      <div class="logsc" id="log-list"></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="ctitle" id="log-title">Run 11 · Week 6</div>
+      <div class="user-quote" id="log-quote"></div>
+      <div class="pgrid" id="parse-out"></div>
+    </div>
+  </div>
+</div>
+
+<!-- M4 MOTIVATION -->
+<div class="sec" id="s-motivation">
+  <div class="sec-hdr">
+    <span class="snum">M4</span>
+    <span class="stitle">Motivation Strategy Selector</span>
+    <span class="stech tg">Game Theory</span>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">Input</div><div class="cval">Run log sentiment + streak + adherence + days to race</div></div>
+  </div>
+  <div style="margin-bottom:10px;">
+    <div class="clbl" style="font-size:11px;margin-bottom:6px;font-weight:800;color:#222;">Select a run log — watch the matrix and message update:</div>
+    <select class="logsel" id="mot-log-sel" onchange="updateMotivation()"></select>
+  </div>
+
+  <!-- compact top strip: state left, log+message right -->
+  <div class="mot-top">
+    <div class="mot-state" id="mot-state-display"></div>
+    <div class="mot-quote-wrap">
+      <div>
+        <div class="clb">Maya just logged:</div>
+        <div class="user-quote" id="mot-quote"></div>
+      </div>
+      <div>
+        <div class="clb">Long Run responds:</div>
+        <div class="chat" id="mot-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- full-width matrix -->
+  <div class="card" style="margin-bottom:0;">
+    <div class="ctitle">Payoff matrix — strategy × runner state</div>
+    <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:10px;">Dark cell = selected combination &nbsp;·&nbsp; Bold row = Maya's current inferred state &nbsp;·&nbsp; Values = expected adherence improvement score</div>
+    <div class="mtx" id="payoff-matrix"></div>
+  </div>
+</div>
+
+<!-- M5 ADAPTIVE -->
+<div class="sec" id="s-adaptive">
+  <div class="sec-hdr">
+    <span class="snum">M5</span>
+    <span class="stitle">Adaptive Progression</span>
+    <span class="stech tr">Q-Learning · 216 states</span>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">State space</div><div class="cval">{{ m5_state_dims }}</div></div>
+    <div class="chip"><div class="clbl">Actions</div><div class="cval">9 (volume × intensity)</div></div>
+    <div class="chip"><div class="clbl">Parameters</div><div class="cval">γ={{ m5_gamma }} · α={{ m5_alpha }} · ε-greedy (see q_learning.py)</div></div>
+  </div>
+  <div class="two" style="margin-bottom:10px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="ctitle">Q-value heatmap — 9 actions in current state</div>
+      <div class="qdims">
+        <span class="qd-lbl">View axis:</span>
+        <select class="qd-sel" id="q-dim-x" onchange="renderQGrid()">
+          <option value="intensity">Intensity</option>
+          <option value="terrain">Terrain</option>
+          <option value="recency">Recency</option>
+        </select>
+        <span class="qd-lbl">vs</span>
+        <select class="qd-sel" id="q-dim-y" onchange="renderQGrid()">
+          <option value="volume">Volume</option>
+          <option value="fatigue">Fatigue</option>
+          <option value="adherence">Adherence</option>
+        </select>
+      </div>
+      <div id="qgrid-wrap"></div>
+      <div style="margin-top:8px;font-size:11px;font-weight:700;color:#444;">Darker cell = higher Q-value · ★ = chosen action for current state</div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:10px;">
+        <div class="ctitle">Recommendation</div>
+        <div class="sg4">
+          <div class="stat"><div class="sv">10.5</div><div class="sl">Next mi</div></div>
+          <div class="stat"><div class="sv">9:50</div><div class="sl">Pace</div></div>
+          <div class="stat"><div class="sv">Road</div><div class="sl">Terrain</div></div>
+          <div class="stat"><div class="sv">79%</div><div class="sl">Conf.</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="ctitle">Current MDP state</div>
+        <div class="dims" id="state-dims"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- M6 RACE -->
+<div class="sec" id="s-race">
+  <div class="sec-hdr">
+    <span class="snum">M6</span>
+    <span class="stitle">Race Readiness Predictor</span>
+    <span class="stech tm">Linear + Logistic Regression</span>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="clbl">Snapshot taken</div><div class="cval">End of week 6</div></div>
+    <div class="chip"><div class="clbl">Avg training pace</div><div class="cval">9:41 min/mi</div></div>
+    <div class="chip"><div class="clbl">Adherence</div><div class="cval">72%</div></div>
+    <div class="chip"><div class="clbl">Runs in log</div><div class="cval">20</div></div>
+  </div>
+  <div class="sg3" style="margin-bottom:12px;">
+    <div class="stat"><div class="sv">{% if m6_meta and m6_meta.get('finish_rmse_test') is not none %}{{ '%.1f'|format(m6_meta['finish_rmse_test']) }}{% else %}—{% endif %}</div><div class="sl">Test RMSE (min)</div></div>
+    <div class="stat"><div class="sv">{% if m6_meta and m6_meta.get('finish_mae_test') is not none %}{{ '%.1f'|format(m6_meta['finish_mae_test']) }}{% else %}—{% endif %}</div><div class="sl">Test MAE (min)</div></div>
+    <div class="stat"><div class="sv">{% if m6_meta and m6_meta.get('readiness_auc') is not none %}{{ '%.3f'|format(m6_meta['readiness_auc']) }}{% else %}—{% endif %}</div><div class="sl">Readiness AUC</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="ctitle">Goal vs predicted — confidence interval</div>
+    <div class="ci-container">
+      <svg class="ci-svg" id="ci-svg" height="70"></svg>
+    </div>
+    <div style="display:flex;gap:20px;font-size:12px;font-weight:800;margin-top:4px;">
+      <span style="color:#378ADD;">▌ Predicted 4:22</span>
+      <span style="color:#1D9E75;">▌ Goal 4:15</span>
+      <span><span style="display:inline-block;width:12px;height:10px;background:#B5D4F4;border-radius:2px;margin-right:4px;vertical-align:middle;"></span>95% CI (4:09 – 4:35)</span>
+    </div>
+    <p style="margin-top:8px;font-size:11px;color:#666;font-weight:600;">Illustrative goal vs predicted bar — not a live inference from the saved Module 6 models.</p>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="ctitle">Recommendations</div>
+    <ul style="list-style:none;padding:0;">
+      <li style="font-size:13px;font-weight:700;color:#333;padding:6px 0 6px 14px;border-bottom:1px solid #e8e4de;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#444;">›</span>Goal 4:15 is reachable — predicted is 7 min slower. Tighten tempo paces weeks 7–9.</li>
+      <li style="font-size:13px;font-weight:700;color:#333;padding:6px 0 6px 14px;border-bottom:1px solid #e8e4de;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#444;">›</span>Adherence at 72% is the primary drag. Two missed sessions/week compounds quickly at 42 days out.</li>
+      <li style="font-size:13px;font-weight:700;color:#333;padding:6px 0 6px 14px;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#444;">›</span>Shin splints resolved on treadmill. Clear for road long runs week 3 if no recurrence.</li>
+    </ul>
+  </div>
+  <div style="margin-top:8px;font-size:11px;font-weight:700;color:#444;">{% if m6_meta and m6_meta.get('n_train') is not none %}Held-out eval (data/module6/metadata.json): n_train={{ m6_meta['n_train'] }} · n_test={{ m6_meta['n_test'] }} · val RMSE {{ '%.1f'|format(m6_meta['val_rmse_minutes']) }} min · val accuracy {{ '%.0f'|format(m6_meta['val_accuracy'] * 100) }}% · readiness F1 {{ '%.2f'|format(m6_meta['readiness_f1']) }}{% else %}Train models and add data/module6/metadata.json for metrics.{% endif %}</div>
+</div>
+
+<!-- CHART -->
+<div class="sec" id="s-chart">
+  <div class="sec-hdr">
+    <span class="snum">Chart</span>
+    <span class="stitle">Training Progression</span>
+  </div>
+  <div class="card">
+    <div class="crow">
+      <span class="clbl2">Adherence</span>
+      <input type="range" id="adh-s" min="50" max="95" value="72" step="1" style="width:90px;">
+      <span class="cval2" id="adh-v">72%</span>
+      <span class="clbl2">Avg pace</span>
+      <input type="range" id="pace-s" min="850" max="1100" value="941" step="1" style="width:90px;">
+      <span class="cval2" id="pace-v">9:41</span>
+      <span class="clbl2">Wk miles</span>
+      <input type="range" id="miles-s" min="18" max="45" value="28" step="1" style="width:90px;">
+      <span class="cval2" id="miles-v">28</span>
+      <button class="tbtn" id="inj-btn" onclick="toggleInjury()">Injury wks</button>
+      <button class="tbtn" id="shin-btn" onclick="toggleShin()">Shin scenario</button>
+    </div>
+    <div class="lgrow">
+      <span><span class="lgsw" style="background:#378ADD;"></span>Completed</span>
+      <span><span class="lgsw" style="background:#B5D4F4;"></span>Planned</span>
+      <span><span class="lgsw" style="background:#D6EFCC;border:1px solid #97C459;"></span>Taper</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:2px;height:14px;background:#E24B4A;display:inline-block;border-radius:1px;"></span>Now</span>
+      <span id="inj-leg" style="display:none;"><span class="lgsw" style="background:#FCEBEB;border:1px solid #F7C1C1;"></span>Injury wks</span>
+      <span id="shin-leg" style="display:none;"><span class="lgsw" style="background:#FDE8C0;border:1px solid #EF9F27;"></span>Shin return</span>
+    </div>
+    <div id="pred-bar"></div>
+    <div class="cwrap">
+      <canvas id="progChart"></canvas>
+      <div class="tt" id="ctt">
+        <div class="ttt" id="tt-w"></div>
+        <div class="ttr" id="tt-m"></div>
+        <div class="ttr" id="tt-l"></div>
+        <div class="ttr" id="tt-s"></div>
+        <div class="ttr" id="tt-p"></div>
+        <div class="ttr" id="tt-st"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end db -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const PLAN={{ m2_plan_js|default([])|tojson }};
+// ── DATA ──────────────────────────────────────────────
+const WEEKS=[
+  {w:'Week 1',long:11,sentiment:'Good',status:'Completed',injury:false},
+  {w:'Week 2',long:13,sentiment:'Good',status:'Completed',injury:false},
+  {w:'Week 3',long:15,sentiment:'Tired',status:'Completed',injury:true},
+  {w:'Week 4',long:13,sentiment:'Good',status:'Cutback',injury:true},
+  {w:'Week 5',long:16,sentiment:'Great',status:'Completed',injury:false},
+  {w:'Week 6',long:11,sentiment:'Tired',status:'Current',injury:false},
+  {w:'Week 7',long:18,sentiment:'—',status:'Planned',injury:false},
+  {w:'Week 8',long:20,sentiment:'—',status:'Planned peak',injury:false},
+  {w:'Week 9',long:18,sentiment:'—',status:'Planned',injury:false},
+  {w:'Week 10',long:15,sentiment:'—',status:'Taper',injury:false},
+  {w:'Week 11',long:12,sentiment:'—',status:'Taper',injury:false},
+  {w:'Week 12',long:8,sentiment:'—',status:'Race week',injury:false},
+];
+const CUR=5;
+const SHIN_MILES=[28,31,34,30,37,40,32,30,38,32,24,20];
+
+const LOGS=[
+  {run:1,week:1,dist:'5.0 mi',pace:'10:12',terrain:'Treadmill',type:'Easy run',sentiment:'good',sentScore:0.7,streak:2,color:'#1D9E75',text:'Easy shakeout on treadmill. Legs stiff at first but loosened after mile 2. Shins fine.'},
+  {run:2,week:1,dist:'4.2 mi',pace:'9:55',terrain:'Road',type:'Tempo',sentiment:'good',sentScore:0.7,streak:3,color:'#1D9E75',text:'Tempo intervals, 3x1 mile at 9:00. Felt controlled. No shin issues.'},
+  {run:3,week:1,dist:'11.0 mi',pace:'10:20',terrain:'Treadmill',type:'Long run',sentiment:'tired',sentScore:0.3,streak:4,color:'#BA7517',text:'Long run 11 miles. Pacing ok. Shins held up well on the belt.'},
+  {run:4,week:2,dist:'5.5 mi',pace:'10:05',terrain:'Treadmill',type:'Easy run',sentiment:'good',sentScore:0.7,streak:1,color:'#1D9E75',text:'Recovery run, felt refreshed. Mild shin tightness faded by mile 3.'},
+  {run:5,week:2,dist:'6.0 mi',pace:'9:40',terrain:'Road',type:'Easy run',sentiment:'great',sentScore:0.95,streak:2,color:'#3B6D11',text:'Best I have felt in weeks. Pace easy and comfortable. No shin issues.'},
+  {run:6,week:2,dist:'13.0 mi',pace:'10:15',terrain:'Road',type:'Long run',sentiment:'tired',sentScore:0.3,streak:3,color:'#BA7517',text:'Long run 13 miles. Miles 10–13 were a grind. Shins fine on road.'},
+  {run:7,week:3,dist:'6.0 mi',pace:'9:50',terrain:'Treadmill',type:'Easy run',sentiment:'good',sentScore:0.7,streak:4,color:'#1D9E75',text:'Easy treadmill run, focused on cadence. Felt controlled throughout.'},
+  {run:8,week:3,dist:'5.0 mi',pace:'8:50',terrain:'Road',type:'Tempo',sentiment:'good',sentScore:0.65,streak:5,color:'#1D9E75',text:'Tempo run. Hit all target paces. Slight shin ache at mile 4.'},
+  {run:9,week:3,dist:'15.0 mi',pace:'10:30',terrain:'Road',type:'Long run',sentiment:'struggled',sentScore:0.05,streak:6,color:'#E24B4A',text:'Shin pain flared at mile 11. Had to slow down. Completed but sore.'},
+  {run:10,week:4,dist:'5.0 mi',pace:'10:45',terrain:'Treadmill',type:'Easy run',sentiment:'tired',sentScore:0.25,streak:1,color:'#BA7517',text:'Cutback week. Shins still sore from long run. Took it very slow.'},
+  {run:11,week:6,dist:'11.0 mi',pace:'9:40',terrain:'Treadmill',type:'Long run',sentiment:'tired',sentScore:0.3,streak:5,color:'#BA7517',text:'Treadmill long run, 11 miles at 9:40. Shins fine on the soft belt. Pretty tired by mile 9 but pushed through.'},
+  {run:12,week:4,dist:'5.5 mi',pace:'10:10',terrain:'Treadmill',type:'Easy run',sentiment:'good',sentScore:0.7,streak:2,color:'#1D9E75',text:'Felt better today. Shin stiffness mostly gone. Kept effort easy.'},
+  {run:13,week:4,dist:'13.0 mi',pace:'10:25',terrain:'Road',type:'Long run',sentiment:'good',sentScore:0.7,streak:3,color:'#1D9E75',text:'Back to 13 for cutback long run. Shin held up. More confident now.'},
+  {run:14,week:5,dist:'6.5 mi',pace:'9:45',terrain:'Road',type:'Easy run',sentiment:'great',sentScore:0.95,streak:4,color:'#3B6D11',text:'Best easy run in weeks. Effortless pace. No shin issues. Energy high.'},
+  {run:15,week:5,dist:'5.0 mi',pace:'8:55',terrain:'Road',type:'Tempo',sentiment:'good',sentScore:0.75,streak:5,color:'#1D9E75',text:'Tempo 4x1 mile at goal pace. Hit all targets. Legs felt springy.'},
+  {run:16,week:5,dist:'16.0 mi',pace:'10:10',terrain:'Road',type:'Long run',sentiment:'great',sentScore:0.95,streak:6,color:'#3B6D11',text:'Best long run yet. Strong through mile 14. Shins totally pain free.'},
+  {run:17,week:6,dist:'5.0 mi',pace:'10:00',terrain:'Treadmill',type:'Easy run',sentiment:'good',sentScore:0.7,streak:3,color:'#1D9E75',text:'Easy recovery run. Legs heavy from 16 miler but manageable.'},
+  {run:18,week:6,dist:'5.5 mi',pace:'9:20',terrain:'Road',type:'Tempo',sentiment:'good',sentScore:0.75,streak:4,color:'#1D9E75',text:'Tempo 3x1.5 miles on road. Nailed the pacing. Shins cooperated.'},
+  {run:19,week:6,dist:'4.0 mi',pace:'10:30',terrain:'Treadmill',type:'Easy run',sentiment:'tired',sentScore:0.2,streak:5,color:'#BA7517',text:'Short recovery run after tough work week. Felt flat. Just got it done.'},
+  {run:20,week:6,dist:'11.0 mi',pace:'9:40',terrain:'Treadmill',type:'Long run',sentiment:'tired',sentScore:0.3,streak:5,color:'#BA7517',text:'Treadmill long run 11 miles, shin-safe. Tired by mile 9 but completed.'},
+];
+
+// ── PLAN ──────────────────────────────────────────────
+let planExp=false;
+function renderPlan(){
+  const c=document.getElementById('plan-weeks');
+  if(!PLAN.length){
+    c.innerHTML='<div class="wrow"><div class="whdr"><span class="wt">No plan</span><span class="ws">Planner unavailable or error</span></div></div>';
+    return;
+  }
+  const show=planExp?PLAN:PLAN.slice(0,3);
+  c.innerHTML=show.map((p,i)=>`
+    <div class="wrow">
+      <div class="whdr" onclick="twk(${i})">
+        <span class="wt">${p.w}</span>
+        <span class="ws">${p.miles} mi · ${p.pills.length} sessions <span id="wa-${i}">↓</span></span>
+      </div>
+      <div class="wpills" id="wp-${i}" style="display:none;">
+        ${p.pills.map((x,j)=>`<span class="pill ${p.types[j]}">${x}</span>`).join('')}
+      </div>
+    </div>`).join('');
+  if(!planExp&&PLAN.length>3)c.innerHTML+=`<div class="wrow" style="opacity:.4;border-bottom:none;"><div class="whdr"><span class="wt">···</span><span class="ws">Weeks 4–${PLAN.length} (${PLAN.length} total)</span></div></div>`;
+}
+function twk(i){
+  const p=document.getElementById('wp-'+i),a=document.getElementById('wa-'+i);
+  if(p){p.style.display=p.style.display==='none'?'flex':'none';if(a)a.textContent=p.style.display==='none'?'↓':'↑';}
+}
+function togglePlan(){
+  planExp=!planExp;renderPlan();
+  const n=PLAN.length||0;
+  document.getElementById('plan-toggle').textContent=planExp?('Show less ↑'):(`Show all ${n} weeks ↓`);
+}
+renderPlan();
+
+// ── LOG LIST ──────────────────────────────────────────
+const ll=document.getElementById('log-list');
+LOGS.forEach((l,i)=>{
+  const d=document.createElement('div');
+  d.className='logr'+(l.run===11?' on':'');
+  d.id='lr'+i;d.onclick=()=>selLog(i);
+  d.innerHTML=`<div class="lstr" style="background:${l.color};"></div><div class="ld">${l.dist}</div><div class="lp">${l.pace}</div><div class="lt">${l.terrain}</div><div class="lx">${l.text}</div>`;
+  ll.appendChild(d);
+});
+function selLog(i){
+  document.querySelectorAll('.logr').forEach(r=>r.classList.remove('on'));
+  document.getElementById('lr'+i).classList.add('on');
+  const l=LOGS[i];
+  document.getElementById('log-title').textContent=`Run ${l.run} · Week ${l.week}`;
+  document.getElementById('log-quote').textContent=`"${l.text}"`;
+  document.getElementById('parse-out').innerHTML=`
+    <div class="pi"><div class="pk">Type</div><div class="pv">${l.type}</div></div>
+    <div class="pi"><div class="pk">Distance</div><div class="pv">${l.dist}</div></div>
+    <div class="pi"><div class="pk">Pace</div><div class="pv">${l.pace} min/mi</div></div>
+    <div class="pi"><div class="pk">Terrain</div><div class="pv">${l.terrain}</div></div>
+    <div class="pi"><div class="pk">Sentiment</div><div class="pv"><span class="badge" style="background:${l.color}22;color:${l.color};border:1.5px solid ${l.color}66;">${l.sentiment.charAt(0).toUpperCase()+l.sentiment.slice(1)}</span></div></div>
+    <div class="pi"><div class="pk">Week</div><div class="pv">Week ${l.week}</div></div>`;
+}
+selLog(Math.max(0,LOGS.findIndex(l=>l.run===11)));
+
+// ── MOTIVATION (4×4: game_model.COACH_STRATEGIES × inferred runner state) ──
+const PF={
+  cols:['Push harder','Maintain','Encourage rest','Encourage variety'],
+  rows:[
+    {key:'engaged',label:'Engaged',vals:[3.0,2.0,0.5,1.5]},
+    {key:'default',label:'Default',vals:[-2.0,2.5,2.0,1.5]},
+    {key:'bored',label:'Bored',vals:[1.0,1.0,0.5,3.0]},
+    {key:'burnout_risk',label:'Burnout risk',vals:[-3.0,1.0,3.5,1.0]},
+  ]
+};
+
+function inferMotState(log){
+  const s=log.sentScore;
+  const streak=log.streak;
+  const week=log.week;
+  if(s<0.2)return{stateIdx:3,stratIdx:2,stratName:'Encourage rest',stateLabel:'Burnout risk',msg:'Signals align with burnout risk in game_model — prioritize rest and easy volume until scores recover.'};
+  if(s>0.85&&streak>=5)return{stateIdx:0,stratIdx:0,stratName:'Push harder',stateLabel:'Engaged',msg:'High sentiment and streak — coach payoff favors controlled progression (push_harder).'};
+  if(streak>=4&&s>=0.3&&s<=0.75)return{stateIdx:1,stratIdx:1,stratName:'Maintain',stateLabel:'Default',msg:'Active streak with moderate sentiment — maintain load before adding intensity.'};
+  if(week>=11)return{stateIdx:2,stratIdx:3,stratName:'Encourage variety',stateLabel:'Bored',msg:'Late block — variety can break monotony without abandoning structure.'};
+  return{stateIdx:1,stratIdx:3,stratName:'Encourage variety',stateLabel:'Default',msg:'Default coaching stance — small variety tweaks before big jumps.'};
+}
+
+// populate motivation selector
+const motSel=document.getElementById('mot-log-sel');
+LOGS.forEach((l,i)=>{
+  const o=document.createElement('option');
+  o.value=i;
+  o.textContent=`Run ${l.run} (Wk ${l.week}) · ${l.type} · ${l.sentiment}`;
+  if(l.run===11)o.selected=true;
+  motSel.appendChild(o);
+});
+
+function renderPayoff(activeStateIdx,activeStratIdx){
+  let mh=`<table class="mt"><thead><tr><th style="max-width:110px;">Runner state</th>${PF.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+  PF.rows.forEach((r,ri)=>{
+    const isActive=ri===activeStateIdx;
+    mh+=`<tr class="${isActive?'ar':''}"><td class="rl" title="${r.key}">${r.label}${isActive?' ◀':''}</td>${r.vals.map((v,ci)=>{
+      const isSel=isActive&&ci===activeStratIdx;
+      const isBest=v===Math.max(...r.vals);
+      return`<td class="${isSel?'hi':isBest?'mid':''}">${v}</td>`;
+    }).join('')}</tr>`;
+  });
+  mh+='</tbody></table>';
+  document.getElementById('payoff-matrix').innerHTML=mh;
+}
+
+function updateMotivation(){
+  const idx=Number(document.getElementById('mot-log-sel').value);
+  const log=LOGS[idx];
+  const m=inferMotState(log);
+  document.getElementById('mot-quote').textContent=`"${log.text}"`;
+  document.getElementById('mot-message').textContent=m.msg;
+  document.getElementById('mot-state-display').innerHTML=`
+    <div class="mot-state-row"><span class="mot-lbl">Inferred state</span><span class="mot-val"><span class="badge bp">${m.stateLabel}</span></span></div>
+    <div class="mot-state-row"><span class="mot-lbl">Sentiment</span><span class="mot-val">${log.sentiment} (${log.sentScore.toFixed(2)})</span></div>
+    <div class="mot-state-row"><span class="mot-lbl">Streak</span><span class="mot-val">${log.streak} days</span></div>
+    <div class="mot-state-row"><span class="mot-lbl">Best response (BR)</span><span class="mot-val" style="color:#1E1850;">${m.stratName}</span></div>`;
+  renderPayoff(m.stateIdx,m.stratIdx);
+}
+updateMotivation();
+
+// ── Q GRID ────────────────────────────────────────────
+const Q_DATA={
+  'volume':['Increase','Maintain','Decrease'],
+  'intensity':['Increase','Maintain','Decrease'],
+  'terrain':['Trail','Road','Treadmill'],
+  'fatigue':['Low','Medium','High'],
+  'adherence':['Low','Medium','High'],
+  'recency':['Recent','Mid','Old'],
+};
+
+// Q-values: 3D table indexed [y][x] for any dim pair
+// seeded with realistic values — best always at maintain/maintain for current state
+const Q_SEEDS={
+  'volume,intensity':[[4.38,3.95,5.44],[5.87,6.31,4.92],[3.12,4.28,3.41]],
+  'volume,terrain':  [[3.22,5.44,4.11],[4.87,6.31,5.20],[2.98,3.41,3.88]],
+  'volume,recency':  [[4.10,5.87,3.55],[5.20,6.31,4.40],[3.30,3.80,2.67]],
+  'fatigue,intensity':[[5.10,4.40,3.80],[4.92,6.31,5.44],[3.40,4.10,5.87]],
+  'fatigue,terrain': [[4.20,5.10,3.90],[4.40,6.31,5.20],[3.80,4.90,5.44]],
+  'fatigue,recency': [[3.90,5.50,4.10],[4.20,6.31,5.80],[5.10,4.40,3.20]],
+  'adherence,intensity':[[3.80,4.40,5.10],[5.20,6.31,4.90],[4.10,5.44,3.50]],
+  'adherence,terrain':  [[3.50,4.80,5.20],[4.90,6.31,5.10],[3.80,5.44,4.20]],
+  'adherence,recency':  [[4.10,5.20,3.80],[5.44,6.31,4.90],[3.20,4.40,5.10]],
+};
+function getQMatrix(dimX,dimY){
+  const key=`${dimY},${dimX}`;
+  const keyAlt=`${dimX},${dimY}`;
+  if(Q_SEEDS[key])return Q_SEEDS[key];
+  if(Q_SEEDS[keyAlt])return Q_SEEDS[keyAlt].map((_,i)=>Q_SEEDS[keyAlt].map(r=>r[i]));
+  // fallback
+  return[[4.1,3.8,4.5],[5.2,6.31,4.9],[3.4,4.1,3.7]];
+}
+
+function qColor(t){
+  const r=Math.round(214-t*170);
+  const g=Math.round(230-t*80);
+  const b=Math.round(244-t*140);
+  return`rgb(${r},${g},${b})`;
+}
+function qTextCol(t){return t>0.5?'#fff':'#111';}
+
+function renderQGrid(){
+  const dimX=document.getElementById('q-dim-x').value;
+  const dimY=document.getElementById('q-dim-y').value;
+  const xLabels=Q_DATA[dimX];
+  const yLabels=Q_DATA[dimY];
+  const mat=getQMatrix(dimX,dimY);
+  const allV=mat.flat();
+  const qmin=Math.min(...allV),qmx=Math.max(...allV);
+
+  let html=`<div class="qgrid" style="grid-template-columns:70px repeat(${xLabels.length},1fr);">`;
+  // header row
+  html+=`<div class="qcell hdr">${dimY} ↓ / ${dimX} →</div>`;
+  xLabels.forEach(x=>{html+=`<div class="qcell hdr">${x}</div>`;});
+  // data rows
+  yLabels.forEach((y,yi)=>{
+    html+=`<div class="qcell rhdr">${y}</div>`;
+    xLabels.forEach((x,xi)=>{
+      const v=mat[yi][xi];
+      const t=(v-qmin)/(qmx-qmin||1);
+      const isBest=v===qmx;
+      html+=`<div class="qcell" style="background:${qColor(t)};"><span class="qval" style="color:${qTextCol(t)};">${v.toFixed(2)}</span><span class="qstar" style="color:${qTextCol(t)};">${isBest?'★ best':''}</span></div>`;
+    });
+  });
+  html+='</div>';
+  document.getElementById('qgrid-wrap').innerHTML=html;
+}
+renderQGrid();
+
+// state dims
+document.getElementById('state-dims').innerHTML=[
+  {lbl:'Fitness',val:'Medium'},
+  {lbl:'Fatigue',val:'Moderate (0.45)'},
+  {lbl:'Adherence',val:'Medium (72%)'},
+  {lbl:'Terrain',val:'Road'},
+  {lbl:'Streak',val:'Active (5 days)'},
+  {lbl:'Recency',val:'Recent'},
+].map(d=>`<div class="dc"><div class="dl">${d.lbl}</div><div class="dv">${d.val}</div></div>`).join('');
+
+// ── CI BAR ────────────────────────────────────────────
+(function(){
+  const svg=document.getElementById('ci-svg');
+  const W=svg.parentElement.clientWidth||700;
+  svg.setAttribute('viewBox',`0 0 ${W} 70`);
+  const MIN=240,MAX=300,PAD=40;
+  const uw=(W-PAD*2)/(MAX-MIN);
+  const px=v=>(v-MIN)*uw+PAD;
+  const ciL=249,ciH=275,pred=262,goal=255;
+  svg.innerHTML=`
+    <rect x="${px(ciL)}" y="28" width="${px(ciH)-px(ciL)}" height="14" rx="7" fill="#B5D4F4"/>
+    <line x1="${px(pred)}" y1="18" x2="${px(pred)}" y2="50" stroke="#378ADD" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${px(goal)}" y1="18" x2="${px(goal)}" y2="50" stroke="#1D9E75" stroke-width="3" stroke-linecap="round"/>
+    <text x="${px(pred)}" y="14" text-anchor="middle" font-size="11" font-weight="800" fill="#378ADD">4:22 predicted</text>
+    <text x="${px(goal)}" y="62" text-anchor="middle" font-size="11" font-weight="800" fill="#1D9E75">4:15 goal</text>
+    <text x="${px(ciL)}" y="62" text-anchor="middle" font-size="10" fill="#444" font-weight="700">4:09</text>
+    <text x="${px(ciH)}" y="62" text-anchor="middle" font-size="10" fill="#444" font-weight="700">4:35</text>`;
+})();
+
+// ── CHART ─────────────────────────────────────────────
+let showInj=false,showShin=false,progChart;
+
+function fmtPace(v){return`${Math.floor(v/100)}:${String(v%100).padStart(2,'0')}`;}
+function computePred(adh,pr,wkMiles){
+  const pm=Math.floor(pr/100)+(pr%100)/100;
+  const mins=262+(72-adh)*0.82+(pm-9.683)*15.6+(28-wkMiles)*0.6;
+  const h=Math.floor(mins/60),m=Math.floor(mins%60),s=Math.round((mins%1)*60);
+  return{str:`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`,mins};
+}
+
+function getMiles(adh,wkMiles){
+  const adhFactor=(adh-50)/45;
+  const milesFactor=wkMiles/28;
+  return WEEKS.map((w,i)=>{
+    if(i<CUR){
+      // completed weeks scale with wkMiles
+      const base=[28,31,34,30,37,40];
+      return Math.round(base[i]*milesFactor);
+    }
+    if(i===CUR)return Math.round(wkMiles*(40/28));
+    // planned weeks: scale by adherence and mileage
+    const base=[42,44,38,32,24,20];
+    const b=base[i-CUR-1];
+    const boost=(b-40)*(0.5+adhFactor*0.9)*milesFactor;
+    return Math.max(10,Math.round(40*milesFactor+boost));
+  });
+}
+
+function updateChart(){
+  if(!progChart)return;
+  const adh=Number(document.getElementById('adh-s').value);
+  const pr=Number(document.getElementById('pace-s').value);
+  const wkMiles=Number(document.getElementById('miles-s').value);
+  const{str,mins}=computePred(adh,pr,wkMiles);
+  const faster=mins<262,slower=mins>262;
+  document.getElementById('pred-bar').innerHTML=
+    `Adherence <strong>${adh}%</strong> &nbsp;·&nbsp; Avg pace <strong>${fmtPace(pr)}</strong> &nbsp;·&nbsp; Weekly miles <strong>${wkMiles}</strong> &nbsp;→&nbsp; Predicted finish <strong style="color:${faster?'#1A4A08':slower?'#7A1F1F':'#111'};">${str}</strong> <span class="badge ${faster?'bg':slower?'bd':'bt'}">${faster?'faster':slower?'slower':'baseline'}</span>`;
+  const data=showShin?SHIN_MILES:getMiles(adh,wkMiles);
+  progChart.data.datasets[0].data=data;
+  progChart.update('active');
+}
+function toggleInjury(){
+  showInj=!showInj;
+  document.getElementById('inj-btn').className=showInj?'tbtn on':'tbtn';
+  document.getElementById('inj-leg').style.display=showInj?'inline':'none';
+  if(progChart)progChart.update();
+}
+function toggleShin(){
+  showShin=!showShin;
+  document.getElementById('shin-btn').className=showShin?'tbtn on':'tbtn';
+  document.getElementById('shin-leg').style.display=showShin?'inline':'none';
+  updateChart();
+}
+document.getElementById('adh-s').addEventListener('input',function(){document.getElementById('adh-v').textContent=this.value+'%';updateChart();});
+document.getElementById('pace-s').addEventListener('input',function(){document.getElementById('pace-v').textContent=fmtPace(Number(this.value));updateChart();});
+document.getElementById('miles-s').addEventListener('input',function(){document.getElementById('miles-v').textContent=this.value;updateChart();});
+
+const pcs=WEEKS.map((_,i)=>i<CUR?'#378ADD':i===CUR?'#E24B4A':'#B5D4F4');
+progChart=new Chart(document.getElementById('progChart'),{
+  type:'line',
+  data:{
+    labels:WEEKS.map((_,i)=>'Wk '+(i+1)),
+    datasets:[{
+      label:'Weekly miles',
+      data:getMiles(72,28),
+      borderColor:'#B5D4F4',borderWidth:2.5,
+      pointBackgroundColor:pcs,pointBorderColor:pcs,
+      pointRadius:WEEKS.map((_,i)=>i===CUR?8:5),pointHoverRadius:9,
+      fill:false,tension:.35,
+      segment:{borderColor:ctx=>ctx.p0DataIndex<CUR?'#378ADD':'#B5D4F4'}
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    animation:{duration:350},
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{
+      x:{ticks:{font:{size:12,weight:'700'},color:'#444',maxRotation:0,autoSkip:false},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}},
+      y:{min:0,max:55,ticks:{font:{size:12,weight:'700'},color:'#444',callback:v=>v+' mi',stepSize:10},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}
+    }
+  },
+  plugins:[
+    {id:'taper',beforeDraw(c){
+      const{ctx,chartArea,scales}=c;if(!chartArea)return;
+      const x9=scales.x.getPixelForValue(8),x12=scales.x.getPixelForValue(11);
+      ctx.save();ctx.fillStyle='rgba(150,220,150,.15)';
+      ctx.fillRect(x9,chartArea.top,x12-x9,chartArea.bottom-chartArea.top);ctx.restore();
+    }},
+    {id:'curline',beforeDraw(c){
+      const{ctx,chartArea,scales}=c;if(!chartArea)return;
+      const xc=scales.x.getPixelForValue(CUR);
+      ctx.save();ctx.strokeStyle='#E24B4A';ctx.lineWidth=2;ctx.setLineDash([5,3]);
+      ctx.beginPath();ctx.moveTo(xc,chartArea.top);ctx.lineTo(xc,chartArea.bottom);ctx.stroke();ctx.restore();
+    }},
+    {id:'injbg',beforeDraw(c){
+      if(!showInj)return;
+      const{ctx,chartArea,scales}=c;if(!chartArea)return;
+      WEEKS.forEach((w,i)=>{
+        if(w.injury){
+          const x=scales.x.getPixelForValue(i);
+          const bw=scales.x.getPixelForValue(1)-scales.x.getPixelForValue(0);
+          ctx.save();ctx.fillStyle='rgba(252,235,235,.6)';
+          ctx.fillRect(x-bw/2,chartArea.top,bw,chartArea.bottom-chartArea.top);ctx.restore();
+        }
+      });
+    }}
+  ]
+});
+updateChart();
+
+const canvas=document.getElementById('progChart');
+const tt=document.getElementById('ctt');
+canvas.addEventListener('mousemove',function(e){
+  const pts=progChart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(pts.length>0){
+    const idx=pts[0].index,w=WEEKS[idx];
+    const rect=canvas.getBoundingClientRect();
+    const x=e.clientX-rect.left,y=e.clientY-rect.top;
+    document.getElementById('tt-w').textContent=w.w+(idx===CUR?' ← current':'');
+    document.getElementById('tt-m').innerHTML=`<strong>Miles:</strong> ${progChart.data.datasets[0].data[idx]} mi`;
+    document.getElementById('tt-l').innerHTML=`<strong>Long run:</strong> ${w.long} mi`;
+    document.getElementById('tt-s').innerHTML=`<strong>Sentiment:</strong> ${w.sentiment}`;
+    document.getElementById('tt-st').textContent=w.status;
+    tt.style.display='block';
+    let tx=x+16;if(tx+170>rect.width)tx=x-175;
+    tt.style.left=tx+'px';tt.style.top=Math.max(0,y-30)+'px';
+  }else tt.style.display='none';
+});
+canvas.addEventListener('mouseleave',()=>tt.style.display='none');
+
+// ── PROGRESS BAR ─────────────────────────────────────
+function goTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'});}
+const SIDS=['s-profile','s-plan','s-safety','s-log','s-motivation','s-adaptive','s-race','s-chart'];
+window.addEventListener('scroll',function(){
+  let cur=0;
+  SIDS.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<130)cur=i;});
+  document.querySelectorAll('.pbi').forEach((el,i)=>{el.className='pbi'+(i===cur?' on':'');});
+},{passive:true});
+</script>
+</body>
+</html>

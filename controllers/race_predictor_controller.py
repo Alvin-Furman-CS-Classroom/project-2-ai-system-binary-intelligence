@@ -3,11 +3,9 @@ Controller for Module 6 – Race Readiness & Finish-Time Predictor demo routes.
 """
 
 from fastapi import Request
-from fastapi.templating import Jinja2Templates
+from app_templates import templates
 
 from src.module6_race_predictor.predictor import predict_race_readiness
-
-templates = Jinja2Templates(directory="templates")
 
 DEMO_SCENARIOS = [
     {

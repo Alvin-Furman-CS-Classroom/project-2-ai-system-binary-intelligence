@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.exceptions import HTTPException
-from fastapi.templating import Jinja2Templates
+from app_templates import templates
+from controllers.long_run_demo_context import build_long_run_demo_context
 from routers.plans import  router as plans_router
 from routers.safety_validator_router import router as safety_validator_router
 from routers.runlog import router as runlog_router
@@ -11,7 +12,6 @@ from routers.race_predictor_route import router as race_router
 
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 
 app.include_router(plans_router)
 app.include_router(safety_validator_router)
@@ -27,3 +27,11 @@ async def not_found_handler(request: Request, _exc: HTTPException):
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+
+@app.get("/demo", response_class=HTMLResponse)
+def long_run_demo(request: Request):
+    """Full pipeline dashboard (templates/long_run_demo.html)."""
+    ctx = build_long_run_demo_context()
+    ctx["request"] = request
+    return templates.TemplateResponse("long_run_demo.html", ctx)

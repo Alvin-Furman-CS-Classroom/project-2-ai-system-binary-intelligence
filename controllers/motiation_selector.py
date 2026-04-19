@@ -2,11 +2,9 @@
 
 from datetime import date
 from fastapi import Request
-from fastapi.templating import Jinja2Templates
+from app_templates import templates
 
 from src.module4_motivation_selector.selector import select_motivation_strategy_detailed
-
-templates = Jinja2Templates(directory="templates")
 
 # The 4 hardcoded demo scenarios (mirrors demo.py's SCENARIOS)
 DEMO_SCENARIOS = [

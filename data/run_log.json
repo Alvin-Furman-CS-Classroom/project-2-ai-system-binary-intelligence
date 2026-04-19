@@ -1,0 +1,89 @@
+{
+  "runs": [
+    {
+      "id": "run_001",
+      "logged_at": "2026-02-25T20:54:38.657552",
+      "raw_input": "easy 5 miles on the road, felt great",
+      "parsed": {
+        "type": "easy run",
+        "distance": 5.0,
+        "pace_minutes": null,
+        "terrain": "road",
+        "sentiment": "positive",
+        "effort": "easy",
+        "notes": "easy 5 miles on the road, felt great"
+      }
+    },
+    {
+      "id": "run_002",
+      "logged_at": "2026-02-25T20:54:38.658437",
+      "raw_input": "long run 10 miles on trail at 9:30 pace, felt tired by mile 8",
+      "parsed": {
+        "type": "long run",
+        "distance": 10.0,
+        "pace_minutes": 9.5,
+        "terrain": "trail",
+        "sentiment": "negative",
+        "effort": "hard",
+        "notes": "long run 10 miles on trail at 9:30 pace, felt tired by mile 8"
+      }
+    },
+    {
+      "id": "run_003",
+      "logged_at": "2026-02-25T20:54:38.658929",
+      "raw_input": "track intervals today, exhausted after but proud I finished",
+      "parsed": {
+        "type": "interval",
+        "distance": null,
+        "pace_minutes": null,
+        "terrain": "track",
+        "sentiment": "positive",
+        "effort": "struggled",
+        "notes": "track intervals today, exhausted after but proud I finished"
+      }
+    },
+    {
+      "id": "run_004",
+      "logged_at": "2026-02-25T20:55:01.081852",
+      "raw_input": "easy 5 miles on the road, felt great",
+      "parsed": {
+        "type": "easy run",
+        "distance": 5.0,
+        "pace_minutes": null,
+        "terrain": "road",
+        "sentiment": "positive",
+        "effort": "easy",
+        "notes": "easy 5 miles on the road, felt great"
+      }
+    },
+    {
+      "id": "run_005",
+      "logged_at": "2026-02-25T20:55:01.082467",
+      "raw_input": "long run 10 miles on trail at 9:30 pace, felt tired by mile 8",
+      "parsed": {
+        "type": "long run",
+        "distance": 10.0,
+        "pace_minutes": 9.5,
+        "terrain": "trail",
+        "sentiment": "negative",
+        "effort": "hard",
+        "notes": "long run 10 miles on trail at 9:30 pace, felt tired by mile 8"
+      }
+    },
+    {
+      "id": "run_006",
+      "logged_at": "2026-02-25T20:55:01.082927",
+      "raw_input": "track intervals today, exhausted after but proud I finished",
+      "parsed": {
+        "type": "interval",
+        "distance": null,
+        "pace_minutes": null,
+        "terrain": "track",
+        "sentiment": "positive",
+        "effort": "struggled",
+        "notes": "track intervals today, exhausted after but proud I finished"
+      }
+    }
+  ],
+  "next_id": 7
+}

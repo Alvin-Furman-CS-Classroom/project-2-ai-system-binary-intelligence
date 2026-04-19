@@ -1,167 +1,869 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Long Run – AI Marathon Training System</title>
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 60px auto;
-        padding: 20px;
-        background-color: #f5f5f5;
-        color: #333;
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-      .header h1 {
-        font-size: 2.2rem;
-        margin-bottom: 8px;
-      }
-      .header p {
-        font-size: 1.05rem;
-        color: #555;
-        max-width: 560px;
-        margin: 0 auto;
-        line-height: 1.6;
-      }
-      .modules {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-      }
-      .card {
-        background: white;
-        border-radius: 10px;
-        padding: 28px 24px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        text-decoration: none;
-        color: inherit;
-        transition: box-shadow 0.2s, transform 0.2s;
-        display: block;
-      }
-      .card:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        transform: translateY(-3px);
-      }
-      .card-badge {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: bold;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        padding: 3px 10px;
-        border-radius: 12px;
-        color: white;
-        margin-bottom: 14px;
-      }
-      .badge-m1 { background-color: #28a745; }
-      .badge-m2 { background-color: #007bff; }
-      .badge-m3 { background-color: #fd7e14; }
-      .badge-m4 { background-color: #9b59b6; }
-      .badge-m5 { background-color: #1abc9c; }
-      .badge-m6 { background-color: #e67e22; }
-      .card h2 {
-        font-size: 1.15rem;
-        margin: 0 0 10px;
-      }
-      .card p {
-        font-size: 0.92rem;
-        color: #666;
-        line-height: 1.55;
-        margin: 0;
-      }
-      .card .arrow {
-        display: inline-block;
-        margin-top: 16px;
-        font-size: 0.9rem;
-        color: #007bff;
-        font-weight: bold;
-      }
-      footer {
-        text-align: center;
-        margin-top: 50px;
-        font-size: 0.85rem;
-        color: #aaa;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <h1>Long Run</h1>
-      <p>
-        An AI-powered marathon training system for beginners. Validate your
-        workouts, generate personalized plans, and log your runs with natural
-        language.
-      </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Long Run · Demo Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f0ede8;color:#111;max-width:960px;margin:0 auto;padding:0 20px 80px;}
+
+/* progress bar */
+#progress-bar{position:fixed;top:0;left:0;right:0;z-index:100;background:#e8e4de;border-bottom:1px solid #d0ccc6;padding:0;display:flex;overflow-x:auto;}
+#progress-bar::-webkit-scrollbar{display:none;}
+.pb-item{flex:1;min-width:80px;padding:8px 6px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#888;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+.pb-item.active{color:#111;border-bottom-color:#111;}
+.pb-item:hover{color:#333;}
+
+body{padding-top:44px;}
+
+.db{padding:0 0 3rem;}
+
+/* section */
+.section{margin-bottom:2.5rem;scroll-margin-top:52px;}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-top:2rem;border-top:2px solid #111;}
+.sec-header.first{border-top:none;padding-top:.5rem;}
+.sec-num{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:#111;padding:3px 8px;border-radius:4px;flex-shrink:0;}
+.sec-title{font-size:16px;font-weight:700;color:#111;}
+.sec-tech{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:4px;flex-shrink:0;}
+.tech-logic{background:#EEEDFE;color:#26215C;}
+.tech-astar{background:#E6F1FB;color:#042C53;}
+.tech-nlp{background:#FAEEDA;color:#412402;}
+.tech-game{background:#EEEDFE;color:#26215C;}
+.tech-rl{background:#E1F5EE;color:#04342C;}
+.tech-ml{background:#FAEEDA;color:#412402;}
+
+/* cards */
+.card{background:#fff;border:1.5px solid #d0ccc6;border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:10px;}
+.card-title{font-size:14px;font-weight:700;color:#111;margin-bottom:10px;}
+
+/* input chips grid */
+.input-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.ic{background:#fff;border:1.5px solid #d0ccc6;border-radius:8px;padding:6px 10px;}
+.ic-lbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#888;margin-bottom:2px;}
+.ic-val{font-size:13px;font-weight:700;color:#111;}
+
+/* stats */
+.stat-grid-6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.stat-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.stat{background:#f0ede8;border-radius:10px;padding:12px 8px;text-align:center;border:1.5px solid #d0ccc6;}
+.stat-val{font-size:20px;font-weight:800;color:#111;}
+.stat-lbl{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+
+/* badges */
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;}
+.bd{background:#FCEBEB;color:#7A1F1F;}
+.bg{background:#D6EFCC;color:#1A4A08;}
+.bi{background:#D6E8F7;color:#0A3560;}
+.ba{background:#FDE8C0;color:#5A3000;}
+.bp{background:#E4E1FC;color:#1E1850;}
+.bt{background:#C8EDE0;color:#023020;}
+
+/* two/three col */
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;}
+.three-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:12px;}
+
+/* rule rows */
+.rule-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #e8e4de;font-size:13px;}
+.rule-row:last-child{border-bottom:none;}
+.ri{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.ri.f{background:#FCEBEB;color:#7A1F1F;border:1.5px solid #F7C1C1;}
+.ri.p{background:#D6EFCC;color:#1A4A08;border:1.5px solid #9FDB7A;}
+.rule-text{font-size:13px;font-weight:700;color:#111;}
+.rule-sub{font-size:12px;color:#555;margin-top:2px;line-height:1.5;}
+
+/* workout before/after */
+.wo-before{border:2px solid #E24B4A;border-radius:10px;padding:12px 14px;background:#FFF5F5;}
+.wo-after{border:2px solid #1D9E75;border-radius:10px;padding:12px 14px;background:#F0FDF8;}
+.wo-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.wo-label.bad{color:#7A1F1F;}
+.wo-label.good{color:#023020;}
+.wo-val{font-size:15px;font-weight:800;color:#111;}
+.wo-sub{font-size:12px;color:#444;margin-top:4px;}
+
+/* plan */
+.expand-btn{background:#f0ede8;border:1.5px solid #d0ccc6;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:#333;cursor:pointer;margin-top:8px;width:100%;}
+.expand-btn:hover{background:#e8e4de;}
+.week-row{padding:9px 0;border-bottom:1px solid #e8e4de;font-size:13px;}
+.week-row:last-child{border-bottom:none;}
+.week-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.wk-title{font-size:13px;font-weight:700;color:#111;}
+.wk-summary{font-size:11px;font-weight:600;color:#666;}
+.wk-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;padding-left:4px;}
+.pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.pill.long{background:#D6E8F7;color:#0A3560;border:1.5px solid #85B7EB;}
+.pill.tempo{background:#FDE8C0;color:#5A3000;border:1.5px solid #EF9F27;}
+.pill.easy{background:#D6EFCC;color:#1A4A08;border:1.5px solid #97C459;}
+.pill.interval{background:#E4E1FC;color:#1E1850;border:1.5px solid #7F77DD;}
+
+/* cost bars */
+.cost-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:13px;}
+.cost-lbl{width:150px;font-weight:600;color:#333;flex-shrink:0;}
+.cost-bar-t{flex:1;height:7px;background:#e8e4de;border-radius:4px;overflow:hidden;}
+.cost-bar-f{height:100%;border-radius:4px;background:#7F77DD;}
+.cost-val{width:28px;text-align:right;font-size:12px;font-weight:700;color:#555;}
+
+/* log list */
+.log-scroll{max-height:300px;overflow-y:auto;border:1.5px solid #d0ccc6;border-radius:10px;}
+.log-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #e8e4de;cursor:pointer;font-size:12px;}
+.log-row:last-child{border-bottom:none;}
+.log-row:hover{background:#f8f5f0;}
+.log-row.active{background:#EAF3FF;}
+.log-stripe{width:5px;height:32px;border-radius:3px;flex-shrink:0;}
+.log-dist{font-size:13px;font-weight:700;color:#111;width:48px;flex-shrink:0;}
+.log-pace{font-size:12px;font-weight:600;color:#444;width:54px;flex-shrink:0;}
+.log-terrain{font-size:12px;color:#666;width:68px;flex-shrink:0;}
+.log-text{font-size:12px;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* sparkline */
+#sentiment-spark{width:100%;height:32px;margin-bottom:8px;}
+
+/* parse */
+.parse-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.parse-item{background:#f8f5f0;border-radius:8px;padding:9px 12px;border:1px solid #e0dcd6;}
+.parse-key{font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.parse-val{font-size:14px;font-weight:700;color:#111;}
+
+/* chat bubble */
+.chat-bubble{background:#111;color:#fff;border-radius:12px 12px 12px 2px;padding:14px 16px;font-size:14px;font-weight:600;line-height:1.6;margin-top:12px;}
+.chat-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:6px;}
+
+/* matrix */
+.matrix-wrap{overflow-x:auto;margin-top:8px;}
+.m-table{border-collapse:collapse;font-size:12px;width:100%;}
+.m-table th{background:#f0ede8;padding:7px 9px;text-align:center;font-size:11px;font-weight:800;color:#333;border:1.5px solid #d0ccc6;}
+.m-table td{padding:7px 9px;text-align:center;border:1.5px solid #d0ccc6;font-size:12px;font-weight:600;color:#444;}
+.m-table td.hi{background:#1E1850;color:#E4E1FC;font-weight:800;}
+.m-table td.mid{background:#E4E1FC;color:#1E1850;font-weight:700;}
+.m-table .row-lbl{text-align:left;font-weight:700;color:#111;background:#f8f5f0;font-size:12px;}
+.m-table .active-row td{background:#F5F3FE;}
+.m-table .active-row .row-lbl{background:#E4E1FC;color:#1E1850;}
+
+/* state dims */
+.state-dims{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.dim-chip{background:#f8f5f0;border:1.5px solid #d0ccc6;border-radius:8px;padding:7px 11px;}
+.dim-lbl{font-size:9px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.07em;}
+.dim-val{font-size:13px;font-weight:700;color:#111;margin-top:2px;}
+
+/* reward rows */
+.reward-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:13px;padding:5px 0;border-bottom:1px solid #e8e4de;}
+.reward-row:last-child{border-bottom:none;}
+.reward-lbl{color:#333;font-weight:600;flex:1;}
+.reward-val{font-size:14px;font-weight:800;color:#111;}
+
+/* q table */
+.q-table-wrap{border-radius:10px;overflow:hidden;border:1.5px solid #d0ccc6;margin-top:8px;}
+.q-table{width:100%;border-collapse:collapse;font-size:13px;}
+.q-table th{background:#111;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;}
+.q-table td{padding:8px 12px;border-bottom:1px solid #e8e4de;font-weight:600;color:#333;}
+.q-table tr:last-child td{border-bottom:none;}
+.q-table tr.best{background:#F0FDF8;}
+.q-table tr.best td{color:#023020;font-weight:800;}
+.q-cell-bar{display:flex;align-items:center;gap:6px;}
+.q-bar-wrap{flex:1;height:8px;background:#e8e4de;border-radius:4px;overflow:hidden;}
+.q-bar-fill{height:100%;border-radius:4px;background:#B5D4F4;}
+.q-bar-fill.best{background:#1D9E75;}
+
+/* episode chart */
+.episode-chart-wrap{position:relative;width:100%;height:120px;margin-top:10px;}
+
+/* CI bar */
+.ci-wrap{margin:12px 0;position:relative;height:48px;}
+.ci-track{position:absolute;top:50%;transform:translateY(-50%);left:0;right:0;height:12px;background:#e8e4de;border-radius:6px;overflow:visible;}
+.ci-fill{position:absolute;height:100%;border-radius:6px;background:#B5D4F4;}
+.ci-pred{position:absolute;top:-8px;width:3px;height:28px;background:#378ADD;border-radius:2px;}
+.ci-goal{position:absolute;top:-8px;width:3px;height:28px;background:#1D9E75;border-radius:2px;}
+.ci-label{position:absolute;font-size:10px;font-weight:800;white-space:nowrap;top:18px;}
+
+/* delta rows */
+.delta-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e8e4de;font-size:13px;}
+.delta-row:last-child{border-bottom:none;}
+.delta-lbl{font-weight:600;color:#333;}
+.delta-val{font-weight:800;color:#7A1F1F;}
+.delta-val.pos{color:#1A4A08;}
+
+/* chart */
+.chart-wrap{position:relative;width:100%;height:260px;}
+.tt{position:absolute;background:#111;border-radius:10px;padding:10px 14px;font-size:12px;color:#fff;pointer-events:none;display:none;min-width:160px;z-index:10;}
+.tt-title{font-weight:800;margin-bottom:5px;font-size:13px;}
+.tt-row{color:#ccc;margin-top:3px;}
+.tt-row strong{color:#fff;}
+
+/* controls */
+.ctrl-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.ctrl-lbl{font-size:12px;font-weight:700;color:#333;white-space:nowrap;}
+.ctrl-val{font-size:13px;font-weight:800;color:#111;min-width:36px;}
+.toggle-btn{background:#f0ede8;border:1.5px solid #d0ccc6;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:#333;cursor:pointer;}
+.toggle-btn.on{background:#FCEBEB;border-color:#E24B4A;color:#7A1F1F;}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;font-weight:600;color:#444;}
+.leg-sw{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:#d0ccc6;border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#111;cursor:pointer;}
+
+#pred-bar{font-size:13px;font-weight:600;color:#333;margin-bottom:10px;padding:8px 12px;background:#fff;border-radius:8px;border:1.5px solid #d0ccc6;}
+
+.muted{font-size:13px;color:#555;line-height:1.6;}
+
+@media(max-width:640px){
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .stat-grid-6{grid-template-columns:repeat(3,1fr);}
+  .stat-grid-4{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar">
+  <div class="pb-item active" onclick="scrollTo('s-profile')" id="pb-profile">Profile</div>
+  <div class="pb-item" onclick="scrollTo('s-plan')" id="pb-plan">M2 Plan</div>
+  <div class="pb-item" onclick="scrollTo('s-safety')" id="pb-safety">M1 Safety</div>
+  <div class="pb-item" onclick="scrollTo('s-log')" id="pb-log">M3 Log</div>
+  <div class="pb-item" onclick="scrollTo('s-motivation')" id="pb-motivation">M4 Motivation</div>
+  <div class="pb-item" onclick="scrollTo('s-adaptive')" id="pb-adaptive">M5 Adaptive</div>
+  <div class="pb-item" onclick="scrollTo('s-race')" id="pb-race">M6 Race</div>
+  <div class="pb-item" onclick="scrollTo('s-chart')" id="pb-chart">Progression</div>
+</div>
+
+<div class="db">
+
+<!-- PROFILE -->
+<div class="section" id="s-profile">
+  <div class="sec-header first">
+    <span class="sec-num">Profile</span>
+    <span class="sec-title">Maya Chen — demo runner</span>
+  </div>
+  <div class="stat-grid-6">
+    <div class="stat"><div class="stat-val">28</div><div class="stat-lbl">Age</div></div>
+    <div class="stat"><div class="stat-val">Inter.</div><div class="stat-lbl">Level</div></div>
+    <div class="stat"><div class="stat-val">28</div><div class="stat-lbl">Wk miles</div></div>
+    <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Day streak</div></div>
+    <div class="stat"><div class="stat-val">72%</div><div class="stat-lbl">Adherence</div></div>
+    <div class="stat"><div class="stat-val">42</div><div class="stat-lbl">Days to race</div></div>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Goal race</div><div class="ic-val">Full marathon · road</div></div>
+    <div class="ic"><div class="ic-lbl">Target time</div><div class="ic-val">4:15:00</div></div>
+    <div class="ic"><div class="ic-lbl">Injury</div><div class="ic-val">Mild shin splints</div></div>
+    <div class="ic"><div class="ic-lbl">Terrain available</div><div class="ic-val">Road, treadmill</div></div>
+    <div class="ic"><div class="ic-lbl">Avg training pace</div><div class="ic-val">9:41 min/mi</div></div>
+  </div>
+</div>
+
+<!-- MODULE 2 — PLAN -->
+<div class="section" id="s-plan">
+  <div class="sec-header">
+    <span class="sec-num">M2</span>
+    <span class="sec-title">Training Plan Generator</span>
+    <span class="sec-tech tech-astar">A* Search</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Weekly miles</div><div class="ic-val">28 mi</div></div>
+    <div class="ic"><div class="ic-lbl">Race in</div><div class="ic-val">42 days</div></div>
+    <div class="ic"><div class="ic-lbl">Experience</div><div class="ic-val">Intermediate</div></div>
+    <div class="ic"><div class="ic-lbl">Terrain</div><div class="ic-val">Road + treadmill</div></div>
+    <div class="ic"><div class="ic-lbl">Injury constraints</div><div class="ic-val">No trail · cap 11.2 mi</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">A* cost function</div>
+    <div class="cost-row"><span class="cost-lbl">Injury penalty</span><div class="cost-bar-t"><div class="cost-bar-f" style="width:80%;"></div></div><span class="cost-val">0.8</span></div>
+    <div class="cost-row"><span class="cost-lbl">Mileage ramp penalty</span><div class="cost-bar-t"><div class="cost-bar-f" style="width:42%;"></div></div><span class="cost-val">0.4</span></div>
+    <div class="cost-row"><span class="cost-lbl">Terrain mismatch</span><div class="cost-bar-t"><div class="cost-bar-f" style="width:20%;"></div></div><span class="cost-val">0.2</span></div>
+    <div class="cost-row"><span class="cost-lbl">Schedule gap</span><div class="cost-bar-t"><div class="cost-bar-f" style="width:15%;"></div></div><span class="cost-val">0.1</span></div>
+    <div style="margin-top:6px;font-size:12px;font-weight:600;color:#666;">247 nodes explored &nbsp;·&nbsp; total penalty 4.2 &nbsp;·&nbsp; 12-week plan</div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="card-title">Generated plan — click any week to expand</div>
+    <div id="plan-weeks"></div>
+    <button class="expand-btn" id="plan-toggle" onclick="togglePlan()">Show all 12 weeks ↓</button>
+  </div>
+</div>
+
+<!-- MODULE 1 — SAFETY -->
+<div class="section" id="s-safety">
+  <div class="sec-header">
+    <span class="sec-num">M1</span>
+    <span class="sec-title">Safety Validator</span>
+    <span class="sec-tech tech-logic">Propositional Logic</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Injury</div><div class="ic-val">Shin splints</div></div>
+    <div class="ic"><div class="ic-lbl">Weekly mileage</div><div class="ic-val">28 mi</div></div>
+    <div class="ic"><div class="ic-lbl">Rest days</div><div class="ic-val">2 this week</div></div>
+    <div class="ic"><div class="ic-lbl">Proposed workout</div><div class="ic-val">14 mi trail long run</div></div>
+  </div>
+  <div class="two-col" style="margin-bottom:12px;">
+    <div class="wo-before">
+      <div class="wo-label bad">&#9888; Proposed — rejected</div>
+      <div class="wo-val">14 mi trail long run</div>
+      <div class="wo-sub">Terrain: trail &nbsp;·&nbsp; 2 rule violations</div>
     </div>
-
-    <div class="modules">
-      <a class="card" href="/safety-validator/">
-        <span class="card-badge badge-m1">Module 1</span>
-        <h2>Workout Safety Validator</h2>
-        <p>
-          Check whether a proposed workout is safe given your injuries, training
-          load, recovery status, and available terrain.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
-
-      <a class="card" href="/plans">
-        <span class="card-badge badge-m2">Module 2</span>
-        <h2>Training Plan Generator</h2>
-        <p>
-          Generate a week-by-week training plan tailored to your race goal,
-          experience level, and schedule using A* search.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
-
-      <a class="card" href="/runlog">
-        <span class="card-badge badge-m3">Module 3</span>
-        <h2>Run Log Parser</h2>
-        <p>
-          Describe your run in plain English and extract structured data like
-          distance, pace, terrain, and effort level automatically.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
-
-      <a class="card" href="/motivation/demo">
-        <span class="card-badge badge-m4">Module 4</span>
-        <h2>Motivation Strategy Selector</h2>
-        <p>
-          Select the right motivational strategy based on your streak, recent
-          sentiments, terrain, adherence, and days to race.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
-
-      <a class="card" href="/progression/demo">
-        <span class="card-badge badge-m5">Module 5</span>
-        <h2>Adaptive Progression</h2>
-        <p>
-          Get a Q-learning–powered next session recommendation: distance, pace,
-          and terrain adjusted to your fatigue, history, and adherence.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
-
-      <a class="card" href="/race/demo">
-        <span class="card-badge badge-m6">Module 6</span>
-        <h2>Race Readiness Predictor</h2>
-        <p>
-          Predict your finish time and race readiness score based on your
-          training history, experience level, and goal race.
-        </p>
-        <span class="arrow">Open &rarr;</span>
-      </a>
+    <div class="wo-after">
+      <div class="wo-label good">&#10003; Safe alternative</div>
+      <div class="wo-val">11 mi treadmill long run</div>
+      <div class="wo-sub">Passes all 31 rules &nbsp;·&nbsp; easy effort</div>
     </div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="rule-row"><div class="ri f">&#10005;</div><div><div class="rule-text">Rule 7 — shin splints + trail terrain incompatible</div><div class="rule-sub">Uneven surface increases tibial stress. System redirects to treadmill.</div></div></div>
+    <div class="rule-row"><div class="ri f">&#10005;</div><div><div class="rule-text">Rule 14 — proposed distance exceeds weekly ceiling by 31%</div><div class="rule-sub">Current weekly total 28 mi. 10% long-run cap = 11.2 mi max. Plan generates 11 mi instead.</div></div></div>
+    <div class="rule-row"><div class="ri p">&#10003;</div><div><div class="rule-text">Rule 2 — rest days sufficient (2 this week, min 1 required)</div></div></div>
+    <div class="rule-row"><div class="ri p">&#10003;</div><div><div class="rule-text">Rule 19 — no back-to-back long run (last was 6 days ago)</div></div></div>
+  </div>
+</div>
 
-    <footer>Long Run &mdash; AI Marathon Training System</footer>
-  </body>
+<!-- MODULE 3 — LOG -->
+<div class="section" id="s-log">
+  <div class="sec-header">
+    <span class="sec-num">M3</span>
+    <span class="sec-title">Run Log Parser</span>
+    <span class="sec-tech tech-nlp">Regex + Word2Vec + Sentiment</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Input</div><div class="ic-val">Free-text run descriptions</div></div>
+    <div class="ic"><div class="ic-lbl">Runs logged</div><div class="ic-val">20 sessions</div></div>
+    <div class="ic"><div class="ic-lbl">Extracted fields</div><div class="ic-val">Type, distance, pace, terrain, sentiment</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">Sentiment arc across all 20 runs</div>
+    <canvas id="sentiment-spark" height="50"></canvas>
+    <div style="display:flex;gap:12px;font-size:11px;font-weight:700;margin-top:4px;">
+      <span style="color:#1D9E75;">&#9632; Great/Good</span>
+      <span style="color:#BA7517;">&#9632; Tired/OK</span>
+      <span style="color:#E24B4A;">&#9632; Struggled</span>
+    </div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;">Click any run to re-parse &#8594;</div>
+      <div class="log-scroll" id="log-list"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:0;height:100%;">
+        <div class="card-title" id="log-title">Run 11 · Week 6</div>
+        <div style="font-size:13px;font-style:italic;color:#333;background:#f8f5f0;border-left:3px solid #111;padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:10px;line-height:1.6;font-weight:500;" id="log-quote"></div>
+        <div class="parse-grid" id="parse-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4 — MOTIVATION -->
+<div class="section" id="s-motivation">
+  <div class="sec-header">
+    <span class="sec-num">M4</span>
+    <span class="sec-title">Motivation Strategy Selector</span>
+    <span class="sec-tech tech-game">Game Theory</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Streak</div><div class="ic-val">5 days</div></div>
+    <div class="ic"><div class="ic-lbl">Adherence</div><div class="ic-val">72% — dipping</div></div>
+    <div class="ic"><div class="ic-lbl">Sentiment trend</div><div class="ic-val">Tired → OK → Good</div></div>
+    <div class="ic"><div class="ic-lbl">Days to race</div><div class="ic-val">42 — mid-block</div></div>
+  </div>
+  <div class="two-col" style="margin-bottom:12px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Inferred runner state</div>
+      <div class="delta-row"><span class="delta-lbl">State label</span><span class="badge bp">Recovering, streak active</span></div>
+      <div class="delta-row"><span class="delta-lbl">Streak</span><span style="font-weight:800;color:#111;">5 days — active</span></div>
+      <div class="delta-row"><span class="delta-lbl">Adherence</span><span style="font-weight:800;color:#5A3000;">72% — dipping</span></div>
+      <div class="delta-row" style="border-bottom:none;"><span class="delta-lbl">Strategy score</span><span style="font-weight:800;color:#111;">8.4 &nbsp;·&nbsp; margin +1.7 &nbsp;·&nbsp; conf 81%</span></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Selected strategy</div>
+      <div style="margin-bottom:8px;"><span class="badge bp" style="font-size:13px;padding:5px 14px;">Streak reinforcement</span></div>
+      <div class="muted">Protect the 5-day streak without adding load pressure. Tone: encouraging, not demanding.</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:10px;padding-top:8px;border-top:1px solid #e8e4de;">Other strategies: Race countdown 6.7 · Challenge push 5.2 · Recovery nudge 4.1</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-title">System message to Maya</div>
+    <div class="chat-label">Long Run says:</div>
+    <div class="chat-bubble" id="motivation-message">You're on a 5-day streak — that's real momentum. Today's session is about protecting that streak, not pushing harder. Keep it easy, stay consistent, and let the fitness come to you. 42 days is plenty of time.</div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="card-title">Payoff matrix — strategy × runner state</div>
+    <div class="muted" style="margin-bottom:8px;">Dark cell = selected. Bold row = Maya's current state. Values = expected adherence improvement.</div>
+    <div class="matrix-wrap" id="payoff-matrix"></div>
+  </div>
+</div>
+
+<!-- MODULE 5 — ADAPTIVE -->
+<div class="section" id="s-adaptive">
+  <div class="sec-header">
+    <span class="sec-num">M5</span>
+    <span class="sec-title">Adaptive Progression</span>
+    <span class="sec-tech tech-rl">Q-Learning · 216 states</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Run history</div><div class="ic-val">20 sessions</div></div>
+    <div class="ic"><div class="ic-lbl">Fatigue score</div><div class="ic-val">0.45 — moderate</div></div>
+    <div class="ic"><div class="ic-lbl">Adherence</div><div class="ic-val">72%</div></div>
+    <div class="ic"><div class="ic-lbl">Streak</div><div class="ic-val">5 days</div></div>
+    <div class="ic"><div class="ic-lbl">Workout type</div><div class="ic-val">Easy run</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">Current MDP state tuple</div>
+    <div class="state-dims" id="state-dims"></div>
+    <div style="font-size:12px;font-weight:700;color:#666;">Dimensions: fitness (3) × fatigue (3) × adherence (3) × terrain (3) × streak (3) × recency (3) = <strong style="color:#111;">216 states</strong></div>
+  </div>
+  <div class="two-col" style="margin-bottom:10px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Reward signal</div>
+      <div class="reward-row"><span class="reward-lbl">Completed planned session</span><span class="reward-val" style="color:#1A4A08;">+1.0</span></div>
+      <div class="reward-row"><span class="reward-lbl">Injury-free completion</span><span class="reward-val" style="color:#1A4A08;">+0.5</span></div>
+      <div class="reward-row"><span class="reward-lbl">Positive sentiment logged</span><span class="reward-val" style="color:#1A4A08;">+0.3</span></div>
+      <div class="reward-row"><span class="reward-lbl">Missed session</span><span class="reward-val" style="color:#7A1F1F;">-1.5</span></div>
+      <div class="reward-row" style="border-bottom:none;"><span class="reward-lbl">Injury flag triggered</span><span class="reward-val" style="color:#7A1F1F;">-2.0</span></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Recommendation</div>
+      <div class="stat-grid-4" style="margin-bottom:10px;">
+        <div class="stat"><div class="stat-val">10.5</div><div class="stat-lbl">Next mi</div></div>
+        <div class="stat"><div class="stat-val">9:50</div><div class="stat-lbl">Pace</div></div>
+        <div class="stat"><div class="stat-val">Road</div><div class="stat-lbl">Terrain</div></div>
+        <div class="stat"><div class="stat-val">79%</div><div class="stat-lbl">Conf.</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:#555;">500 episodes &nbsp;·&nbsp; γ=0.9 &nbsp;·&nbsp; α=0.1 &nbsp;·&nbsp; ε-greedy decay</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">Q-value table — all 9 actions for current state</div>
+    <div class="q-table-wrap">
+      <table class="q-table">
+        <thead><tr><th style="width:40%;">Action</th><th style="width:15%;">Q-value</th><th>Relative strength</th></tr></thead>
+        <tbody id="qtbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0;">
+    <div class="card-title">Q-value convergence over training episodes</div>
+    <div class="muted" style="margin-bottom:8px;">Best action Q-value stabilizes as the agent learns. Flat tail = convergence.</div>
+    <div class="episode-chart-wrap"><canvas id="episodeChart"></canvas></div>
+  </div>
+</div>
+
+<!-- MODULE 6 — RACE -->
+<div class="section" id="s-race">
+  <div class="sec-header">
+    <span class="sec-num">M6</span>
+    <span class="sec-title">Race Readiness Predictor</span>
+    <span class="sec-tech tech-ml">Linear + Logistic Regression</span>
+  </div>
+  <div class="input-grid">
+    <div class="ic"><div class="ic-lbl">Snapshot taken</div><div class="ic-val">End of week 6</div></div>
+    <div class="ic"><div class="ic-lbl">Avg training pace</div><div class="ic-val">9:41 min/mi</div></div>
+    <div class="ic"><div class="ic-lbl">Adherence</div><div class="ic-val">72%</div></div>
+    <div class="ic"><div class="ic-lbl">Runs in log</div><div class="ic-val">20</div></div>
+    <div class="ic"><div class="ic-lbl">Days to race</div><div class="ic-val">42</div></div>
+  </div>
+  <div class="three-col" style="margin-bottom:12px;">
+    <div class="stat"><div class="stat-val">4:22:14</div><div class="stat-lbl">Predicted finish</div></div>
+    <div class="stat"><div class="stat-val" style="font-size:15px;">4:09 – 4:35</div><div class="stat-lbl">95% CI</div></div>
+    <div class="stat"><div class="stat-val">71%</div><div class="stat-lbl">Readiness</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">Confidence interval vs goal time</div>
+    <div class="muted" style="margin-bottom:10px;">Goal of 4:15 sits just inside the confidence interval — achievable but tight.</div>
+    <div class="ci-wrap" id="ci-wrap"></div>
+    <div style="margin-top:10px;display:flex;gap:16px;font-size:12px;font-weight:700;">
+      <span style="color:#378ADD;">&#9646; Predicted finish (4:22)</span>
+      <span style="color:#1D9E75;">&#9646; Goal time (4:15)</span>
+      <span style="color:#B5D4F4;">&#9632; 95% confidence interval</span>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:6px;padding:6px 10px;background:#f0ede8;border-radius:8px;">Readiness score: <strong style="color:#111;">71%</strong> &nbsp;·&nbsp; <span style="background:#D6EFCC;color:#1A4A08;padding:2px 8px;border-radius:4px;font-weight:700;">Race day status: On track</span></div>
+  <div style="height:8px;background:#e8e4de;border-radius:4px;overflow:hidden;margin-bottom:12px;"><div style="width:71%;height:100%;background:#1D9E75;border-radius:4px;"></div></div>
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Recommendations</div>
+      <ul style="list-style:none;padding:0;">
+        <li style="font-size:13px;font-weight:600;color:#333;padding:6px 0 6px 14px;border-bottom:1px solid #e8e4de;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#888;">›</span>Goal 4:15 is reachable — predicted is 7 min slower. Tighten tempo paces weeks 7–9.</li>
+        <li style="font-size:13px;font-weight:600;color:#333;padding:6px 0 6px 14px;border-bottom:1px solid #e8e4de;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#888;">›</span>Adherence at 72% is the primary drag. Two missed sessions/week compounds at 42 days out.</li>
+        <li style="font-size:13px;font-weight:600;color:#333;padding:6px 0 6px 14px;position:relative;line-height:1.5;"><span style="position:absolute;left:3px;color:#888;">›</span>Shin splints resolved on treadmill. Clear for road long runs at week 3 if no recurrence.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">Coefficient sensitivity</div>
+      <div class="muted" style="margin-bottom:8px;">How much does changing each input shift the predicted finish?</div>
+      <div class="delta-row"><span class="delta-lbl">Adherence −5%</span><span class="delta-val">+4.1 min slower</span></div>
+      <div class="delta-row"><span class="delta-lbl">Avg pace −0.5 min/mi</span><span class="delta-val">+7.8 min slower</span></div>
+      <div class="delta-row"><span class="delta-lbl">Weekly miles +5</span><span class="delta-val pos">−3.2 min faster</span></div>
+      <div class="delta-row" style="border-bottom:none;"><span class="delta-lbl">Experience: advanced</span><span class="delta-val pos">−5.5 min faster</span></div>
+    </div>
+  </div>
+  <div style="margin-top:10px;font-size:11px;font-weight:700;color:#888;">Calibrated on Girardi 2017 dataset (n=86) &nbsp;·&nbsp; Regression RMSE 14.2 min &nbsp;·&nbsp; MAE 11.1 min &nbsp;·&nbsp; Logistic accuracy 88% &nbsp;·&nbsp; AUC 0.92</div>
+</div>
+
+<!-- CHART -->
+<div class="section" id="s-chart">
+  <div class="sec-header">
+    <span class="sec-num">Chart</span>
+    <span class="sec-title">Training Progression</span>
+  </div>
+  <div class="card">
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Adherence</span>
+      <input type="range" id="adh-slider" min="50" max="95" value="72" step="1" style="width:100px;">
+      <span class="ctrl-val" id="adh-val">72%</span>
+      <span class="ctrl-lbl" style="margin-left:8px;">Avg pace</span>
+      <input type="range" id="pace-slider" min="850" max="1100" value="941" step="1" style="width:100px;">
+      <span class="ctrl-val" id="pace-val">9:41</span>
+      <button class="toggle-btn" id="injury-toggle" onclick="toggleInjury()">Injury weeks</button>
+      <button class="toggle-btn" id="shin-toggle" onclick="toggleShin()" style="margin-left:0;">Shin scenario</button>
+    </div>
+    <div class="legend-row">
+      <span><span class="leg-sw" style="background:#378ADD;"></span>Completed</span>
+      <span><span class="leg-sw" style="background:#B5D4F4;"></span>Planned</span>
+      <span><span class="leg-sw" style="background:#D6EFCC;border:1px solid #97C459;"></span>Taper zone</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:2px;height:14px;background:#E24B4A;display:inline-block;border-radius:1px;"></span>Current week</span>
+      <span id="injury-legend" style="display:none;"><span class="leg-sw" style="background:#FCEBEB;border:1px solid #F7C1C1;"></span>Injury flag</span>
+      <span id="shin-legend" style="display:none;"><span class="leg-sw" style="background:#FDE8C0;border:1px solid #EF9F27;"></span>Shin return scenario</span>
+    </div>
+    <div id="pred-bar"></div>
+    <div class="chart-wrap">
+      <canvas id="progChart"></canvas>
+      <div class="tt" id="chartTT">
+        <div class="tt-title" id="tt-w"></div>
+        <div class="tt-row" id="tt-m"></div>
+        <div class="tt-row" id="tt-l"></div>
+        <div class="tt-row" id="tt-s"></div>
+        <div class="tt-row" id="tt-p"></div>
+        <div class="tt-row" id="tt-st"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const WEEKS=[
+  {w:'Week 1',miles:28,long:11,sentiment:'Good',status:'Completed',injury:false,pred:'4:38'},
+  {w:'Week 2',miles:31,long:13,sentiment:'Good',status:'Completed',injury:false,pred:'4:33'},
+  {w:'Week 3',miles:34,long:15,sentiment:'Tired',status:'Completed',injury:true,pred:'4:31'},
+  {w:'Week 4',miles:30,long:13,sentiment:'Good',status:'Completed (cutback)',injury:true,pred:'4:29'},
+  {w:'Week 5',miles:37,long:16,sentiment:'Great',status:'Completed',injury:false,pred:'4:25'},
+  {w:'Week 6',miles:40,long:11,sentiment:'Tired',status:'Current week',injury:false,pred:'4:22'},
+  {w:'Week 7',miles:42,long:18,sentiment:'—',status:'Planned',injury:false,pred:'4:18'},
+  {w:'Week 8',miles:44,long:20,sentiment:'—',status:'Planned (peak)',injury:false,pred:'4:15'},
+  {w:'Week 9',miles:38,long:18,sentiment:'—',status:'Planned',injury:false,pred:'4:17'},
+  {w:'Week 10',miles:32,long:15,sentiment:'—',status:'Planned (taper)',injury:false,pred:'4:19'},
+  {w:'Week 11',miles:24,long:12,sentiment:'—',status:'Planned (taper)',injury:false,pred:'4:20'},
+  {w:'Week 12',miles:20,long:8,sentiment:'—',status:'Race week',injury:false,pred:'4:22'},
+];
+const CUR=5;
+
+const LOGS=[
+  {run:1,week:1,dist:'5.0 mi',pace:'10:12',terrain:'Treadmill',type:'Easy run',sentiment:'good',color:'#1D9E75',text:'Easy shakeout on treadmill. Legs felt stiff at first but loosened up after mile 2. Shins were fine.'},
+  {run:2,week:1,dist:'4.2 mi',pace:'9:55',terrain:'Road',type:'Tempo',sentiment:'good',color:'#1D9E75',text:'Tempo intervals on the road, 3x1 mile at 9:00. Felt controlled. No shin issues.'},
+  {run:3,week:1,dist:'11.0 mi',pace:'10:20',terrain:'Treadmill',type:'Long run',sentiment:'tired',color:'#BA7517',text:'Long run on treadmill, 11 miles. Pacing felt ok. Got a bit bored but shins held up well.'},
+  {run:4,week:2,dist:'5.5 mi',pace:'10:05',terrain:'Treadmill',type:'Easy run',sentiment:'good',color:'#1D9E75',text:'Recovery easy run, felt refreshed after rest day. Mild shin tightness faded by mile 3.'},
+  {run:5,week:2,dist:'6.0 mi',pace:'9:40',terrain:'Road',type:'Easy run',sentiment:'great',color:'#3B6D11',text:'Solid aerobic run on road. Best I have felt in weeks. Pace felt easy and comfortable.'},
+  {run:6,week:2,dist:'13.0 mi',pace:'10:15',terrain:'Road',type:'Long run',sentiment:'tired',color:'#BA7517',text:'Long run on road 13 miles. Miles 10–13 were a grind. Shins felt fine on road surface.'},
+  {run:7,week:3,dist:'6.0 mi',pace:'9:50',terrain:'Treadmill',type:'Easy run',sentiment:'good',color:'#1D9E75',text:'Easy treadmill run, focused on cadence. Felt controlled throughout.'},
+  {run:8,week:3,dist:'5.0 mi',pace:'8:50',terrain:'Road',type:'Tempo',sentiment:'good',color:'#1D9E75',text:'Tempo run on road. Hit target paces for all 3 intervals. Slight shin ache at mile 4.'},
+  {run:9,week:3,dist:'15.0 mi',pace:'10:30',terrain:'Road',type:'Long run',sentiment:'struggled',color:'#E24B4A',text:'Long run 15 miles on road. Shin pain flared at mile 11. Had to slow down. Completed but sore.'},
+  {run:10,week:4,dist:'5.0 mi',pace:'10:45',terrain:'Treadmill',type:'Easy run',sentiment:'tired',color:'#BA7517',text:'Cutback week easy run. Shins still sore from last long run. Took it very slow.'},
+  {run:11,week:6,dist:'11.0 mi',pace:'9:40',terrain:'Treadmill',type:'Long run',sentiment:'tired',color:'#BA7517',text:'Did my treadmill long run today, 11 miles at about 9:40 pace. Shins felt fine on the soft belt. Pretty tired by mile 9 but pushed through.'},
+  {run:12,week:4,dist:'5.5 mi',pace:'10:10',terrain:'Treadmill',type:'Easy run',sentiment:'good',color:'#1D9E75',text:'Felt better today on the treadmill. Shin stiffness mostly gone. Kept effort conversational.'},
+  {run:13,week:4,dist:'13.0 mi',pace:'10:25',terrain:'Road',type:'Long run',sentiment:'good',color:'#1D9E75',text:'Back to 13 for cutback long run. Road felt ok, shin held up. More confident now.'},
+  {run:14,week:5,dist:'6.5 mi',pace:'9:45',terrain:'Road',type:'Easy run',sentiment:'great',color:'#3B6D11',text:'Best easy run in weeks. Pace felt effortless. No shin issues at all. Energy was high.'},
+  {run:15,week:5,dist:'5.0 mi',pace:'8:55',terrain:'Road',type:'Tempo',sentiment:'good',color:'#1D9E75',text:'Tempo work, 4x1 mile at goal pace. Hit all targets. Legs felt springy.'},
+  {run:16,week:5,dist:'16.0 mi',pace:'10:10',terrain:'Road',type:'Long run',sentiment:'great',color:'#3B6D11',text:'16 mile long run, best one yet. Felt strong through mile 14. Shins totally pain free.'},
+  {run:17,week:6,dist:'5.0 mi',pace:'10:00',terrain:'Treadmill',type:'Easy run',sentiment:'good',color:'#1D9E75',text:'Easy recovery run to start the week. Legs a bit heavy from 16 miler but manageable.'},
+  {run:18,week:6,dist:'5.5 mi',pace:'9:20',terrain:'Road',type:'Tempo',sentiment:'good',color:'#1D9E75',text:'Tempo intervals on road, 3x1.5 miles. Nailed the pacing. Shins cooperated.'},
+  {run:19,week:6,dist:'4.0 mi',pace:'10:30',terrain:'Treadmill',type:'Easy run',sentiment:'tired',color:'#BA7517',text:'Short recovery run after tough work week. Felt flat and tired. Just got it done.'},
+  {run:20,week:6,dist:'11.0 mi',pace:'9:40',terrain:'Treadmill',type:'Long run',sentiment:'tired',color:'#BA7517',text:'Treadmill long run 11 miles, shin-safe. Tired by mile 9 but completed the session.'},
+];
+
+const PLAN=[
+  {w:'Week 1',miles:28,pills:['Easy 5 mi · treadmill','Tempo 4 mi · road','Long 11 mi · treadmill'],types:['easy','tempo','long']},
+  {w:'Week 2',miles:32,pills:['Easy 5 mi · treadmill','Easy 6 mi · road','Long 13 mi · road'],types:['easy','easy','long']},
+  {w:'Week 3',miles:35,pills:['Easy 6 mi · road','Tempo 5 mi · road','Long 15 mi · road'],types:['easy','tempo','long']},
+  {w:'Week 4',miles:30,pills:['Easy 5 mi · treadmill','Easy 5 mi · road','Long 13 mi · road'],types:['easy','easy','long']},
+  {w:'Week 5',miles:37,pills:['Easy 6 mi · road','Tempo 5 mi · road','Long 16 mi · road'],types:['easy','tempo','long']},
+  {w:'Week 6',miles:40,pills:['Easy 5 mi · treadmill','Tempo 5.5 mi · road','Easy 4 mi · treadmill','Long 11 mi · treadmill'],types:['easy','tempo','easy','long']},
+  {w:'Week 7',miles:42,pills:['Easy 6 mi · road','Intervals 5 mi · road','Long 18 mi · road'],types:['easy','interval','long']},
+  {w:'Week 8',miles:44,pills:['Easy 6 mi · road','Tempo 6 mi · road','Long 20 mi · road'],types:['easy','tempo','long']},
+  {w:'Week 9',miles:38,pills:['Easy 6 mi · road','Tempo 5 mi · road','Long 18 mi · road'],types:['easy','tempo','long']},
+  {w:'Week 10',miles:32,pills:['Easy 5 mi · road','Easy 5 mi · road','Long 15 mi · road'],types:['easy','easy','long']},
+  {w:'Week 11',miles:24,pills:['Easy 4 mi · road','Easy 4 mi · treadmill','Long 12 mi · road'],types:['easy','easy','long']},
+  {w:'Week 12',miles:20,pills:['Easy 3 mi · road','Easy 3 mi · road','Long 8 mi · road'],types:['easy','easy','long']},
+];
+
+let planExpanded=false;
+function renderPlan(){
+  const c=document.getElementById('plan-weeks');
+  const show=planExpanded?PLAN:PLAN.slice(0,3);
+  c.innerHTML=show.map((p,i)=>`
+    <div class="week-row">
+      <div class="week-hdr" onclick="toggleWeek(${i})">
+        <span class="wk-title">${p.w}</span>
+        <span class="wk-summary">${p.miles} mi total &nbsp;·&nbsp; ${p.pills.length} sessions <span id="wk-arrow-${i}">↓</span></span>
+      </div>
+      <div class="wk-pills" id="wk-pills-${i}" style="display:none;">
+        ${p.pills.map((pill,j)=>`<span class="pill ${p.types[j]}">${pill}</span>`).join('')}
+      </div>
+    </div>`).join('');
+  if(!planExpanded)c.innerHTML+=`<div class="week-row" style="opacity:.4;border-bottom:none;"><div class="week-hdr"><span class="wk-title">···</span><span class="wk-summary">Weeks 4–12 continue</span></div></div>`;
+}
+function toggleWeek(i){
+  const p=document.getElementById('wk-pills-'+i);const a=document.getElementById('wk-arrow-'+i);
+  if(p){p.style.display=p.style.display==='none'?'flex':'none';if(a)a.textContent=p.style.display==='none'?'↓':'↑';}
+}
+function togglePlan(){
+  planExpanded=!planExpanded;renderPlan();
+  document.getElementById('plan-toggle').textContent=planExpanded?'Show less ↑':'Show all 12 weeks ↓';
+}
+renderPlan();
+
+// sentiment sparkline
+const sentColors=LOGS.map(l=>l.color);
+const sparkCanvas=document.getElementById('sentiment-spark');
+const sctx=sparkCanvas.getContext('2d');
+sparkCanvas.width=sparkCanvas.offsetWidth||700;
+sparkCanvas.height=50;
+const sw=sparkCanvas.width,sh=sparkCanvas.height;
+const barW=Math.floor(sw/LOGS.length)-2;
+LOGS.forEach((l,i)=>{
+  const x=i*(barW+2);
+  sctx.fillStyle=l.color;
+  sctx.fillRect(x,4,barW,sh-8);
+});
+
+// log list
+const ll=document.getElementById('log-list');
+LOGS.forEach((l,i)=>{
+  const d=document.createElement('div');
+  d.className='log-row'+(l.run===11?' active':'');
+  d.id='lr'+i;d.onclick=()=>selectLog(i);
+  d.innerHTML=`<div class="log-stripe" style="background:${l.color};"></div><div class="log-dist">${l.dist}</div><div class="log-pace">${l.pace}</div><div class="log-terrain">${l.terrain}</div><div class="log-text">${l.text}</div>`;
+  ll.appendChild(d);
+});
+function selectLog(i){
+  document.querySelectorAll('.log-row').forEach(r=>r.classList.remove('active'));
+  document.getElementById('lr'+i).classList.add('active');
+  const l=LOGS[i];
+  document.getElementById('log-title').textContent=`Run ${l.run} · Week ${l.week}`;
+  document.getElementById('log-quote').textContent=`"${l.text}"`;
+  document.getElementById('parse-out').innerHTML=`
+    <div class="parse-item"><div class="parse-key">Type</div><div class="parse-val">${l.type}</div></div>
+    <div class="parse-item"><div class="parse-key">Distance</div><div class="parse-val">${l.dist}</div></div>
+    <div class="parse-item"><div class="parse-key">Pace</div><div class="parse-val">${l.pace} min/mi</div></div>
+    <div class="parse-item"><div class="parse-key">Terrain</div><div class="parse-val">${l.terrain}</div></div>
+    <div class="parse-item"><div class="parse-key">Sentiment</div><div class="parse-val"><span class="badge" style="background:${l.color}22;color:${l.color};border:1.5px solid ${l.color}44;">${l.sentiment.charAt(0).toUpperCase()+l.sentiment.slice(1)}</span></div></div>
+    <div class="parse-item"><div class="parse-key">Week</div><div class="parse-val">Week ${l.week}</div></div>`;
+}
+selectLog(LOGS.findIndex(l=>l.run===11));
+
+// payoff matrix
+const PAYOFF={
+  cols:['Streak reinf.','Race countdown','Challenge push','Recovery nudge','Milestone reward'],
+  rows:[
+    {state:'Recovering, streak active',vals:[8.4,6.7,5.2,4.1,3.8],best:0,active:true},
+    {state:'High adherence, fresh',vals:[5.1,7.2,8.8,3.2,6.4],best:2,active:false},
+    {state:'Low adherence, fatigued',vals:[4.8,5.5,3.1,8.9,4.2],best:3,active:false},
+    {state:'Race week, anxious',vals:[3.2,9.1,4.5,6.8,7.7],best:1,active:false},
+    {state:'Plateau, bored',vals:[4.4,5.3,7.6,5.1,8.2],best:4,active:false},
+  ]
+};
+const mx=document.getElementById('payoff-matrix');
+let mh=`<table class="m-table"><thead><tr><th>Runner state</th>${PAYOFF.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+PAYOFF.rows.forEach((r,ri)=>{
+  mh+=`<tr class="${r.active?'active-row':''}"><td class="row-lbl">${r.state}${r.active?' ◀':''}</td>${r.vals.map((v,ci)=>{
+    const isSel=ri===0&&ci===0;const isBest=ci===r.best;
+    return`<td class="${isSel?'hi':isBest?'mid':''}">${v}</td>`;
+  }).join('')}</tr>`;
+});
+mh+='</tbody></table>';mx.innerHTML=mh;
+
+// state dims
+document.getElementById('state-dims').innerHTML=[
+  {lbl:'Fitness bucket',val:'Medium (28 mi/wk)'},
+  {lbl:'Fatigue level',val:'Moderate (0.45)'},
+  {lbl:'Adherence bucket',val:'Medium (72%)'},
+  {lbl:'Terrain',val:'Road'},
+  {lbl:'Streak bucket',val:'Active (5 days)'},
+  {lbl:'Recency',val:'Recent (3 days)'},
+].map(d=>`<div class="dim-chip"><div class="dim-lbl">${d.lbl}</div><div class="dim-val">${d.val}</div></div>`).join('');
+
+// Q table
+const QDATA=[
+  {action:'maintain volume · maintain intensity',q:6.31,best:true},
+  {action:'increase volume · maintain intensity',q:5.87,best:false},
+  {action:'maintain volume · decrease intensity',q:5.44,best:false},
+  {action:'decrease volume · maintain intensity',q:4.92,best:false},
+  {action:'increase volume · increase intensity',q:4.38,best:false},
+  {action:'maintain volume · increase intensity',q:3.95,best:false},
+  {action:'decrease volume · decrease intensity',q:3.41,best:false},
+  {action:'increase volume · decrease intensity',q:3.12,best:false},
+  {action:'decrease volume · increase intensity',q:2.67,best:false},
+];
+const qmax=QDATA[0].q;
+document.getElementById('qtbody').innerHTML=QDATA.map(r=>`
+  <tr class="${r.best?'best':''}">
+    <td>${r.action}${r.best?' &#9733; selected':''}</td>
+    <td style="font-size:14px;font-weight:800;">${r.q.toFixed(2)}</td>
+    <td>
+      <div class="q-cell-bar">
+        <div class="q-bar-wrap"><div class="q-bar-fill${r.best?' best':''}" style="width:${Math.round(r.q/qmax*100)}%;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#888;width:30px;text-align:right;">${Math.round(r.q/qmax*100)}%</span>
+      </div>
+    </td>
+  </tr>`).join('');
+
+// episode convergence chart
+(function(){
+  const eps=[];const qvals=[];
+  for(let i=0;i<=500;i+=10){
+    eps.push(i);
+    const v=6.31*(1-Math.exp(-i/120))+Math.sin(i*0.08)*Math.exp(-i/80)*0.8;
+    qvals.push(Math.round(v*100)/100);
+  }
+  new Chart(document.getElementById('episodeChart'),{
+    type:'line',
+    data:{labels:eps,datasets:[{label:'Best Q-value',data:qvals,borderColor:'#1D9E75',borderWidth:2,pointRadius:0,fill:false,tension:.4}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{
+        x:{ticks:{font:{size:10},color:'#888',maxTicksLimit:8},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false},title:{display:true,text:'Episodes',font:{size:11,weight:'700'},color:'#666'}},
+        y:{ticks:{font:{size:10},color:'#888',callback:v=>v.toFixed(1)},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false},title:{display:true,text:'Q-value',font:{size:11,weight:'700'},color:'#666'}}
+      }
+    }
+  });
+})();
+
+// CI bar
+(function(){
+  const wrap=document.getElementById('ci-wrap');
+  const MIN=240,MAX=300;
+  const ciLo=249,ciHi=275,pred=262,goal=255;
+  const pct=v=>((v-MIN)/(MAX-MIN)*100).toFixed(1);
+  wrap.innerHTML=`
+    <div class="ci-track">
+      <div class="ci-fill" style="left:${pct(ciLo)}%;width:${pct(ciHi)-pct(ciLo)}%;"></div>
+      <div class="ci-pred" style="left:${pct(pred)}%;"><span class="ci-label" style="left:-20px;color:#378ADD;">4:22</span></div>
+      <div class="ci-goal" style="left:${pct(goal)}%;"><span class="ci-label" style="left:4px;color:#1D9E75;">4:15 goal</span></div>
+    </div>`;
+})();
+
+// chart
+let showInjury=false,showShin=false;
+function toggleInjury(){
+  showInjury=!showInjury;
+  document.getElementById('injury-toggle').className=showInjury?'toggle-btn on':'toggle-btn';
+  document.getElementById('injury-legend').style.display=showInjury?'inline':'none';
+  if(progChart)progChart.update();
+}
+function toggleShin(){
+  showShin=!showShin;
+  document.getElementById('shin-toggle').className=showShin?'toggle-btn on':'toggle-btn';
+  document.getElementById('shin-legend').style.display=showShin?'inline':'none';
+  updateChart();
+}
+
+function paceToMin(v){const h=Math.floor(v/100);const m=v%100;return h*60+m/100*60/100*100;}
+function computePred(adh,paceRaw){
+  const baseAdh=72,basePace=9.683;
+  const paceMin=Math.floor(paceRaw/100)+(paceRaw%100)/100;
+  const mins=262+(baseAdh-adh)*0.82+(paceMin-basePace)*15.6;
+  const h=Math.floor(mins/60);const m=Math.floor(mins%60);const s=Math.round((mins%1)*60);
+  return{str:`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`,mins};
+}
+function fmtPace(v){const h=Math.floor(v/100);const m=String(v%100).padStart(2,'0');return`${h}:${m}`;}
+
+const shinMiles=[28,31,34,30,37,40,32,30,38,32,24,20];
+
+function updateChart(){
+  if(!progChart)return;
+  const adh=Number(document.getElementById('adh-slider').value);
+  const paceRaw=Number(document.getElementById('pace-slider').value);
+  const{str,mins}=computePred(adh,paceRaw);
+  const faster=mins<262,slower=mins>262;
+  document.getElementById('pred-bar').innerHTML=`Adherence <strong>${adh}%</strong> · Avg pace <strong>${fmtPace(paceRaw)} min/mi</strong> → Predicted finish <strong style="color:${faster?'#1A4A08':slower?'#7A1F1F':'#111'};">${str}</strong>${faster?' (faster than baseline)':slower?' (slower than baseline)':' (baseline)'}`;
+  const data=showShin?shinMiles:WEEKS.map(w=>w.miles);
+  progChart.data.datasets[0].data=data;
+  progChart.update();
+}
+
+const pcs=WEEKS.map((_,i)=>i<CUR?'#378ADD':i===CUR?'#E24B4A':'#B5D4F4');
+let progChart;
+progChart=new Chart(document.getElementById('progChart'),{
+  type:'line',
+  data:{
+    labels:WEEKS.map((_,i)=>'Wk '+(i+1)),
+    datasets:[{
+      label:'Weekly miles',data:WEEKS.map(w=>w.miles),
+      borderColor:'#B5D4F4',borderWidth:2.5,
+      pointBackgroundColor:pcs,pointBorderColor:pcs,
+      pointRadius:WEEKS.map((_,i)=>i===CUR?8:5),pointHoverRadius:9,
+      fill:false,tension:.35,
+      segment:{borderColor:ctx=>ctx.p0DataIndex<CUR?'#378ADD':'#B5D4F4'}
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{
+      x:{ticks:{font:{size:12,weight:'700'},color:'#444',maxRotation:0,autoSkip:false},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}},
+      y:{min:0,max:55,ticks:{font:{size:12,weight:'700'},color:'#444',callback:v=>v+' mi',stepSize:10},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}
+    }
+  },
+  plugins:[
+    {id:'taper',beforeDraw(c){const{ctx,chartArea,scales}=c;if(!chartArea)return;const x9=scales.x.getPixelForValue(8),x12=scales.x.getPixelForValue(11);ctx.save();ctx.fillStyle='rgba(150,220,150,.15)';ctx.fillRect(x9,chartArea.top,x12-x9,chartArea.bottom-chartArea.top);ctx.restore();}},
+    {id:'curline',beforeDraw(c){const{ctx,chartArea,scales}=c;if(!chartArea)return;const xc=scales.x.getPixelForValue(CUR);ctx.save();ctx.strokeStyle='#E24B4A';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.beginPath();ctx.moveTo(xc,chartArea.top);ctx.lineTo(xc,chartArea.bottom);ctx.stroke();ctx.restore();}},
+    {id:'injury',beforeDraw(c){if(!showInjury)return;const{ctx,chartArea,scales}=c;if(!chartArea)return;WEEKS.forEach((w,i)=>{if(w.injury){const x=scales.x.getPixelForValue(i);const bw=(scales.x.getPixelForValue(1)-scales.x.getPixelForValue(0));ctx.save();ctx.fillStyle='rgba(252,235,235,.6)';ctx.fillRect(x-bw/2,chartArea.top,bw,chartArea.bottom-chartArea.top);ctx.restore();}});}}
+  ]
+});
+
+document.getElementById('adh-slider').addEventListener('input',function(){
+  document.getElementById('adh-val').textContent=this.value+'%';updateChart();
+});
+document.getElementById('pace-slider').addEventListener('input',function(){
+  document.getElementById('pace-val').textContent=fmtPace(Number(this.value));updateChart();
+});
+updateChart();
+
+const canvas=document.getElementById('progChart');
+const tt=document.getElementById('chartTT');
+canvas.addEventListener('mousemove',function(e){
+  const pts=progChart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(pts.length>0){
+    const idx=pts[0].index;const w=WEEKS[idx];
+    const rect=canvas.getBoundingClientRect();
+    const x=e.clientX-rect.left;const y=e.clientY-rect.top;
+    document.getElementById('tt-w').textContent=w.w+(idx===CUR?' ← current':'');
+    document.getElementById('tt-m').innerHTML=`<strong>Total miles:</strong> ${w.miles} mi`;
+    document.getElementById('tt-l').innerHTML=`<strong>Long run:</strong> ${w.long} mi`;
+    document.getElementById('tt-s').innerHTML=`<strong>Sentiment:</strong> ${w.sentiment}`;
+    document.getElementById('tt-p').innerHTML=`<strong>Predicted finish:</strong> ${w.pred}`;
+    document.getElementById('tt-st').textContent=w.status;
+    tt.style.display='block';
+    let tx=x+16;if(tx+170>rect.width)tx=x-175;
+    tt.style.left=tx+'px';tt.style.top=Math.max(0,y-30)+'px';
+  }else tt.style.display='none';
+});
+canvas.addEventListener('mouseleave',()=>tt.style.display='none');
+
+// scroll progress bar
+const sectionIds=['s-profile','s-plan','s-safety','s-log','s-motivation','s-adaptive','s-race','s-chart'];
+const pbIds=['pb-profile','pb-plan','pb-safety','pb-log','pb-motivation','pb-adaptive','pb-race','pb-chart'];
+function scrollTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'});}
+window.addEventListener('scroll',function(){
+  let cur=0;
+  sectionIds.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<120)cur=i;
+  });
+  pbIds.forEach((id,i)=>{
+    document.getElementById(id).className='pb-item'+(i===cur?' active':'');
+  });
+},{passive:true});
+</script>
+</body>
 </html>

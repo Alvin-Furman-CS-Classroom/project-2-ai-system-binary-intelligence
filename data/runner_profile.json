@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "Demo Runner",
+  "paths": {
+    "run_log": "data/run_log.json"
+  },
+  "planner": {
+    "goal": "complete marathon",
+    "race_date": "2026-10-01",
+    "days_per_week": 4,
+    "current_weekly_miles": 15,
+    "experience": "beginner",
+    "available_terrain": ["road", "trail", "track"]
+  },
+  "progression_defaults": {
+    "fatigue_score": 0.3,
+    "next_workout_type": "easy run",
+    "default_terrain": "road"
+  },
+  "module1_runner": {
+    "experience_level": "beginner",
+    "weekly_mileage": 15,
+    "injuries": [],
+    "symptoms": [],
+    "pain_level": "none",
+    "cleared_by_doctor": false,
+    "fully_recovered": true,
+    "sleep_quality": "good",
+    "hydrated": true,
+    "rest_days_this_week": 2,
+    "days_trained_this_week": 3,
+    "hard_workout_yesterday": false,
+    "available_terrain": ["road", "trail", "track"],
+    "weather": "normal",
+    "proper_footwear": true,
+    "race_date": "2026-10-01"
+  }
+}

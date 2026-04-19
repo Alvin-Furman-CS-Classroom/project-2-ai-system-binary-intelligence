@@ -3,11 +3,9 @@ Controller for Module 5 – Adaptive Progression demo routes.
 """
 
 from fastapi import Request
-from fastapi.templating import Jinja2Templates
+from app_templates import templates
 
 from src.module5_adaptive_progression.adaptor import adapt_progression_detailed
-
-templates = Jinja2Templates(directory="templates")
 
 DEMO_SCENARIOS = [
     {

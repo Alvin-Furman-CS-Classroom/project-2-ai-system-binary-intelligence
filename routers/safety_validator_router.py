@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from app_templates import templates
 
 from controllers.safety_validator_controller import (
     run_validate,
@@ -17,8 +17,6 @@ from schemas.safety_validator_schemas import (
 )
 
 router = APIRouter(prefix="/safety-validator", tags=["safety-validator"])
-
-templates = Jinja2Templates(directory="templates")
 
 
 # ✅ HTML page route
