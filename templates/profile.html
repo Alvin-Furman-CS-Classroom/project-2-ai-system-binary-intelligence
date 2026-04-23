@@ -1113,6 +1113,7 @@
       const ctx = m.context;
       const cap = s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
+      // 1. Update Strategy Badges
       const sb = document.getElementById('mot-strategy-badge');
       sb.textContent = cap(m.strategy);
       sb.className = 'strategy-badge s-' + m.strategy;
@@ -1123,19 +1124,33 @@
       stEl.textContent = 'State: ' + cap(m.inferred_state);
       stEl.className = 'state-badge state-' + m.inferred_state;
 
-      const maxScore = Math.max(...Object.values(m.scores));
+      // 2. Update Scores (Adding Red Negative Logic)
+      const scoreValues = Object.values(m.scores);
+      const maxAbs = Math.max(...scoreValues.map(Math.abs), 1);
+
       let html = '<h2>Score Breakdown</h2>';
       for (const [strat, score] of Object.entries(m.scores)) {
-        const pct = Math.round((score / maxScore) * 100);
-        const winner = strat === m.strategy ? ' winner' : '';
-        html += '<div class="score-row">'
-          + '<div class="score-label">' + cap(strat) + '</div>'
-          + '<div class="score-track"><div class="score-fill' + winner + '" style="width:' + pct + '%"></div></div>'
-          + '<div class="score-val">' + score.toFixed(1) + '</div>'
-          + '</div>';
+        const isNegative = score < 0;
+        const pct = Math.round((Math.abs(score) / maxAbs) * 50);
+
+        let fillCls = 'score-fill';
+        if (strat === m.strategy) fillCls += ' winner';
+        if (isNegative) fillCls += ' negative';
+
+        const valCls = isNegative ? 'score-val negative' : 'score-val';
+
+        html += `
+      <div class="score-row">
+        <div class="score-label">${cap(strat)}</div>
+        <div class="score-track">
+          <div class="${fillCls}" style="width: ${pct}%"></div>
+        </div>
+        <div class="${valCls}">${score.toFixed(1)}</div>
+      </div>`;
       }
       document.getElementById('motivation-scores-card').innerHTML = html;
 
+      // 3. Update Context Items
       document.querySelector('[data-ctx="streak"]').textContent = ctx.current_streak;
       document.querySelector('[data-ctx="adherence"]').textContent = ctx.adherence_percent + '%';
       document.querySelector('[data-ctx="days_to_race"]').textContent = ctx.days_to_race > 0 ? ctx.days_to_race : '—';
