@@ -1,6 +1,16 @@
 """
 Module 5 - Adaptive Progression System
-Feature extraction from validated run history.
+Feature extraction and adjustment logic for adaptive training recommendations.
+
+Responsibilities:
+  - Estimate weekly mileage from recent run history
+  - Extract baseline distance/pace and terrain sequences
+  - Apply Q-learning volume/intensity adjustments (distance and pace factors)
+  - Analyse sentiment trend over recent sessions (improving / stable / declining)
+  - Refine recommendations using Module 4 coaching signals:
+      race-proximity volume caps, struggle-streak pace easing, terrain variety
+  - Down-weight Q-table confidence when runner adherence is low
+  - Select next-session terrain, avoiding monotonous surface repetition
 """
 
 from datetime import datetime

@@ -1,0 +1,1778 @@
+<!doctype html>
+<html>
+<head>
+  <title>{{ profile.name }} – Long Run</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px 20px 60px; background: #f5f5f5; color: #333; }
+
+    /* Navbar */
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: white; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 12px 20px; margin-bottom: 20px;
+    }
+    .navbar .nav-brand { font-weight: 700; font-size: 1rem; color: #333; text-decoration: none; }
+    .navbar .nav-links { display: flex; gap: 8px; }
+    .navbar .nav-links a {
+      font-size: 0.88rem; font-weight: 600; padding: 6px 16px;
+      border-radius: 20px; text-decoration: none; transition: background 0.15s;
+    }
+    .nav-home     { background: #f0f2f5; color: #555; }
+    .nav-home:hover { background: #e2e6ea; }
+    .nav-profiles { background: #e8f0fe; color: #1a73e8; }
+    .nav-profiles:hover { background: #d2e3fc; }
+
+    /* Profile header */
+    .profile-header { margin-bottom: 20px; }
+    .profile-header h1 { margin: 0 0 2px; font-size: 1.7rem; }
+    .profile-header .meta { font-size: 0.82rem; color: #999; }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+      background: white; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 10px 14px; margin-bottom: 24px;
+    }
+    .tab-btn {
+      padding: 8px 18px; border: none; border-radius: 20px;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      background: #f0f2f5; color: #555; transition: background 0.15s, color 0.15s;
+      position: relative;
+    }
+    .tab-btn:hover { background: #e2e6ea; }
+    .tab-btn.active { background: #007bff; color: white; }
+    .tab-badge {
+      display: inline-block; background: #dc3545; color: white;
+      font-size: 0.65rem; border-radius: 9px; padding: 1px 5px;
+      margin-left: 4px; vertical-align: middle; line-height: 1.4;
+    }
+    .tab-btn.active .tab-badge { background: rgba(255,255,255,0.35); }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Cards */
+    .card { background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 18px; }
+    .card h2 { margin: 0 0 18px; font-size: 1rem; color: #555; border-bottom: 2px solid #007bff; padding-bottom: 6px; }
+
+    /* Info grid */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .info-item label { font-size: 0.72rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+    .info-item span { font-size: 0.95rem; font-weight: 600; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 12px; background: #e8f0fe; color: #1a73e8; font-size: 0.78rem; margin: 2px; }
+
+    /* Active plan banner */
+    .plan-banner { background: #eef5ff; border: 1px solid #c5d5ff; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; }
+    .plan-banner strong { color: #1a73e8; }
+
+    /* Generate form */
+    select, input[type="date"] {
+      width: 100%; padding: 9px 12px; border: 1px solid #ddd;
+      border-radius: 6px; font-size: 0.95rem; margin-bottom: 14px;
+    }
+    .field-label { font-weight: 600; font-size: 0.88rem; color: #555; display: block; margin-bottom: 5px; }
+    button.btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; color: white; }
+    .btn-primary { background: #007bff; } .btn-primary:hover { background: #0056b3; }
+    .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
+    .btn-gray    { background: #6c757d; margin-bottom: 10px; } .btn-gray:hover { background: #545b62; }
+    .back-btn-row { margin-bottom: 14px; }
+    .back-btn { background: none; border: none; color: #007bff; font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 0; }
+    .back-btn:hover { text-decoration: underline; }
+
+    /* Examples */
+    .examples { margin-top: 8px; font-size: 13px; color: #888; }
+    .example-link { cursor: pointer; color: #007bff; text-decoration: underline; margin-right: 8px; }
+    .example-link:hover { color: #0056b3; }
+
+    /* Motivation tab */
+    .strategy-hero { text-align: center; padding: 24px 0 16px; }
+    .strategy-badge {
+      display: inline-block; padding: 8px 24px; border-radius: 24px;
+      font-size: 1rem; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 10px;
+    }
+    .s-push_harder       { background: #fff3cd; color: #856404; }
+    .s-maintain          { background: #d4edda; color: #155724; }
+    .s-encourage_rest    { background: #cce5ff; color: #004085; }
+    .s-encourage_variety { background: #e2cfff; color: #4b0082; }
+    .tone-badge {
+      display: inline-block; padding: 3px 12px; border-radius: 12px;
+      font-size: 0.78rem; font-weight: 600; background: #f0f2f5; color: #555;
+    }
+    .state-badge {
+      display: inline-block; padding: 4px 14px; border-radius: 12px;
+      font-size: 0.82rem; font-weight: 700;
+    }
+    .state-engaged       { background: #d4edda; color: #155724; }
+    .state-default       { background: #e2e3e5; color: #383d41; }
+    .state-bored         { background: #fff3cd; color: #856404; }
+    .state-burnout_risk  { background: #f8d7da; color: #721c24; }
+    .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .score-label { width: 160px; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; }
+    .score-track { flex: 1; position: relative; background: #e9ecef; border-radius: 6px; height: 14px; overflow: hidden; }
+    .score-track::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #bbb; z-index: 1; }
+    .score-fill  { position: absolute; height: 100%; border-radius: 6px; background: #9b59b6; transition: width 0.4s; left: 50%; }
+    .score-fill.winner { background: #007bff; }
+    .score-fill.negative { background: #e74c3c !important; left: auto; right: 50%; }
+    .score-val { width: 36px; text-align: right; font-size: 0.82rem; color: #666; flex-shrink: 0; }
+    .score-val.negative { color: #e74c3c; }
+    .ctx-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .ctx-item { background: #f8f9fa; border-radius: 8px; padding: 10px 12px; text-align: center; }
+    .ctx-item .v { font-size: 1rem; font-weight: 700; color: #333; }
+    .ctx-item .l { font-size: 0.68rem; color: #aaa; text-transform: uppercase; margin-top: 2px; }
+    .reasoning-box { background: #f8f9fa; border-left: 3px solid #9b59b6; border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 0.88rem; color: #555; line-height: 1.6; }
+
+    /* Race readiness tab */
+    .readiness-hero { text-align: center; padding: 20px 0 8px; }
+    .finish-time { font-size: 2.2rem; font-weight: 800; color: #e67e22; letter-spacing: -0.02em; }
+    .finish-lbl  { font-size: 0.72rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+    .ci-text     { font-size: 0.85rem; color: #888; margin-top: 6px; }
+    .readiness-stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 16px 0 0; }
+    .r-stat { background: #fafafa; border: 1px solid #ebebeb; border-radius: 8px; padding: 14px 10px; text-align: center; }
+    .r-stat .v { font-size: 1.15rem; font-weight: 700; color: #e67e22; }
+    .r-stat .l { font-size: 0.68rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
+    .readiness-bar-wrap { height: 8px; background: #eee; border-radius: 4px; margin: 6px 0 0; overflow: hidden; }
+    .readiness-bar-fill { height: 100%; border-radius: 4px; background: #e67e22; }
+    .recs-list { list-style: none; padding: 0; margin: 0; border-left: 3px solid #e67e22; padding-left: 14px; }
+    .recs-list li { font-size: 0.87rem; color: #444; line-height: 1.65; }
+    .recs-list li + li { margin-top: 6px; }
+    .readiness-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .readiness-form-grid input { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
+    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; font-size: 0.85rem; color: #555; }
+    .snapshot-grid strong { color: #333; }
+
+    /* Run log */
+    textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; resize: vertical; font-family: inherit; margin-bottom: 10px; }
+    #parse-preview { display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    #parse-preview h3 { margin: 0 0 12px; font-size: 0.9rem; color: #555; }
+    .preview-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .preview-item { text-align: center; }
+    .preview-item .val { font-size: 1rem; font-weight: 700; color: #333; }
+    .preview-item .lbl { font-size: 0.68rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Sentiment */
+    .sentiment-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+    .s-positive  { background: #d4edda; color: #155724; }
+    .s-neutral   { background: #fff3cd; color: #856404; }
+    .s-moderate  { background: #fff3cd; color: #856404; }
+    .s-negative  { background: #f8d7da; color: #721c24; }
+    .s-struggled { background: #f5c6cb; color: #491217; }
+
+    /* Latest run */
+    .run-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+    .run-stat .v { font-size: 1.05rem; font-weight: 700; }
+    .run-stat .l { font-size: 0.68rem; color: #aaa; text-transform: uppercase; }
+
+    /* History list */
+    .history-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .history-item:last-child { border-bottom: none; }
+    .h-type { font-weight: 700; font-size: 0.93rem; }
+    .h-notes { font-size: 0.78rem; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
+    .h-right { text-align: right; flex-shrink: 0; }
+    .h-dist { font-weight: 700; }
+    .h-date { font-size: 0.73rem; color: #aaa; }
+    .btn-delete-run {
+      background: none; border: 1px solid #f5c6cb; color: #c0392b;
+      border-radius: 6px; padding: 3px 9px; font-size: 0.75rem; cursor: pointer;
+      margin-top: 4px; transition: background 0.15s;
+    }
+    .btn-delete-run:hover { background: #f8d7da; }
+    .empty-state { color: #aaa; font-size: 0.9rem; text-align: center; padding: 30px 0; }
+
+    /* Plan tab */
+    .plan-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .plan-stat { background: #f8f9fa; border-radius: 8px; padding: 12px 14px; text-align: center; }
+    .plan-stat .v { font-size: 1.15rem; font-weight: 700; color: #007bff; }
+    .plan-stat .l { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+    /* Progress bar */
+    .progress-wrap { margin-bottom: 20px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: #666; margin-bottom: 5px; }
+    .progress-track { background: #e9ecef; border-radius: 8px; height: 10px; overflow: hidden; }
+    .progress-fill { background: #007bff; height: 100%; border-radius: 8px; transition: width 0.4s; }
+
+    /* Calendar – shared badges */
+    .cal-badge { font-size: 0.6rem; font-weight: 600; padding: 3px 5px; border-radius: 4px; line-height: 1.4; display: block; text-align: center; }
+    .badge-easy     { background: #d4edda; color: #155724; }
+    .badge-long     { background: #cce5ff; color: #004085; }
+    .badge-tempo    { background: #fff3cd; color: #856404; }
+    .badge-interval { background: #f8d7da; color: #721c24; }
+    .badge-rest     { background: #e2e3e5; color: #383d41; }
+    .badge-other    { background: #e2cfff; color: #4b0082; }
+
+    /* Calendar – week card grid overview */
+    .weeks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .week-card {
+      background: white; border: 1px solid #e2e6ea; border-radius: 10px;
+      padding: 13px 13px 11px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .week-card:hover { border-color: #007bff; box-shadow: 0 4px 14px rgba(0,123,255,0.1); }
+    .week-card.is-current {
+      border: 2px solid #28a745; background: #eafaf0;
+    }
+    .week-card.is-current .week-card-num { color: #1e7e34; }
+    .week-card.is-current .week-card-miles { color: #28a745; }
+    .week-card.is-current:hover { box-shadow: 0 4px 14px rgba(40,167,69,0.15); border-color: #1e7e34; }
+    .week-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .week-card-num { font-size: 0.88rem; font-weight: 700; color: #333; }
+    .week-card-miles { font-size: 0.78rem; font-weight: 700; color: #007bff; }
+    .week-card-dates { font-size: 0.7rem; color: #aaa; margin-bottom: 8px; }
+    .week-card-badges { display: flex; gap: 3px; flex-wrap: wrap; }
+
+    /* Cursor-following tooltip */
+    #week-hover-tooltip {
+      display: none; position: fixed; z-index: 9999; pointer-events: none;
+      background: white; border: 1px solid #dde3ed; border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13); padding: 14px 16px;
+      min-width: 220px; max-width: 300px;
+    }
+    .tip-title { font-size: 0.88rem; font-weight: 700; color: #333; margin-bottom: 2px; }
+    .tip-dates { font-size: 0.72rem; color: #aaa; margin-bottom: 10px; }
+    .tip-divider { border: none; border-top: 1px solid #eee; margin: 0 0 8px; }
+    .tip-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+    .tip-day { font-size: 0.72rem; font-weight: 700; color: #555; width: 26px; flex-shrink: 0; }
+    .tip-dist { font-size: 0.7rem; color: #888; }
+    .tip-rest { font-size: 0.7rem; color: #ccc; }
+
+    /* Calendar – detail (single week) */
+    .cal-back-btn {
+      background: none; border: none; color: #007bff; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; padding: 0 0 14px; display: block;
+    }
+    .cal-back-btn:hover { text-decoration: underline; }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .cal-nav h3 { margin: 0; font-size: 0.95rem; color: #333; text-align: center; flex: 1; }
+    .cal-nav button { background: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 14px; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+    .cal-nav button:disabled { background: #ccc; cursor: default; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
+    .cal-day {
+      background: #fafafa; border: 1px solid #ebebeb; border-radius: 8px;
+      padding: 8px 6px; min-height: 110px; display: flex; flex-direction: column; align-items: center;
+    }
+    .cal-day.has-workout { background: #eef5ff; border-color: #c5d5ff; }
+    .cal-day.cal-today   { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,0.18); }
+    .cal-day-name { font-size: 0.65rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .cal-day-num  { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 5px; }
+    .cal-day.has-workout .cal-day-num { color: #1a73e8; }
+    .cal-badge.full { margin-top: 2px; width: 100%; }
+    .cal-rest-lbl { font-size: 0.62rem; color: #ccc; margin-top: auto; }
+
+    /* Week table toggle */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #007bff; color: white; padding: 10px 12px; text-align: left; }
+    td { padding: 9px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+    tr:hover td { background: #f8f9fa; }
+    ul.workout-list { margin: 0; padding-left: 18px; }
+    ul.workout-list li { margin: 3px 0; }
+
+    /* Adaptive Progression tab */
+    .trend-improving { color: #27ae60; }
+    .trend-declining { color: #c0392b; }
+    .trend-stable    { color: #666; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="nav-brand" href="/">Long Run</a>
+    <div class="nav-links">
+      <a class="nav-home" href="/">Home</a>
+      <a class="nav-profiles" href="/profiles">Profiles</a>
+    </div>
+  </nav>
+
+  <div class="profile-header">
+    <h1>{{ profile.name }}</h1>
+    <div class="meta">Joined {{ profile.created_at }}</div>
+  </div>
+
+  <!-- Tab navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="plan">
+      My Plan
+      {% if not profile.saved_plan %}<span class="tab-badge">!</span>{% endif %}
+    </button>
+    <button class="tab-btn" data-tab="log">Log Run</button>
+    <button class="tab-btn" data-tab="history">
+      History
+      {% if profile.run_history %}<span class="tab-badge">{{ profile.run_history | length }}</span>{% endif %}
+    </button>
+   
+
+  </div>
+
+  <!-- ===== OVERVIEW TAB ===== -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="card">
+      <h2>Runner Info</h2>
+      <div class="info-grid">
+        <div class="info-item"><label>Experience</label><span>{{ profile.experience | title }}</span></div>
+        <div class="info-item"><label>Weekly Miles</label><span>{{ profile.current_weekly_miles }} mi</span></div>
+        <div class="info-item">
+          <label>Terrain</label>
+          <span>{% for t in profile.available_terrain %}<span class="pill">{{ t }}</span>{% endfor %}</span>
+        </div>
+        <div class="info-item">
+          <label>Training Days</label>
+          <span>{% for d in profile.training_days %}<span class="pill">{{ d[:3] }}</span>{% endfor %}</span>
+        </div>
+      </div>
+    </div>
+
+    {% if safety %}
+    {% set sr = safety.result %}
+    {% set sp = safety.proposed %}
+    <div class="card">
+      <h2>Safety Check <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 1 · Safety Validator</span></h2>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        {% if sr.safe %}
+        <span style="font-size:1.5rem;color:#27ae60;">✓</span>
+        <span style="font-size:1rem;font-weight:700;color:#27ae60;">Safe to Run</span>
+        {% else %}
+        <span style="font-size:1.5rem;color:#c0392b;">⚠</span>
+        <span style="font-size:1rem;font-weight:700;color:#c0392b;">Not Recommended</span>
+        {% endif %}
+      </div>
+      <div style="font-size:0.78rem;color:#aaa;margin-bottom:8px;">
+        Checking: <strong>{{ sp.type | title }}</strong> &middot; {{ "%.1f mi" | format(sp.distance) }} &middot; {{ sp.terrain | title }}
+      </div>
+      {% if sr.reason %}
+      <div style="font-size:0.85rem;color:#555;line-height:1.5;margin-bottom:12px;">{{ sr.reason }}</div>
+      {% endif %}
+      {% if sr.alternative %}
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:0.85rem;color:#166534;margin-bottom:12px;">
+        <strong>Alternative:</strong> {{ sr.alternative.type | title }}
+        {% if sr.alternative.distance %} &middot; {{ "%.1f mi" | format(sr.alternative.distance) }}{% endif %}
+        {% if sr.alternative.terrain %} &middot; {{ sr.alternative.terrain | title }}{% endif %}
+      </div>
+      {% elif not sr.safe and sr.recommendation == "rest" %}
+      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:0.85rem;color:#856404;margin-bottom:12px;">
+        <strong>Recommendation:</strong> Rest Day
+      </div>
+      {% endif %}
+      <button class="btn btn-primary" style="width:auto;padding:8px 20px;font-size:0.88rem;" onclick="switchTab('safety')">Check a Workout &rarr;</button>
+    </div>
+    {% endif %}
+
+    {% if profile.active_plan %}
+    {% set ap = profile.active_plan %}
+    <div class="card">
+      <h2>Active Plan <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 2 · Training Plan Generator</span></h2>
+      <div class="plan-summary-grid" style="margin-bottom:14px;">
+        <div class="plan-stat">
+          <div class="v">{{ ap.race_type | replace("_", " ") | title }}</div>
+          <div class="l">Race</div>
+        </div>
+        <div class="plan-stat">
+          <div class="v">{{ ap.race_date }}</div>
+          <div class="l">Race Date</div>
+        </div>
+        <div class="plan-stat">
+          <div class="v">{{ ap.total_weeks }}</div>
+          <div class="l">Weeks</div>
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:#bbb;margin-bottom:14px;">Generated {{ ap.generated_at }}</div>
+      <button class="btn btn-primary" onclick="switchTab('plan')">View My Plan &rarr;</button>
+    </div>
+    {% else %}
+    <div class="card">
+      <h2>No Plan Yet</h2>
+      <p style="color:#888;font-size:0.9rem;margin:0 0 14px;">Generate a personalised training plan to get started.</p>
+      <button class="btn btn-primary" onclick="switchTab('generate')">Generate a Plan &rarr;</button>
+    </div>
+    {% endif %}
+
+    {% if profile.run_history %}
+    <div class="card">
+      <h2>Log Run <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 3 · Run Log Parser</span></h2>
+      {% set latest = profile.run_history[0] %}
+      <div style="font-size:0.78rem;color:#aaa;margin-bottom:8px;">{{ latest.logged_at | replace("T"," ") }}</div>
+      <div class="run-stats">
+        <div class="run-stat"><div class="v">{{ latest.type | title if latest.type else "—" }}</div><div class="l">Type</div></div>
+        <div class="run-stat">
+          <div class="v">{{ "%.1f mi" | format(latest.distance) if latest.distance else "—" }}</div><div class="l">Distance</div>
+        </div>
+        <div class="run-stat">
+          <div class="v">
+            {% if latest.pace_minutes %}
+              {% set m = latest.pace_minutes | int %}
+              {% set s = ((latest.pace_minutes - m) * 60) | round | int %}
+              {{ "%d:%02d /mi" | format(m, s) }}
+            {% else %}—{% endif %}
+          </div>
+          <div class="l">Pace</div>
+        </div>
+        <div class="run-stat">
+          <div class="v">{{ latest.terrain | title if latest.terrain else "—" }}</div><div class="l">Terrain</div>
+        </div>
+        <div class="run-stat">
+          <div class="v"><span class="sentiment-badge s-{{ latest.sentiment }}">{{ latest.sentiment | title if latest.sentiment else "—" }}</span></div>
+          <div class="l">Effort</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;font-size:0.88rem;" onclick="switchTab('log')">See All Runs &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if motivation %}
+    <div class="card">
+      <h2>Motivation <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 4</span></h2>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        <span class="strategy-badge s-{{ motivation.strategy }}">{{ motivation.strategy | replace("_"," ") | title }}</span>
+        <span class="state-badge state-{{ motivation.inferred_state }}">{{ motivation.inferred_state | replace("_"," ") | title }}</span>
+        <span class="tone-badge">{{ motivation.message_tone | title }}</span>
+      </div>
+      <div class="ctx-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="ctx-item"><div class="v">{{ motivation.context.current_streak }}</div><div class="l">Day Streak</div></div>
+        <div class="ctx-item"><div class="v">{{ motivation.context.adherence_percent }}%</div><div class="l">Adherence</div></div>
+        <div class="ctx-item"><div class="v">{{ motivation.context.days_to_race if motivation.context.days_to_race > 0 else "—" }}</div><div class="l">Days to Race</div></div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;font-size:0.88rem;" onclick="switchTab('motivation')">View Motivation &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if progression %}
+    <div class="card">
+      <h2>Adaptive Progression <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 5 · Q-Learning</span></h2>
+      <div class="readiness-stat-row" style="margin:0 0 14px;">
+        <div class="r-stat">
+          <div class="v" style="color:#27ae60;">{{ "%.1f mi" | format(progression.next_distance) }}</div>
+          <div class="l">Next Distance</div>
+        </div>
+        <div class="r-stat">
+          <div class="v" style="color:#27ae60;">
+            {% set pm = progression.target_pace | int %}
+            {% set ps = ((progression.target_pace - pm) * 60) | round | int %}
+            {{ "%d:%02d /mi" | format(pm, ps) }}
+          </div>
+          <div class="l">Target Pace</div>
+        </div>
+        <div class="r-stat">
+          <div class="v" style="color:#27ae60;text-transform:capitalize;">{{ progression.suggested_terrain }}</div>
+          <div class="l">Terrain</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:0.82rem;color:#666;flex-shrink:0;width:90px;">Confidence</span>
+        <div class="score-track" style="flex:1;">
+          <div class="js-overview-bar" data-pct="{{ (progression.confidence * 100) | round | int }}" style="height:100%;border-radius:6px;background:#27ae60;"></div>
+        </div>
+        <span style="font-size:0.82rem;color:#666;width:36px;text-align:right;flex-shrink:0;">{{ (progression.confidence * 100) | round | int }}%</span>
+      </div>
+      <div style="font-size:0.85rem;color:#555;">
+        Effort trend: <span class="trend-{{ progression.sentiment_trend }}" style="font-weight:700;">{{ progression.sentiment_trend | title }}</span>
+        {% if progression.sentiment_trend == "improving" %}▲{% elif progression.sentiment_trend == "declining" %}▼{% else %}→{% endif %}
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;font-size:0.88rem;" onclick="switchTab('progression')">View Full Analysis &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if profile.race_readiness %}
+    {% set rr = profile.race_readiness %}
+    {% set res = rr.result %}
+    <div class="card">
+      <h2>Race Readiness <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 6 · ML Predictor</span></h2>
+      <div style="text-align:center;padding:10px 0 6px;">
+        <div class="finish-time">{{ res.predicted_finish }}</div>
+        <div class="finish-lbl">Predicted Finish</div>
+        <div class="ci-text">95% range: {{ res.confidence_interval[0] }} – {{ res.confidence_interval[1] }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 8px;">
+        <span style="font-size:0.82rem;color:#666;flex-shrink:0;width:90px;">Readiness</span>
+        <div class="readiness-bar-wrap" style="flex:1;margin:0;">
+          <div class="readiness-bar-fill js-overview-bar" data-pct="{{ (res.readiness_score * 100) | round | int }}"></div>
+        </div>
+        <span style="font-size:0.82rem;color:#666;width:36px;text-align:right;flex-shrink:0;">{{ (res.readiness_score * 100) | round | int }}%</span>
+      </div>
+      <div style="font-size:0.78rem;color:#aaa;">{{ rr.snapshot.days_to_race }} days to race &middot; Computed {{ rr.computed_at }}</div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;font-size:0.88rem;" onclick="switchTab('readiness')">View Full Prediction &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ===== MY PLAN TAB ===== -->
+  <div id="tab-plan" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+    {% if profile.saved_plan %}
+    {% set sp = profile.saved_plan %}
+
+    <div class="card">
+      <h2>{{ sp.race_type }} &mdash; {{ sp.race_date }}</h2>
+      <div class="plan-summary-grid">
+        <div class="plan-stat"><div class="v">{{ sp.total_weeks }}</div><div class="l">Total Weeks</div></div>
+        <div class="plan-stat"><div class="v">{{ sp.race_distance }}</div><div class="l">Distance</div></div>
+        <div class="plan-stat"><div class="v">{{ sp.generated_at }}</div><div class="l">Generated</div></div>
+      </div>
+
+      <!-- Progress -->
+      {% set runs_logged = profile.run_history | length if profile.run_history else 0 %}
+      {% set total_w = namespace(n=0) %}
+      {% for week in sp.plan %}{% set total_w.n = total_w.n + (week.workouts | length) %}{% endfor %}
+      {% set pct = ([runs_logged / total_w.n * 100, 100] | min) | int if total_w.n > 0 else 0 %}
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Runs logged: <strong>{{ runs_logged }}</strong></span>
+          <span>Plan workouts: <strong>{{ total_w.n }}</strong></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" data-pct="{{ pct }}"></div>
+        </div>
+        <div style="font-size:0.75rem;color:#aaa;margin-top:4px;">{{ pct }}% completed</div>
+      </div>
+
+      <p style="color:#666;font-size:0.88rem;margin:0;">{{ sp.rationale }}</p>
+    </div>
+
+    <!-- Weekly Mileage Chart -->
+    <div class="card">
+      <h2>Weekly Mileage</h2>
+      <canvas id="milesChart" height="100"></canvas>
+    </div>
+
+    <!-- Calendar -->
+    <div class="card">
+      <h2>Training Calendar</h2>
+
+      <!-- Overview: all weeks list (default view) -->
+      <div id="cal-overview">
+        <div class="weeks-list" id="weeks-list"></div>
+      </div>
+
+      <!-- Detail: single week expanded (shown on click) -->
+      <div id="cal-detail" style="display:none;">
+        <button class="cal-back-btn" onclick="showCalOverview()">&#8592; All Weeks</button>
+        <div class="cal-nav">
+          <button id="calPrev" onclick="changeWeek(-1)">&#8249;</button>
+          <h3 id="calTitle"></h3>
+          <button id="calNext" onclick="changeWeek(1)">&#8250;</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <!-- Weekly table (collapsible) -->
+    <div class="card">
+      <h2 style="display:flex;justify-content:space-between;align-items:center;">
+        Weekly Breakdown
+        <button onclick="toggleTable()" id="tblToggle"
+          style="font-size:0.78rem;padding:4px 12px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">Show</button>
+      </h2>
+      <div class="table-wrap" id="tblWrap" style="display:none;">
+        <table>
+          <thead><tr><th>Week</th><th>Miles</th><th>Long Run</th><th>Workouts</th></tr></thead>
+          <tbody>
+            {% for week in sp.plan %}
+            <tr>
+              <td>{{ week.week }}<br><span style="font-size:0.73rem;color:#aaa;">{{ week.week_start_date }}</span></td>
+              <td>{{ "%.1f" | format(week.total_miles) }}</td>
+              <td>{{ "%.1f" | format(week.long_run) }}</td>
+              <td>
+                <ul class="workout-list">
+                  {% for w in week.workouts %}
+                  <li><strong>{{ w.day }}</strong> – {{ w.type | title }}: {{ "%.1f" | format(w.distance) }} mi ({{ w.terrain }})</li>
+                  {% endfor %}
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script id="plan-json" type="application/json">{{ sp.plan | tojson }}</script>
+    <script>
+      const planData = JSON.parse(document.getElementById('plan-json').textContent);
+
+      // Weekly mileage chart
+      new Chart(document.getElementById('milesChart'), {
+        type: 'line',
+        data: {
+          labels: planData.map(w => w.week_start_date),
+          datasets: [{
+            label: 'Weekly Miles',
+            data: planData.map(w => parseFloat(w.total_miles.toFixed(1))),
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0,123,255,0.1)',
+            pointBackgroundColor: '#007bff',
+            tension: 0.3,
+            fill: true,
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { title: { display: true, text: 'Week Starting' } },
+            y: { title: { display: true, text: 'Miles' }, beginAtZero: true }
+          }
+        }
+      });
+      const workoutMap = {};
+      planData.forEach(week => {
+        (week.workouts || []).forEach(w => {
+          if (w.workout_date) {
+            if (!workoutMap[w.workout_date]) workoutMap[w.workout_date] = [];
+            workoutMap[w.workout_date].push(w);
+          }
+        });
+      });
+
+      // Build sorted list of Monday ISO strings (one per plan week)
+      function isoMonday(isoDate) {
+        const d = new Date(isoDate + 'T00:00:00');
+        const day = d.getDay(); // 0=Sun
+        const diff = day === 0 ? -6 : 1 - day;
+        const mon = new Date(d);
+        mon.setDate(d.getDate() + diff);
+        return mon.toISOString().slice(0, 10);
+      }
+
+      const weekSet = new Set(Object.keys(workoutMap).map(isoMonday));
+      const calWeeks = [...weekSet].sort();
+      let calIdx = 0;
+
+      // Start on the current or nearest upcoming week
+      const todayIso = new Date().toISOString().slice(0, 10);
+      const todayMon = isoMonday(todayIso);
+      const nearestIdx = calWeeks.findIndex(w => w >= todayMon);
+      if (nearestIdx !== -1) calIdx = nearestIdx;
+
+      // Map each Monday to its plan week number
+      const weekNumMap = {};
+      planData.forEach(w => {
+        (w.workouts || []).forEach(wo => {
+          if (wo.workout_date) weekNumMap[isoMonday(wo.workout_date)] = w.week;
+        });
+      });
+
+      function badgeClass(type) {
+        const t = (type||'').toLowerCase();
+        if (t.includes('easy')) return 'badge-easy';
+        if (t.includes('long')) return 'badge-long';
+        if (t.includes('tempo')) return 'badge-tempo';
+        if (t.includes('interval')||t.includes('speed')) return 'badge-interval';
+        if (t.includes('hill')) return 'badge-other';
+        if (t.includes('recovery')) return 'badge-rest';
+        if (t.includes('rest')) return 'badge-rest';
+        return 'badge-other';
+      }
+
+      // ── Calendar overview (week card grid) ────────────────────────────────
+      function renderOverview() {
+        const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        const fmt = d => d.toLocaleDateString('default', {month:'short', day:'numeric'});
+        let html = '<div class="weeks-grid">';
+
+        calWeeks.forEach((monIso, idx) => {
+          const mon = new Date(monIso + 'T00:00:00');
+          const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+          const weekNum  = weekNumMap[monIso] || (idx + 1);
+          const isCurrent = monIso === todayMon;
+          const planWeek  = planData.find(w => w.week === weekNum);
+          const totalMi   = planWeek ? planWeek.total_miles.toFixed(1) : '—';
+
+          const days = dayNames.map((name, i) => {
+            const d = new Date(mon); d.setDate(mon.getDate() + i);
+            return { name, workouts: workoutMap[d.toISOString().slice(0,10)] || [] };
+          });
+          const hasAny = days.some(d => d.workouts.length);
+
+          html += `<div class="week-card${isCurrent ? ' is-current' : ''}"
+            onclick="openWeekDetail(${idx})"
+            onmouseenter="showWeekTip(event,${idx})"
+            onmousemove="moveWeekTip(event)"
+            onmouseleave="hideWeekTip()">`;
+
+          html += `<div class="week-card-top">`;
+          html += `<span class="week-card-num">Week ${weekNum}</span>`;
+          html += `<span class="week-card-miles">${totalMi} mi</span>`;
+          html += `</div>`;
+          html += `<div class="week-card-dates">${fmt(mon)} – ${fmt(sun)}</div>`;
+
+          if (hasAny) {
+            html += `<div class="week-card-badges">`;
+            days.forEach(day => day.workouts.forEach(w => {
+              html += `<span class="cal-badge ${badgeClass(w.type)}" style="width:auto;">${w.type.replace(/\b\w/g,c=>c.toUpperCase())}</span>`;
+            }));
+            html += `</div>`;
+          } else {
+            html += `<div style="font-size:0.72rem;color:#ccc;">Rest week</div>`;
+          }
+
+          html += `</div>`; // .week-card
+        });
+
+        html += '</div>';
+        document.getElementById('weeks-list').innerHTML = html;
+      }
+
+      function openWeekDetail(idx) {
+        calIdx = idx;
+        document.getElementById('cal-overview').style.display = 'none';
+        document.getElementById('cal-detail').style.display = 'block';
+        renderWeek();
+      }
+
+      function showCalOverview() {
+        document.getElementById('cal-detail').style.display = 'none';
+        document.getElementById('cal-overview').style.display = 'block';
+      }
+
+      // ── Calendar detail (single week) ──────────────────────────────────────
+      function renderWeek() {
+        if (!calWeeks.length) return;
+        const monIso = calWeeks[calIdx];
+        const mon = new Date(monIso + 'T00:00:00');
+        const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+        const weekNum = weekNumMap[monIso] || (calIdx + 1);
+        const fmt = d => d.toLocaleDateString('default', {month:'short', day:'numeric'});
+
+        document.getElementById('calTitle').textContent = `Week ${weekNum} · ${fmt(mon)} – ${fmt(sun)}`;
+        document.getElementById('calPrev').disabled = calIdx === 0;
+        document.getElementById('calNext').disabled = calIdx === calWeeks.length - 1;
+
+        const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        let html = '';
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(mon); d.setDate(mon.getDate() + i);
+          const iso = d.toISOString().slice(0, 10);
+          const ws = workoutMap[iso] || [];
+          const isToday = iso === todayIso;
+          let cls = 'cal-day';
+          if (ws.length) cls += ' has-workout';
+          if (isToday)   cls += ' cal-today';
+          html += `<div class="${cls}">`;
+          html += `<div class="cal-day-name">${dayNames[i]}</div>`;
+          html += `<div class="cal-day-num">${d.getDate()}</div>`;
+          if (ws.length) {
+            ws.forEach(w => {
+              html += `<span class="cal-badge full ${badgeClass(w.type)}">${w.type.replace(/\b\w/g,c=>c.toUpperCase())}<br>${parseFloat(w.distance).toFixed(1)} mi</span>`;
+            });
+          } else {
+            html += `<span class="cal-rest-lbl">Rest</span>`;
+          }
+          html += '</div>';
+        }
+        document.getElementById('calGrid').innerHTML = html;
+      }
+
+      function changeWeek(dir) {
+        calIdx = Math.max(0, Math.min(calWeeks.length - 1, calIdx + dir));
+        renderWeek();
+      }
+
+      function toggleTable() {
+        const w = document.getElementById('tblWrap');
+        const b = document.getElementById('tblToggle');
+        const hidden = w.style.display === 'none';
+        w.style.display = hidden ? '' : 'none';
+        b.textContent = hidden ? 'Hide' : 'Show';
+      }
+
+      // ── Week card tooltip (follows cursor) ────────────────────────────────
+      const _tipEl = document.getElementById('week-hover-tooltip');
+
+      function showWeekTip(e, idx) {
+        const monIso  = calWeeks[idx];
+        const mon     = new Date(monIso + 'T00:00:00');
+        const sun     = new Date(mon); sun.setDate(mon.getDate() + 6);
+        const weekNum = weekNumMap[monIso] || (idx + 1);
+        const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        const fmt = d => d.toLocaleDateString('default', {month:'short', day:'numeric'});
+
+        const days = dayNames.map((name, i) => {
+          const d = new Date(mon); d.setDate(mon.getDate() + i);
+          return { name, workouts: workoutMap[d.toISOString().slice(0,10)] || [] };
+        });
+
+        let html = `<div class="tip-title">Week ${weekNum}</div>`;
+        html += `<div class="tip-dates">${fmt(mon)} – ${fmt(sun)}</div>`;
+        html += `<hr class="tip-divider">`;
+        days.forEach(day => {
+          html += `<div class="tip-row">`;
+          html += `<span class="tip-day">${day.name}</span>`;
+          if (day.workouts.length) {
+            day.workouts.forEach(w => {
+              html += `<span class="cal-badge ${badgeClass(w.type)}" style="width:auto;">${w.type.replace(/\b\w/g,c=>c.toUpperCase())}</span>`;
+              html += `<span class="tip-dist">${parseFloat(w.distance).toFixed(1)} mi</span>`;
+            });
+          } else {
+            html += `<span class="tip-rest">Rest</span>`;
+          }
+          html += `</div>`;
+        });
+
+        _tipEl.innerHTML = html;
+        _tipEl.style.display = 'block';
+        moveWeekTip(e);
+      }
+
+      function moveWeekTip(e) {
+        const offset = 18;
+        const tw = _tipEl.offsetWidth, th = _tipEl.offsetHeight;
+        const vw = window.innerWidth,   vh = window.innerHeight;
+        let x = e.clientX + offset;
+        let y = e.clientY + offset;
+        if (x + tw > vw - 8) x = e.clientX - tw - offset;
+        if (y + th > vh - 8) y = e.clientY - th - offset;
+        _tipEl.style.left = x + 'px';
+        _tipEl.style.top  = y + 'px';
+      }
+
+      function hideWeekTip() {
+        _tipEl.style.display = 'none';
+      }
+
+      if (calWeeks.length) renderOverview();
+
+    </script>
+
+    {% else %}
+    <div class="card">
+      <div class="empty-state">
+        No plan saved yet.<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('generate')">Generate Your First Plan &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ===== LOG RUN TAB ===== -->
+  <div id="tab-log" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+    <div class="card">
+      <h2>Log a Run</h2>
+      <textarea id="run-text" rows="4" placeholder="Describe your run… e.g. &quot;Easy 5 miles on the road at 10:00 pace, felt great&quot;"></textarea>
+      <div class="examples">
+        Try an example:
+        <span class="example-link" onclick="setExample(0)">Long trail run</span>
+        <span class="example-link" onclick="setExample(1)">Easy recovery jog</span>
+        <span class="example-link" onclick="setExample(2)">Track intervals</span>
+      </div>
+      <button class="btn btn-gray" type="button" onclick="parseRun()">Preview Parse</button>
+
+      <div id="parse-preview">
+        <h3>Parsed Result</h3>
+        <div class="preview-grid">
+          <div class="preview-item"><div class="val" id="prev-type">—</div><div class="lbl">Type</div></div>
+          <div class="preview-item"><div class="val" id="prev-dist">—</div><div class="lbl">Distance</div></div>
+          <div class="preview-item"><div class="val" id="prev-pace">—</div><div class="lbl">Pace</div></div>
+          <div class="preview-item"><div class="val" id="prev-terrain">—</div><div class="lbl">Terrain</div></div>
+          <div class="preview-item"><div class="val" id="prev-sent">—</div><div class="lbl">Effort</div></div>
+        </div>
+      </div>
+
+      <form id="save-form" action="/user/{{ profile.slug }}/runlog" method="post" style="display:none;">
+        <input type="hidden" name="text" id="save-text" />
+        <button class="btn btn-success" type="submit">Save Run to Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY TAB ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+
+    {% if profile.run_history %}
+    <script id="progress-chart-json" type="application/json">{{ progress_chart | tojson }}</script>
+
+    <div class="card">
+      <h2>Progress vs Plan</h2>
+      <canvas id="progressChart" height="110"></canvas>
+    </div>
+    <script>
+    (function() {
+      const pc = JSON.parse(document.getElementById('progress-chart-json').textContent);
+      if (!pc.labels || !pc.labels.length) return;
+
+      const datasets = [
+        {
+          label: 'Actual Miles',
+          data: pc.actual,
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0,123,255,0.08)',
+          pointBackgroundColor: '#007bff',
+          tension: 0.3, fill: true, spanGaps: true,
+        },
+      ];
+      if (pc.planned && pc.planned.length) {
+        datasets.push({
+          label: 'Planned Miles',
+          data: pc.planned,
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220,53,69,0.05)',
+          pointBackgroundColor: '#dc3545',
+          borderDash: [5, 4],
+          tension: 0.3, fill: false,
+        });
+      }
+
+      new Chart(document.getElementById('progressChart'), {
+        type: 'line',
+        data: { labels: pc.labels, datasets },
+        options: {
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } },
+          scales: {
+            x: { title: { display: true, text: 'Week Starting' } },
+            y: { title: { display: true, text: 'Miles' }, beginAtZero: true },
+          }
+        }
+      });
+    })();
+    </script>
+    {% endif %}
+
+    <div class="card">
+      <h2>Run History &mdash; <span id="history-count">{{ profile.run_history | length if profile.run_history else 0 }}</span> runs</h2>
+      {% if profile.run_history %}
+      <div id="history-list">
+        {% for run in profile.run_history %}
+        <div class="history-item" data-run-index="{{ loop.index0 }}">
+          <div style="flex:1;min-width:0;">
+            <div class="h-type">
+              {{ run.type | title if run.type else "Run" }}
+              {% if run.terrain %}&middot; <span style="font-weight:400;color:#888;">{{ run.terrain | title }}</span>{% endif %}
+              &nbsp;<span class="sentiment-badge s-{{ run.sentiment }}">{{ run.sentiment | title }}</span>
+            </div>
+            <div class="h-notes">{{ run.notes }}</div>
+          </div>
+          <div class="h-right">
+            <div class="h-dist">{{ "%.1f mi" | format(run.distance) if run.distance else "—" }}</div>
+            <div class="h-date">{{ run.logged_at[:10] }}</div>
+            <button class="btn-delete-run" data-index="{{ loop.index0 }}" onclick="deleteRun(parseInt(this.dataset.index), this)">Remove</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="empty-state" id="history-empty">No runs logged yet.<br><br>
+          <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('log')">Log Your First Run &rarr;</button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ===== GENERATE PLAN TAB ===== -->
+  <div id="tab-generate" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+    <div class="card">
+      <h2>Generate a Training Plan</h2>
+      {% if profile.active_plan %}
+      <div class="plan-banner" style="margin-bottom:16px;">
+        Current plan: <strong>{{ profile.active_plan.race_type }}</strong> on <strong>{{ profile.active_plan.race_date }}</strong>.
+        Generating a new plan will replace it.
+      </div>
+      {% endif %}
+      <form action="/user/{{ profile.slug }}/plan" method="post">
+        <label class="field-label">Race Type</label>
+        <select name="race_type" required>
+          <option value="full_marathon">Full Marathon (42.2 km)</option>
+          <option value="half_marathon">Half Marathon (21.1 km)</option>
+          <option value="10k">10K</option>
+        </select>
+        <label class="field-label">Race Date</label>
+        <input type="date" name="race_date" required />
+        <button class="btn btn-primary" type="submit">Generate Plan for {{ profile.name }}</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MOTIVATION TAB ===== -->
+  <div id="tab-motivation" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+    {% if motivation %}
+    {% set m = motivation %}
+    {% set ctx = m.context %}
+
+    <div class="card">
+      <h2>History</h2>
+      <label style="font-size:0.88rem;color:#555;display:block;margin-bottom:8px;">View motivation as of run:</label>
+      <select id="motivation-week-select" style="padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem;max-width:260px;background:#fff;">
+        <option value="current">Current</option>
+      </select>
+      <div id="motivation-history-note" style="font-size:0.78rem;color:#aaa;margin-top:8px;display:none;">
+        Showing motivation based on runs up to the selected entry
+      </div>
+    </div>
+
+    <div id="motivation-strategy-card" class="card">
+      <h2>Motivation Strategy</h2>
+      <div class="strategy-hero">
+        <div>
+          <span id="mot-strategy-badge" class="strategy-badge s-{{ m.strategy }}">
+            {{ m.strategy | replace("_", " ") | title }}
+          </span>
+        </div>
+        <div style="margin-top:8px;">
+          <span id="mot-tone-badge" class="tone-badge">Tone: {{ m.message_tone | title }}</span>
+          &nbsp;
+          <span id="mot-state-badge" class="state-badge state-{{ m.inferred_state }}">
+            State: {{ m.inferred_state | replace("_", " ") | title }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div id="motivation-scores-card" class="card">
+      <h2>Score Breakdown</h2>
+      {% set min_score = m.scores.values() | min %}
+      {% set max_score = m.scores.values() | max %}
+      {% set max_abs = [max_score, min_score | abs] | max %}
+      {% for strat, score in m.scores.items() %}
+      {% set pct = ((score | abs / max_abs) * 50) | int %}
+      {% set fill_cls = "score-fill js-score-fill" %}
+      {% if strat == m.strategy %}{% set fill_cls = fill_cls + " winner" %}{% endif %}
+      {% if score < 0 %}{% set fill_cls = fill_cls + " negative" %}{% endif %}
+      {% set val_cls = "score-val negative" if score < 0 else "score-val" %}
+      <div class="score-row">
+        <div class="score-label">{{ strat | replace("_", " ") | title }}</div>
+        <div class="score-track">
+          <div class="{{ fill_cls }}" data-pct="{{ pct }}"></div>
+        </div>
+        <div class="{{ val_cls }}">{{ "%.1f" | format(score) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div id="motivation-context-card" class="card">
+      <h2>Context Used</h2>
+      <div class="ctx-grid">
+        <div class="ctx-item"><div class="v" data-ctx="streak">{{ ctx.current_streak }}</div><div class="l">Day Streak</div></div>
+        <div class="ctx-item"><div class="v" data-ctx="adherence">{{ ctx.adherence_percent }}%</div><div class="l">Adherence</div></div>
+        <div class="ctx-item"><div class="v" data-ctx="days_to_race">{{ ctx.days_to_race if ctx.days_to_race > 0 else "—" }}</div><div class="l">Days to Race</div></div>
+        <div class="ctx-item" style="grid-column:span 2;">
+          <div class="v" data-ctx="sentiments" style="font-size:0.88rem;">{{ ctx.recent_sentiments | join(", ") | title }}</div>
+          <div class="l">Recent Sentiments</div>
+        </div>
+        <div class="ctx-item">
+          <div class="v" data-ctx="terrain" style="font-size:0.88rem;">{{ ctx.terrain_last_week | unique | join(", ") | title }}</div>
+          <div class="l">Terrains</div>
+        </div>
+      </div>
+    </div>
+
+    <script id="mot-history-data" type="application/json">{{ profile.run_history | tojson }}</script>
+    <script id="mot-slug-data" type="application/json">"{{ profile.slug }}"</script>
+    <script>
+    (function () {
+      const runHistory = JSON.parse(document.getElementById('mot-history-data').textContent);
+      const profileSlug = JSON.parse(document.getElementById('mot-slug-data').textContent);
+      const select = document.getElementById('motivation-week-select');
+      if (!select || !runHistory.length) return;
+
+      runHistory.forEach(function(r, i) {
+        if (!r.logged_at) return;
+        const date = r.logged_at.substring(0, 10);
+        const type = r.type ? r.type.charAt(0).toUpperCase() + r.type.slice(1) : 'Run';
+        const dist = r.distance ? r.distance.toFixed(1) + ' mi' : '';
+        const opt = document.createElement('option');
+        opt.value = date;
+        opt.dataset.idx = i;
+        opt.textContent = date + ' · ' + type + (dist ? ' · ' + dist : '');
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', async function () {
+        const val = this.value;
+        const note = document.getElementById('motivation-history-note');
+        if (val === 'current') {
+          note.style.display = 'none';
+          location.reload();
+          return;
+        }
+        note.style.display = 'block';
+        try {
+          const idx = parseInt(select.options[select.selectedIndex].dataset.idx || '0');
+          const res = await fetch('/user/' + profileSlug + '/motivation?run_index=' + idx);
+          if (!res.ok) { alert('No run data available for that entry.'); return; }
+          renderMotivation(await res.json());
+        } catch (e) {
+          alert('Could not load history: ' + e.message);
+        }
+      });
+    })();
+
+    function renderMotivation(m) {
+      const ctx = m.context;
+      const cap = s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+      const sb = document.getElementById('mot-strategy-badge');
+      sb.textContent = cap(m.strategy);
+      sb.className = 'strategy-badge s-' + m.strategy;
+
+      document.getElementById('mot-tone-badge').textContent = 'Tone: ' + cap(m.message_tone);
+
+      const stEl = document.getElementById('mot-state-badge');
+      stEl.textContent = 'State: ' + cap(m.inferred_state);
+      stEl.className = 'state-badge state-' + m.inferred_state;
+
+      const maxScore = Math.max(...Object.values(m.scores));
+      let html = '<h2>Score Breakdown</h2>';
+      for (const [strat, score] of Object.entries(m.scores)) {
+        const pct = Math.round((score / maxScore) * 100);
+        const winner = strat === m.strategy ? ' winner' : '';
+        html += '<div class="score-row">'
+          + '<div class="score-label">' + cap(strat) + '</div>'
+          + '<div class="score-track"><div class="score-fill' + winner + '" style="width:' + pct + '%"></div></div>'
+          + '<div class="score-val">' + score.toFixed(1) + '</div>'
+          + '</div>';
+      }
+      document.getElementById('motivation-scores-card').innerHTML = html;
+
+      document.querySelector('[data-ctx="streak"]').textContent = ctx.current_streak;
+      document.querySelector('[data-ctx="adherence"]').textContent = ctx.adherence_percent + '%';
+      document.querySelector('[data-ctx="days_to_race"]').textContent = ctx.days_to_race > 0 ? ctx.days_to_race : '—';
+      document.querySelector('[data-ctx="sentiments"]').textContent = ctx.recent_sentiments.map(s => cap(s)).join(', ');
+      const terrains = [...new Set(ctx.terrain_last_week)];
+      document.querySelector('[data-ctx="terrain"]').textContent = terrains.map(s => cap(s)).join(', ');
+    }
+    </script>
+
+    {% else %}
+    <div class="card">
+      <div class="empty-state">
+        Log at least one run to get a personalised motivation strategy.<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('log')">Log a Run &rarr;</button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ===== RACE READINESS TAB ===== -->
+  <div id="tab-readiness" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+
+    {% if profile.race_readiness %}
+    {% set rr = profile.race_readiness %}
+    {% set res = rr.result %}
+
+    <div class="card">
+      <h2>Prediction — {{ rr.snapshot.goal_race.distance | title }}</h2>
+      <div class="readiness-hero">
+        <div class="finish-time">{{ res.predicted_finish }}</div>
+        <div class="finish-lbl">Predicted Finish Time</div>
+        <div class="ci-text">95% range: {{ res.confidence_interval[0] }} – {{ res.confidence_interval[1] }}</div>
+      </div>
+      {% if interval_chart %}
+      <img src="{{ interval_chart }}" alt="Prediction interval chart"
+           style="width:100%;max-width:520px;display:block;margin:16px auto 0;" />
+      {% endif %}
+      <div class="readiness-stat-row">
+        <div class="r-stat" style="grid-column:span 2;">
+          <div class="v">{{ (res.readiness_score * 100) | round | int }}%</div>
+          <div class="l">Readiness Score</div>
+          <div class="readiness-bar-wrap">
+            <div class="readiness-bar-fill js-readiness-fill"
+                 data-pct="{{ (res.readiness_score * 100) | round | int }}"></div>
+          </div>
+        </div>
+        <div class="r-stat">
+          <div class="v">{{ rr.snapshot.days_to_race }}</div>
+          <div class="l">Days to Race</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recommendations</h2>
+      <ul class="recs-list">
+        {% for rec in res.recommendations %}
+        <li>{{ rec }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Snapshot Used</h2>
+      <div class="snapshot-grid">
+        <span><strong>Age</strong> {{ profile.age | default(rr.age) }}</span>
+        <span><strong>Experience</strong> {{ rr.snapshot.experience_level | title }}</span>
+        <span><strong>Goal Time</strong> {{ rr.target_time }}</span>
+        <span><strong>Terrain</strong> {{ rr.snapshot.goal_race.terrain | title }}</span>
+        <span><strong>Adherence</strong> {{ rr.snapshot.adherence_percent }}%</span>
+        <span><strong>Runs Used</strong> {{ rr.snapshot.history | length }}</span>
+      </div>
+      <div style="margin-top:14px;font-size:0.75rem;color:#aaa;">Computed {{ rr.computed_at }}</div>
+    </div>
+
+    <div class="card">
+      <h2>Re-run Prediction</h2>
+      <p style="font-size:0.85rem;color:#888;margin-bottom:12px;">Age is taken from your profile ({{ profile.age | default(30) }}).</p>
+      <form action="/user/{{ profile.slug }}/readiness" method="post">
+        <input type="hidden" name="age" value="{{ profile.age | default(30) }}" />
+        <label class="field-label">Target Finish Time (h:mm:ss)</label>
+        <input type="text" name="target_time" value="{{ rr.target_time }}" placeholder="2:00:00"
+               style="max-width:220px;margin-bottom:14px;" required />
+        <br>
+        <button class="btn btn-primary" type="submit" style="width:auto;padding:10px 24px;">Update Prediction</button>
+      </form>
+    </div>
+
+    {% elif profile.run_history and profile.active_plan %}
+
+    <div class="card">
+      <h2>Predict Your Race Readiness</h2>
+      <p style="font-size:0.88rem;color:#666;margin-bottom:16px;">
+        Based on your {{ profile.run_history | length }} logged runs and your
+        <strong>{{ profile.active_plan.race_type }}</strong> goal on <strong>{{ profile.active_plan.race_date }}</strong>.
+        Just add your age and goal finish time.
+      </p>
+      <p style="font-size:0.85rem;color:#888;margin-bottom:12px;">Age taken from your profile: <strong>{{ profile.age }}</strong></p>
+      <form action="/user/{{ profile.slug }}/readiness" method="post">
+        <input type="hidden" name="age" value="{{ profile.age | default(30) }}" />
+        <label class="field-label">Target Finish Time (h:mm:ss)</label>
+        <input type="text" name="target_time" placeholder="e.g. 2:00:00"
+               style="max-width:220px;margin-bottom:14px;" required />
+        <br>
+        <button class="btn btn-primary" type="submit" style="width:auto;padding:10px 24px;">Run Prediction</button>
+      </form>
+    </div>
+
+    {% else %}
+    <div class="card">
+      <div class="empty-state">
+        {% if not profile.run_history %}
+        Log some runs first so the predictor has training data to work with.<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('log')">Log a Run &rarr;</button>
+        {% else %}
+        Generate a training plan first so we know your race goal.<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('generate')">Generate a Plan &rarr;</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ===== ADAPTIVE PROGRESSION TAB ===== -->
+  <div id="tab-progression" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+
+    <!-- Intro / generate button -->
+    <div class="card">
+      <h2>Adaptive Progression <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 5 · Q-Learning</span></h2>
+      <p style="color:#666;font-size:0.88rem;margin:0 0 6px;">
+        Uses reinforcement learning to recommend your next workout based on recent run history,
+        fatigue, adherence, and motivation. Each analysis is computed fresh from your latest data.
+      </p>
+      {% if profile.run_history %}
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#166534;margin-bottom:16px;">
+        <strong>{{ profile.run_history | length }} run{{ 's' if profile.run_history | length != 1 else '' }}</strong> available for analysis.
+        Click below to generate a recommendation.
+      </div>
+      <button id="prog-gen-btn" class="btn btn-primary" style="width:auto;padding:11px 32px;font-size:1rem;" onclick="generateProgression()">
+        &#9654;&nbsp; Analyze My Progression
+      </button>
+      {% else %}
+      <div class="empty-state" style="padding:16px 0 0;">
+        Log at least one run so the AI has data to work with.<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab('log')">Log a Run &rarr;</button>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Loading -->
+    <div id="prog-loading" style="display:none;" class="card">
+      <div style="text-align:center;padding:28px 0;">
+        <div class="prog-spinner"></div>
+        <div style="margin-top:14px;font-size:0.9rem;color:#888;">Running Q-learning analysis on your training data…</div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="prog-error" style="display:none;" class="card">
+      <p id="prog-error-msg" style="color:#c0392b;font-size:0.9rem;margin:0;"></p>
+    </div>
+
+    <!-- Results (built entirely by JS after fetch) -->
+    <div id="prog-results" style="display:none;">
+
+      <!-- Recommendation hero -->
+      <div class="card">
+        <h2>Next Recommended Workout</h2>
+        <div class="readiness-stat-row">
+          <div class="r-stat">
+            <div class="v" id="prog-dist" style="color:#27ae60;">—</div>
+            <div class="l">Distance</div>
+          </div>
+          <div class="r-stat">
+            <div class="v" id="prog-pace" style="color:#27ae60;">—</div>
+            <div class="l">Target Pace</div>
+          </div>
+          <div class="r-stat">
+            <div class="v" id="prog-terrain" style="color:#27ae60;text-transform:capitalize;">—</div>
+            <div class="l">Terrain</div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="score-label" style="width:120px;flex-shrink:0;">Confidence</span>
+            <div class="score-track" style="flex:1;">
+              <div id="prog-conf-bar" style="height:100%;border-radius:6px;background:#27ae60;width:0;transition:width 0.5s;"></div>
+            </div>
+            <span id="prog-conf-val" style="font-size:0.82rem;color:#666;width:36px;text-align:right;flex-shrink:0;"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="score-label" style="width:120px;flex-shrink:0;">Effort Trend</span>
+            <span id="prog-trend" style="font-size:0.95rem;font-weight:700;"></span>
+            <span id="prog-trend-icon" style="font-size:1rem;"></span>
+          </div>
+        </div>
+
+        <div class="reasoning-box" id="prog-reasoning" style="margin-top:16px;border-left-color:#27ae60;"></div>
+      </div>
+
+      <!-- Run history chart (distance + pace) -->
+      <div class="card">
+        <h2>Recent Runs</h2>
+        <p style="font-size:0.78rem;color:#aaa;margin:0 0 12px;">
+          Bars = distance, coloured by effort &nbsp;
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(39,174,96,0.8);border-radius:2px;"></span> positive &nbsp;
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(52,152,219,0.8);border-radius:2px;"></span> neutral &nbsp;
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(192,57,43,0.8);border-radius:2px;"></span> negative
+          &nbsp;|&nbsp; <span style="color:#e67e22;font-weight:700;">——</span> pace (right axis)
+        </p>
+        <canvas id="prog-run-chart" height="130"></canvas>
+      </div>
+
+      <!-- AI decision chart -->
+      <div class="card">
+        <h2>AI Decision Breakdown</h2>
+        <p style="font-size:0.78rem;color:#aaa;margin:0 0 12px;">
+          Each bar is a possible action (volume / intensity change). The <span style="color:#007bff;font-weight:700;">blue</span> bar is the chosen action.
+          Higher score = more preferred by the Q-learning model.
+        </p>
+        <canvas id="prog-q-chart" height="170"></canvas>
+      </div>
+
+      <!-- Training state -->
+      <div class="card">
+        <h2>Training State</h2>
+        <div class="ctx-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="ctx-item">
+            <div class="v" id="prog-weekly">—</div>
+            <div class="l">Weekly Mi</div>
+          </div>
+          <div class="ctx-item">
+            <div class="v" id="prog-adherence">—</div>
+            <div class="l">Adherence</div>
+          </div>
+          <div class="ctx-item">
+            <div class="v" id="prog-episodes">—</div>
+            <div class="l">Q-Episodes</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;font-size:0.82rem;color:#666;">
+          <strong style="color:#555;">MDP State: </strong>
+          <span id="prog-state-pills"></span>
+        </div>
+        <p style="font-size:0.72rem;color:#bbb;margin:10px 0 0;">
+          State = fitness tier · fatigue level · terrain streak · workout category · adherence tier
+        </p>
+      </div>
+
+      <div style="text-align:center;margin-bottom:24px;">
+        <button class="btn btn-gray" style="width:auto;padding:10px 28px;" onclick="generateProgression()">&#8635;&nbsp; Refresh Analysis</button>
+      </div>
+
+    </div><!-- /prog-results -->
+  </div>
+
+  <!-- ===== SAFETY CHECK TAB ===== -->
+  <div id="tab-safety" class="tab-content">
+    <div class="back-btn-row"><button class="back-btn" onclick="switchTab('overview')">&#8592; Overview</button></div>
+    <div class="card">
+      <h2>Workout Safety Validator <span style="font-size:0.72rem;font-weight:400;color:#aaa;margin-left:6px;">Module 1 · Propositional Logic</span></h2>
+
+      <h3 style="font-size:0.88rem;font-weight:700;color:#333;margin:0 0 12px;">Runner Profile</h3>
+      <div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;font-size:0.88rem;color:#555;margin-bottom:16px;">
+        <div><strong>Weekly Mileage:</strong> {{ profile.current_weekly_miles }} mi &nbsp;&middot;&nbsp; <strong>Available Terrain:</strong> {{ profile.available_terrain | join(", ") | title }}</div>
+        <div style="font-size:0.75rem;color:#aaa;margin-top:4px;">Rest days this week are computed automatically from your run history.</div>
+      </div>
+
+      <label class="field-label">Injuries (comma separated):</label>
+      <input type="text" id="sf-injuries" placeholder="e.g. shin splints, knee" style="margin-bottom:4px;" />
+      <div class="examples" style="margin-bottom:14px;">
+        Try: <span class="example-link" onclick="sfSetInjury('shin splints')">shin splints</span>
+             <span class="example-link" onclick="sfSetInjury('knee, achilles')">knee, achilles</span>
+             <span class="example-link" onclick="sfSetInjury('stress fracture')">stress fracture</span>
+             <span class="example-link" onclick="sfSetInjury('')">none</span>
+      </div>
+
+      <h3 style="font-size:0.88rem;font-weight:700;color:#333;margin:0 0 12px;">Proposed Workout</h3>
+
+      <label class="field-label">Type:</label>
+      <select id="sf-type">
+        <option value="easy run">Easy Run</option>
+        <option value="long run">Long Run</option>
+        <option value="tempo">Tempo</option>
+        <option value="intervals">Intervals</option>
+      </select>
+
+      <label class="field-label">Distance (miles):</label>
+      <input type="number" id="sf-distance" value="5" min="0.5" max="30" step="0.5" style="margin-bottom:4px;" />
+      <div class="examples" style="margin-bottom:14px;">
+        Try: <span class="example-link" onclick="sfSetDist(5)">5 mi</span>
+             <span class="example-link" onclick="sfSetDist(10)">10 mi</span>
+             <span class="example-link" onclick="sfSetDist(12)">12 mi</span>
+             <span class="example-link" onclick="sfSetDist(20)">20 mi</span>
+      </div>
+
+      <label class="field-label">Terrain:</label>
+      <select id="sf-terrain">
+        {% for t in profile.available_terrain %}
+        <option value="{{ t }}">{{ t | title }}</option>
+        {% endfor %}
+      </select>
+
+      <button class="btn btn-primary" type="button" onclick="checkSafety()">Validate</button>
+    </div>
+
+    <div id="safety-result" style="display:none;" class="card">
+      <h3 style="font-size:0.88rem;font-weight:700;color:#333;margin:0 0 14px;">Result:</h3>
+      <div id="safety-verdict" style="text-align:center;padding:14px 0 10px;"></div>
+      <div id="safety-reason" class="reasoning-box" style="margin-top:12px;"></div>
+      <div id="safety-alternative" style="display:none;margin-top:14px;">
+        <div style="font-size:0.75rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Suggested Alternative</div>
+        <div id="safety-alt-content" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 16px;font-size:0.88rem;color:#166534;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    let overviewScrollY = 0;
+
+    function switchTab(name) {
+      const current = document.querySelector('.tab-content.active');
+      if (current && current.id === 'tab-overview') overviewScrollY = window.scrollY;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+      history.replaceState(null,'','#'+name);
+      if (name === 'overview') {
+        requestAnimationFrame(() => window.scrollTo(0, overviewScrollY));
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    const hash = location.hash.replace('#','');
+    if (hash && document.getElementById('tab-' + hash)) switchTab(hash);
+
+    // Static bar fills (plan, readiness tabs)
+    document.querySelectorAll('.js-score-fill, .js-readiness-fill, .js-overview-bar').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+    const pf = document.getElementById('progressFill');
+    if (pf) pf.style.width = pf.dataset.pct + '%';
+
+    // ── Log Run tab ──────────────────────────────────────────────────────────
+    const examples = [
+      "Did my long run on the trail today, 10 miles at 9:30 pace. Felt pretty tired by mile 8 but the soft surface helped my shins.",
+      "Easy 4mi recovery jog on the road, about 8:45/mi. Felt great and relaxed.",
+      "Track workout: 6x800m, averaged 6:10 pace. Legs were cooked by the end.",
+    ];
+    function setExample(i) {
+      document.getElementById('run-text').value = examples[i];
+      document.getElementById('parse-preview').style.display = 'none';
+      document.getElementById('save-form').style.display = 'none';
+    }
+
+    async function parseRun() {
+      const text = document.getElementById('run-text').value.trim();
+      if (!text) return;
+      try {
+        const res = await fetch('/runlog/parse', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text}),
+        });
+        if (!res.ok) { alert('Could not parse run.'); return; }
+        const data = await res.json();
+        const r = data.result;
+        document.getElementById('prev-type').textContent = r.type ? r.type.charAt(0).toUpperCase()+r.type.slice(1) : '—';
+        document.getElementById('prev-dist').textContent = r.distance ? r.distance.toFixed(1)+' mi' : '—';
+        if (r.pace_minutes) {
+          const m = Math.floor(r.pace_minutes);
+          const s = Math.round((r.pace_minutes - m) * 60);
+          document.getElementById('prev-pace').textContent = m + ':' + String(s).padStart(2,'0') + ' /mi';
+        } else document.getElementById('prev-pace').textContent = '—';
+        document.getElementById('prev-terrain').textContent = r.terrain ? r.terrain.charAt(0).toUpperCase()+r.terrain.slice(1) : '—';
+        const sentEl = document.getElementById('prev-sent');
+        sentEl.textContent = r.sentiment ? r.sentiment.charAt(0).toUpperCase()+r.sentiment.slice(1) : '—';
+        sentEl.className = 'val sentiment-badge s-' + (r.sentiment || 'neutral');
+        document.getElementById('parse-preview').style.display = 'block';
+        document.getElementById('save-text').value = text;
+        document.getElementById('save-form').style.display = 'block';
+      } catch(e) { alert('Error: ' + e.message); }
+    }
+
+    // ── Adaptive Progression tab ─────────────────────────────────────────────
+    let _runChart = null, _qChart = null;
+
+    function fmtPace(p) {
+      const m = Math.floor(p);
+      const s = Math.round((p - m) * 60);
+      return m + ':' + String(s).padStart(2,'0') + ' /mi';
+    }
+
+    async function generateProgression() {
+      const btn      = document.getElementById('prog-gen-btn');
+      const loading  = document.getElementById('prog-loading');
+      const results  = document.getElementById('prog-results');
+      const errBox   = document.getElementById('prog-error');
+      const errMsg   = document.getElementById('prog-error-msg');
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Analyzing…'; }
+      loading.style.display = 'block';
+      results.style.display = 'none';
+      errBox.style.display  = 'none';
+
+      try {
+        const res  = await fetch('/user/{{ profile.slug }}/progression');
+        const data = await res.json();
+
+        if (!data.ok) {
+          errMsg.textContent    = data.error || 'Something went wrong.';
+          errBox.style.display  = 'block';
+          return;
+        }
+
+        renderProgression(data.progression, data.chart_data);
+        results.style.display = 'block';
+      } catch(e) {
+        errMsg.textContent   = 'Network error: ' + e.message;
+        errBox.style.display = 'block';
+      } finally {
+        loading.style.display = 'none';
+        if (btn) { btn.disabled = false; btn.innerHTML = '&#9654;&nbsp; Analyze My Progression'; }
+      }
+    }
+
+    function renderProgression(pg, cd) {
+      // Recommendation card
+      document.getElementById('prog-dist').textContent    = pg.next_distance.toFixed(1) + ' mi';
+      document.getElementById('prog-pace').textContent    = fmtPace(pg.target_pace);
+      document.getElementById('prog-terrain').textContent = pg.suggested_terrain.charAt(0).toUpperCase() + pg.suggested_terrain.slice(1);
+
+      const confPct = Math.round(pg.confidence * 100);
+      document.getElementById('prog-conf-val').textContent = confPct + '%';
+      document.getElementById('prog-conf-bar').style.width = confPct + '%';
+
+      const trendEl   = document.getElementById('prog-trend');
+      const trendIcon = document.getElementById('prog-trend-icon');
+      trendEl.textContent  = pg.sentiment_trend.charAt(0).toUpperCase() + pg.sentiment_trend.slice(1);
+      trendEl.className    = 'trend-' + pg.sentiment_trend;
+      trendIcon.textContent = pg.sentiment_trend === 'improving' ? '▲' : pg.sentiment_trend === 'declining' ? '▼' : '→';
+      trendIcon.className   = 'trend-' + pg.sentiment_trend;
+
+      document.getElementById('prog-reasoning').textContent = pg.reasoning;
+
+      // State card
+      document.getElementById('prog-weekly').textContent    = pg.weekly_miles.toFixed(1) + ' mi';
+      document.getElementById('prog-adherence').textContent = Math.round(pg.adherence_percent) + '%';
+      document.getElementById('prog-episodes').textContent  = pg.episode_count;
+
+      const pillsEl = document.getElementById('prog-state-pills');
+      pillsEl.innerHTML = (pg.state || []).map(s => `<span class="pill">${s}</span>`).join(' ');
+
+      // Charts
+      buildRunChart(cd);
+      buildQChart(pg.q_values);
+    }
+
+    function buildRunChart(cd) {
+      if (_runChart) _runChart.destroy();
+      const sentColor = s => s === 'positive' ? 'rgba(39,174,96,0.8)'
+                           : s === 'negative'  ? 'rgba(192,57,43,0.8)'
+                           : 'rgba(52,152,219,0.8)';
+      _runChart = new Chart(document.getElementById('prog-run-chart'), {
+        data: {
+          labels: cd.labels,
+          datasets: [
+            {
+              type: 'bar', label: 'Distance (mi)', data: cd.distances, yAxisID: 'y',
+              backgroundColor: cd.sentiments.map(sentColor), borderRadius: 5,
+            },
+            {
+              type: 'line', label: 'Pace (min/mi)', data: cd.paces, yAxisID: 'y2',
+              borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.06)',
+              pointBackgroundColor: '#e67e22', tension: 0.3, fill: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                afterBody: ctx => ctx[0] ? ['Effort: ' + cd.sentiments[ctx[0].dataIndex], 'Type: ' + (cd.types[ctx[0].dataIndex] || '—')] : [],
+              },
+            },
+          },
+          scales: {
+            y:  { title: { display: true, text: 'Distance (mi)' }, beginAtZero: true },
+            y2: {
+              title: { display: true, text: 'Pace (min/mi)' },
+              position: 'right',
+              reverse: true,
+              grid: { drawOnChartArea: false },
+            },
+          },
+        },
+      });
+    }
+
+    // ── Safety Check tab ─────────────────────────────────────────────────────
+    function sfSetInjury(val) { document.getElementById('sf-injuries').value = val; }
+    function sfSetDist(val)   { document.getElementById('sf-distance').value = val; }
+
+    async function checkSafety() {
+      const ignoredValues = ['no', 'none', 'n/a', 'na', 'nil', 'nope', 'nothing', ''];
+      const noInjuryPattern = /\b(no injur|don'?t have|have no|not injured|no issues|nothing wrong|injury.?free)\b/i;
+      const injuries = document.getElementById('sf-injuries').value
+        .split(',').map(s => s.trim())
+        .filter(s => s.length > 0 && !ignoredValues.includes(s.toLowerCase()) && !noInjuryPattern.test(s));
+
+      const body = {
+        injuries,
+        workout_type: document.getElementById('sf-type').value,
+        distance:     parseFloat(document.getElementById('sf-distance').value),
+        terrain:      document.getElementById('sf-terrain').value,
+      };
+
+      const resultEl = document.getElementById('safety-result');
+      resultEl.style.display = 'none';
+
+      try {
+        const res  = await fetch('/user/{{ profile.slug }}/safety', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          document.getElementById('safety-verdict').innerHTML = '<div style="color:#c0392b;font-weight:700;">Error: ' + (data.error || 'Something went wrong.') + '</div>';
+          document.getElementById('safety-reason').style.display = 'none';
+          document.getElementById('safety-alternative').style.display = 'none';
+          resultEl.style.display = 'block';
+          return;
+        }
+        const r = data.result;
+        const verdictEl = document.getElementById('safety-verdict');
+        const reasonEl  = document.getElementById('safety-reason');
+        if (r.safe) {
+          verdictEl.innerHTML = '<div style="font-size:2rem;color:#27ae60;">✓</div><div style="font-size:1.1rem;font-weight:700;color:#27ae60;margin-top:4px;">Safe to Run</div>';
+          reasonEl.style.borderLeftColor = '#27ae60';
+        } else {
+          verdictEl.innerHTML = '<div style="font-size:2rem;color:#c0392b;">⚠</div><div style="font-size:1.1rem;font-weight:700;color:#c0392b;margin-top:4px;">Not Recommended</div>';
+          reasonEl.style.borderLeftColor = '#c0392b';
+        }
+        reasonEl.textContent = r.reason || '';
+        reasonEl.style.display = r.reason ? 'block' : 'none';
+
+        const altBox     = document.getElementById('safety-alternative');
+        const altContent = document.getElementById('safety-alt-content');
+        if (r.alternative) {
+          const a = r.alternative;
+          const parts = [(a.type||'').replace(/\b\w/g,c=>c.toUpperCase())];
+          if (a.distance) parts.push(parseFloat(a.distance).toFixed(1) + ' mi');
+          if (a.terrain)  parts.push((a.terrain).replace(/\b\w/g,c=>c.toUpperCase()));
+          altContent.innerHTML = '<strong>' + parts.join(' &middot; ') + '</strong>'
+            + (a.reason ? '<br><span style="display:block;margin-top:4px;">' + a.reason + '</span>' : '');
+          altBox.style.display = 'block';
+        } else if (r.recommendation === 'rest') {
+          altContent.innerHTML = '<strong>Rest Day</strong> — Take a day off to recover.';
+          altBox.style.display = 'block';
+        } else {
+          altBox.style.display = 'none';
+        }
+        resultEl.style.display = 'block';
+      } catch(e) {
+        document.getElementById('safety-verdict').innerHTML = '<div style="color:#c0392b;font-weight:700;">Error: ' + e.message + '</div>';
+        resultEl.style.display = 'block';
+      }
+    }
+
+    // ── History delete ────────────────────────────────────────────────────────
+    async function deleteRun(index, btn) {
+      if (!confirm('Remove this run from your history?')) return;
+      btn.disabled = true;
+      btn.textContent = '…';
+      try {
+        const res = await fetch('/user/{{ profile.slug }}/runlog/' + index, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.ok) { alert(data.error || 'Could not delete run.'); btn.disabled = false; btn.textContent = 'Remove'; return; }
+        const item = btn.closest('.history-item');
+        item.remove();
+        // Re-index remaining buttons so subsequent deletes hit the right index
+        document.querySelectorAll('#history-list .history-item').forEach((el, i) => {
+          el.dataset.runIndex = i;
+          el.querySelector('.btn-delete-run').dataset.index = i;
+        });
+        const countEl = document.getElementById('history-count');
+        if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
+        if (!document.querySelector('#history-list .history-item')) {
+          document.getElementById('history-list').innerHTML =
+            '<div class="empty-state">No runs logged yet.<br><br>' +
+            '<button class="btn btn-primary" style="width:auto;padding:10px 24px;" onclick="switchTab(\'log\')">Log Your First Run &rarr;</button></div>';
+        }
+      } catch(e) { alert('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Remove'; }
+    }
+
+    function buildQChart(qValues) {
+      if (!qValues) return;
+      if (_qChart) _qChart.destroy();
+      const labels = Object.keys(qValues);
+      const vals   = Object.values(qValues);
+      const maxVal = Math.max(...vals);
+      _qChart = new Chart(document.getElementById('prog-q-chart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: vals,
+            backgroundColor: vals.map(v => v === maxVal ? 'rgba(0,123,255,0.85)' : 'rgba(108,117,125,0.35)'),
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' Q-value: ' + ctx.raw.toFixed(4) } },
+          },
+          scales: {
+            x: { title: { display: true, text: 'Q-value (higher = preferred)' } },
+            y: { ticks: { font: { size: 11 } } },
+          },
+        },
+      });
+    }
+  </script>
+  <div id="week-hover-tooltip"></div>
+</body>
+</html>

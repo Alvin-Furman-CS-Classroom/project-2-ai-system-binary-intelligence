@@ -151,7 +151,6 @@ Current generate_row formula (synthetic_data.py) — calibrated from real data:
         + 7.383 * avg_training_pace_min_per_mile   # column in CSV / learner input
         - 2.4   * longest_run_miles
         - 4.0   * num_runs_20_plus
-        + 0.12  * goal_time_minutes
     )
     + experience offset (+8 beginner, -6 advanced)
     + Normal(0, 14) noise

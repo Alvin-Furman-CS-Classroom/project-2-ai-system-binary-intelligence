@@ -36,7 +36,6 @@ def _feature_vector(validated: dict[str, Any]) -> np.ndarray:
     )
     row = {
         "age": validated["age"],
-        "goal_time_minutes": validated["goal_time_minutes"],
         "goal_distance_km": validated["goal_distance_km"],
         "experience_encoded": exp_enc,
         "race_terrain_encoded": _terrain_encoding(validated["race_terrain"]),

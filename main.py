@@ -8,11 +8,13 @@ from routers.runlog import router as runlog_router
 from routers.motivation_selector_route import router as motivation_router
 from routers.adaptive_progression_route import router as adaptive_router
 from routers.race_predictor_route import router as race_router
+from routers.profile_route import router as profile_router
 
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+app.include_router(profile_router)
 app.include_router(plans_router)
 app.include_router(safety_validator_router)
 app.include_router(runlog_router)
@@ -27,3 +29,7 @@ async def not_found_handler(request: Request, _exc: HTTPException):
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/demo", response_class=HTMLResponse)
+def demo(request: Request):
+    return templates.TemplateResponse("demo.html", {"request": request})

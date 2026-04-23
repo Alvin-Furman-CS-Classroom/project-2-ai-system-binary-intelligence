@@ -6,6 +6,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 from src.module6_race_predictor.predictor import predict_race_readiness
+from src.module6_race_predictor.charts import make_interval_chart_b64
 
 templates = Jinja2Templates(directory="templates")
 
@@ -196,7 +197,28 @@ def handle_custom(request: Request, form_data: dict):
 
     result = predict_race_readiness(snapshot, auto_train=True)
 
+    # Parse goal time to minutes for the chart
+    def _parse_goal(t: str) -> float | None:
+        try:
+            parts = [float(p) for p in t.split(":")]
+            if len(parts) == 3:
+                return parts[0] * 60 + parts[1] + parts[2] / 60
+            if len(parts) == 2:
+                return parts[0] * 60 + parts[1]
+        except Exception:
+            pass
+        return None
+
+    goal_min = _parse_goal(target_time)
+    interval_chart = make_interval_chart_b64(
+        pred_min=result["predicted_finish_minutes"],
+        lo_min=result["confidence_interval_minutes"][0],
+        hi_min=result["confidence_interval_minutes"][1],
+        goal_min=goal_min,
+    )
+
     return templates.TemplateResponse(
         "race_result.html",
-        {"request": request, "snapshot": snapshot, "result": result},
+        {"request": request, "snapshot": snapshot, "result": result,
+         "interval_chart": interval_chart},
     )

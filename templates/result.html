@@ -95,8 +95,47 @@
     </div>
 
     {% if result.plan %}
-    <h2>Weekly Plan Breakdown</h2>
-    <table>
+    <h2>Weekly Mileage by Date</h2>
+    <div class="summary">
+      <canvas id="milesChart" height="100"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const labels = [{% for week in result.plan %}"{{ week.week_start_date }}"{% if not loop.last %},{% endif %}{% endfor %}];
+      const miles  = [{% for week in result.plan %}{{ "%.1f"|format(week.total_miles) }}{% if not loop.last %},{% endif %}{% endfor %}];
+      new Chart(document.getElementById("milesChart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Weekly Miles",
+            data: miles,
+            borderColor: "#007bff",
+            backgroundColor: "rgba(0,123,255,0.1)",
+            pointBackgroundColor: "#007bff",
+            tension: 0.3,
+            fill: true,
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { title: { display: true, text: "Week Starting" } },
+            y: { title: { display: true, text: "Miles" }, beginAtZero: true }
+          }
+        }
+      });
+    </script>
+    {% endif %}
+
+    {% if result.plan %}
+    <h2 style="display:flex;align-items:center;justify-content:space-between;">
+      Weekly Plan Breakdown
+      <button onclick="const t=document.getElementById('planTable');const s=document.getElementById('tableToggle');const shown=t.style.display!=='none';t.style.display=shown?'none':'table';s.textContent=shown?'Show':'Hide';"
+              id="tableToggle"
+              style="font-size:0.8rem;padding:4px 14px;background:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;">Hide</button>
+    </h2>
+    <table id="planTable">
       <thead>
         <tr>
           <th>Week</th>
@@ -128,6 +167,168 @@
     </table>
     {% endif %}
 
+    <h2>Training Calendar</h2>
+    <style>
+      .cal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 12px 20px;
+        margin-bottom: 12px;
+      }
+      .cal-nav button {
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 16px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .cal-nav button:disabled { background: #ccc; cursor: default; }
+      .cal-nav h3 { margin: 0; color: #333; font-size: 1.1rem; }
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+      }
+      .cal-header-row {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin-bottom: 4px;
+      }
+      .cal-header-cell {
+        text-align: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 0;
+      }
+      .cal-day {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        padding: 8px 6px;
+        min-height: 80px;
+      }
+      .cal-day.empty { background: transparent; box-shadow: none; }
+      .cal-day.has-workout { background: #eef5ff; }
+      .cal-day-num {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #333;
+      }
+      .cal-badge {
+        margin-top: 5px;
+        font-size: 0.66rem;
+        font-weight: 600;
+        padding: 2px 5px;
+        border-radius: 4px;
+        line-height: 1.4;
+        display: block;
+      }
+      .badge-easy     { background: #d4edda; color: #155724; }
+      .badge-long     { background: #cce5ff; color: #004085; }
+      .badge-tempo    { background: #fff3cd; color: #856404; }
+      .badge-interval { background: #f8d7da; color: #721c24; }
+      .badge-rest     { background: #e2e3e5; color: #383d41; }
+      .badge-other    { background: #e2cfff; color: #4b0082; }
+    </style>
+
+    {% if result.plan %}
+    <div class="cal-nav">
+      <button id="calPrev" onclick="changeMonth(-1)">&#8249;</button>
+      <h3 id="calTitle"></h3>
+      <button id="calNext" onclick="changeMonth(1)">&#8250;</button>
+    </div>
+    <div class="cal-header-row">
+      <div class="cal-header-cell">Mon</div>
+      <div class="cal-header-cell">Tue</div>
+      <div class="cal-header-cell">Wed</div>
+      <div class="cal-header-cell">Thu</div>
+      <div class="cal-header-cell">Fri</div>
+      <div class="cal-header-cell">Sat</div>
+      <div class="cal-header-cell">Sun</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+
+    <script>
+      const workoutMap = {};
+      const planData = {{ result.plan | tojson }};
+      planData.forEach(week => {
+        (week.workouts || []).forEach(w => {
+          if (w.workout_date) {
+            if (!workoutMap[w.workout_date]) workoutMap[w.workout_date] = [];
+            workoutMap[w.workout_date].push(w);
+          }
+        });
+      });
+
+      const months = [...new Set(
+        Object.keys(workoutMap).map(d => d.slice(0, 7))
+      )].sort();
+      let idx = 0;
+
+      function badgeClass(type) {
+        const t = (type || '').toLowerCase();
+        if (t.includes('easy'))     return 'badge-easy';
+        if (t.includes('long'))     return 'badge-long';
+        if (t.includes('tempo'))    return 'badge-tempo';
+        if (t.includes('interval') || t.includes('speed')) return 'badge-interval';
+        if (t.includes('rest'))     return 'badge-rest';
+        return 'badge-other';
+      }
+
+      function renderMonth() {
+        const [year, month] = months[idx].split('-').map(Number);
+        document.getElementById('calTitle').textContent =
+          new Date(year, month - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+        document.getElementById('calPrev').disabled = idx === 0;
+        document.getElementById('calNext').disabled = idx === months.length - 1;
+
+        const firstDay = new Date(year, month - 1, 1);
+        const totalDays = new Date(year, month, 0).getDate();
+        const startOffset = (firstDay.getDay() + 6) % 7; // Monday=0
+
+        let html = '';
+        for (let i = 0; i < startOffset; i++) html += '<div class="cal-day empty"></div>';
+
+        for (let d = 1; d <= totalDays; d++) {
+          const iso = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          const workouts = workoutMap[iso] || [];
+          html += `<div class="cal-day${workouts.length ? ' has-workout' : ''}">`;
+          html += `<div class="cal-day-num">${d}</div>`;
+          workouts.forEach(w => {
+            html += `<span class="cal-badge ${badgeClass(w.type)}">${w.type.replace(/\b\w/g,c=>c.toUpperCase())}<br>${parseFloat(w.distance).toFixed(1)} mi</span>`;
+          });
+          html += '</div>';
+        }
+
+        const totalCells = startOffset + totalDays;
+        const remainder = totalCells % 7;
+        if (remainder) for (let i = 0; i < 7 - remainder; i++) html += '<div class="cal-day empty"></div>';
+
+        document.getElementById('calGrid').innerHTML = html;
+      }
+
+      function changeMonth(dir) {
+        idx = Math.max(0, Math.min(months.length - 1, idx + dir));
+        renderMonth();
+      }
+
+      if (months.length) renderMonth();
+    </script>
+    {% endif %}
+
+    {% if result.profile_slug %}
+    <a href="/user/{{ result.profile_slug }}#plan" class="back-link" style="background:#28a745;margin-right:10px;">View in Profile &rarr;</a>
+    {% endif %}
     <a href="/plans" class="back-link">Create Another Plan</a>
   </body>
 </html>

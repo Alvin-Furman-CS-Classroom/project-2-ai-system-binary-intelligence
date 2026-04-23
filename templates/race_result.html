@@ -120,14 +120,14 @@
   </div>
 
   <p class="section-title">Prediction</p>
-  <div class="stat-row">
-    <div class="stat">
+  <div class="card" style="padding: 18px 20px 14px;">
+    <img src="{{ interval_chart }}" alt="95% prediction interval chart"
+         style="width:100%; max-width:560px; display:block; margin:0 auto;" />
+  </div>
+  <div class="stat-row" style="margin-top:10px;">
+    <div class="stat" style="grid-column: span 2;">
       <div class="val">{{ result.predicted_finish }}</div>
       <div class="lbl">Predicted finish</div>
-    </div>
-    <div class="stat">
-      <div class="val-sm">{{ result.confidence_interval[0] }}<br>– {{ result.confidence_interval[1] }}</div>
-      <div class="lbl">95% interval</div>
     </div>
     <div class="stat">
       <div class="val">{{ (result.readiness_score * 100) | round | int }}%</div>

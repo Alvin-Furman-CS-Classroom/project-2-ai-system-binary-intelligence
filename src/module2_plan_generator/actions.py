@@ -83,28 +83,53 @@ _INTERMEDIATE_TEMPLATES: dict[int, list[list[tuple[str, float]]]] = {
     ],
     2: [
         [("tempo", 0.45), ("long run", 0.55)],
+        [("intervals", 0.42), ("long run", 0.58)],
         [("easy run", 0.40), ("long run", 0.60)],
     ],
     3: [
         [("easy run", 0.30), ("tempo", 0.30), ("long run", 0.40)],
+        [("easy run", 0.30), ("intervals", 0.28), ("long run", 0.42)],
+        [("recovery run", 0.28), ("tempo", 0.28), ("long run", 0.44)],
     ],
     4: [
+        # Cycle 0 – Tempo week
         [("easy run", 0.25), ("tempo", 0.20), ("easy run", 0.20), ("long run", 0.35)],
+        # Cycle 1 – Interval week
         [("easy run", 0.20), ("intervals", 0.20), ("easy run", 0.25), ("long run", 0.35)],
+        # Cycle 2 – Tempo + recovery week
+        [("easy run", 0.22), ("tempo", 0.20), ("recovery run", 0.15), ("long run", 0.43)],
+        # Cycle 3 – Recovery week (aligns with every-4th cutback)
+        [("recovery run", 0.20), ("easy run", 0.22), ("easy run", 0.18), ("long run", 0.40)],
     ],
     5: [
+        # Cycle 0 – Tempo week
         [("easy run", 0.20), ("tempo", 0.18), ("easy run", 0.15),
          ("easy run", 0.17), ("long run", 0.30)],
+        # Cycle 1 – Interval week
         [("easy run", 0.20), ("easy run", 0.15), ("intervals", 0.18),
          ("easy run", 0.17), ("long run", 0.30)],
+        # Cycle 2 – Tempo + recovery week
+        [("easy run", 0.18), ("tempo", 0.18), ("easy run", 0.14),
+         ("recovery run", 0.12), ("long run", 0.38)],
+        # Cycle 3 – Recovery week (aligns with every-4th cutback)
+        [("recovery run", 0.18), ("easy run", 0.18), ("easy run", 0.14),
+         ("recovery run", 0.12), ("long run", 0.38)],
     ],
     6: [
         [("easy run", 0.15), ("tempo", 0.15), ("easy run", 0.15),
          ("recovery run", 0.10), ("easy run", 0.15), ("long run", 0.30)],
+        [("easy run", 0.15), ("easy run", 0.12), ("intervals", 0.15),
+         ("recovery run", 0.10), ("easy run", 0.18), ("long run", 0.30)],
+        [("easy run", 0.14), ("tempo", 0.15), ("easy run", 0.13),
+         ("recovery run", 0.10), ("easy run", 0.16), ("long run", 0.32)],
     ],
     7: [
         [("easy run", 0.14), ("tempo", 0.14), ("easy run", 0.12),
          ("recovery run", 0.10), ("intervals", 0.14), ("easy run", 0.12), ("long run", 0.24)],
+        [("easy run", 0.13), ("intervals", 0.13), ("easy run", 0.12),
+         ("recovery run", 0.10), ("easy run", 0.14), ("tempo", 0.13), ("long run", 0.25)],
+        [("recovery run", 0.12), ("easy run", 0.13), ("intervals", 0.13),
+         ("easy run", 0.11), ("recovery run", 0.10), ("easy run", 0.14), ("long run", 0.27)],
     ],
 }
 
@@ -256,16 +281,22 @@ def generate_week_candidates(state: TrainingState) -> list[tuple[tuple[dict, ...
     if not templates:
         return []
 
+    # Cycle through templates by week so each week gets a different workout
+    # structure (tempo → intervals → tempo+recovery → recovery → repeat).
+    # A* still optimises mileage and terrain freely within the selected template.
+    template_idx = (week_index - 1) % len(templates)
+    selected_templates = [templates[template_idx]]
+
     # Get target mileage options.
     mileage_targets = _compute_target_miles(state, week_index)
 
     # Get terrain assignment options.
     terrain_assignments = _assign_terrains(days, state.available_terrain)
 
-    # Combine templates x mileages x terrains.
+    # Combine selected template x mileages x terrains.
     candidates: list[tuple[tuple[dict, ...], float]] = []
 
-    for template in templates:
+    for template in selected_templates:
         for target_miles in mileage_targets:
             for terrains in terrain_assignments:
                 workouts = _build_workouts(template, target_miles, terrains)

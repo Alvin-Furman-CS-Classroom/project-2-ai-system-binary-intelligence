@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <title>Profiles – Long Run</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 50px auto; padding: 20px; background: #f5f5f5; color: #333; }
+    h1 { margin-bottom: 4px; }
+    .sub { color: #888; font-size: 0.9rem; margin-bottom: 28px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .card {
+      background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 20px; text-decoration: none; color: inherit;
+      transition: box-shadow 0.2s, transform 0.2s; display: block;
+    }
+    .card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.15); transform: translateY(-3px); }
+    .card h2 { margin: 0 0 6px; font-size: 1.05rem; }
+    .card p { margin: 0; font-size: 0.82rem; color: #888; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; background: #e8f0fe; color: #1a73e8; font-size: 0.75rem; margin-top: 8px; }
+    .new-btn {
+      display: inline-block; margin-bottom: 24px; padding: 10px 20px;
+      background: #007bff; color: white; border-radius: 6px; text-decoration: none; font-size: 0.95rem;
+    }
+    .new-btn:hover { background: #0056b3; }
+    .empty { color: #aaa; text-align: center; padding: 40px; }
+    .back { display: inline-block; margin-top: 20px; color: #888; font-size: 0.85rem; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Runner Profiles</h1>
+  <p class="sub">Select a profile to generate a training plan.</p>
+  <a class="new-btn" href="/profile/new">+ New Profile</a>
+
+  {% if profiles %}
+  <div class="grid">
+    {% for p in profiles %}
+    <a class="card" href="/user/{{ p.slug }}">
+      <h2>{{ p.name }}</h2>
+      <p>{{ p.experience | title }} &mdash; {{ p.current_weekly_miles }} mi/week</p>
+      {% if p.active_plan %}
+      <span class="pill">Plan: {{ p.active_plan.race_type }}</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No profiles yet. <a href="/profile/new">Create one →</a></div>
+  {% endif %}
+
+  <br><a class="back" href="/">← Home</a>
+</body>
+</html>

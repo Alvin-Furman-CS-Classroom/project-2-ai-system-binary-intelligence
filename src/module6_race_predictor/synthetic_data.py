@@ -295,12 +295,8 @@ def generate_row(rng: np.random.Generator) -> dict[str, float]:
     # Step 2: scale to actual race distance and add terrain offset.
     scaled_estimate = marathon_base * distance_factor + TERRAIN_FINISH_OFFSETS[rt_name]
 
-    # Step 3: blend with goal time (already in the right units for this distance).
-    # Shorter races: goal time is a stronger predictor — runners know their 5K pace well.
-    goal_blend = 0.45 + 0.30 * (1.0 - distance_factor)
-    base = goal_blend * goal_time_minutes + (1.0 - goal_blend) * scaled_estimate
-
-    # Step 4: scale noise by distance so a 5K has ~1-2 min spread, marathon ~14 min.
+    # Step 3: scale noise by distance so a 5K has ~1-2 min spread, marathon ~14 min.
+    base = scaled_estimate
     noise = float(rng.normal(0, SYNTHETIC_FINISH_NOISE_STD * distance_factor))
 
     # Distance-appropriate clip: ~2.5 min/km fast end, ~12 min/km slow end.

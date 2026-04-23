@@ -43,7 +43,7 @@ PENALTY_TEN_PERCENT_RULE = 10           # Used by check_ten_percent_rule (interm
 # Workout type classifications
 # ---------------------------------------------------------------------------
 
-HARD_WORKOUT_TYPES = {"long run", "tempo", "intervals", "race pace"}
+HARD_WORKOUT_TYPES = {"long run", "tempo", "intervals", "race pace", "hill workout"}
 EASY_WORKOUT_TYPES = {"easy run", "recovery run"}
 
 
